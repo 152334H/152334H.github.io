@@ -1,0 +1,224 @@
+baseURL = "https://152334H.github.io/"
+theme = "LoveIt"
+title = "152334H"
+languageCode = "en"
+languageName = "English"
+paginate = 5
+
+googleAnalytics = "G-W0STJ4D3N3"
+
+enableRobotsTXT = true
+enableGitInfo = true
+enableEmoji = true
+
+[author]
+  name = "152334H"
+  email = ""
+  link = "https://152334H.github.io/"
+
+# Menu config
+[menu]
+  [[menu.main]]
+    weight = 1
+    identifier = "posts"
+    # you can add extra information before the name (HTML format is supported), such as icons
+    pre = ""
+    post = ""
+    name = "All Posts"
+    url = "/posts/"
+    # title will be shown when you hover on this menu link
+    title = ""
+  [[menu.main]]
+    weight = 2
+    identifier = "tags"
+    pre = ""
+    post = ""
+    name = "Tags"
+    url = "/tags/"
+    title = ""
+  [[menu.main]]
+    weight = 3
+    identifier = "categories"
+    pre = ""
+    post = ""
+    name = "Categories"
+    url = "/categories/"
+    title = ""
+  [[menu.main]]
+    weight = 5
+    identifier = "about"
+    # bold this
+    pre = "<b>"
+    post = "</b>"
+    name = "About"
+    url = "/about/"
+    title = ""
+
+[params]
+  env = "production"
+  defaultTheme = "dark"
+  gitRepo = "https://github.com/152334H/blog"
+  dateFormat = "January 2, 2006"
+  title = "152334H"
+  description = "152334H Personal Blog"
+  images = ["/undefined.png"]
+  [params.header]
+    # behaviour of header toolbar
+    desktopMode = "fixed"
+    mobileMode = "auto"
+    [params.header.title]
+    logo = "" #TBD
+    name = "Simple Thoughts"
+    pre = ""
+    post = ""
+    typeit = false # optional animation
+  [params.footer]
+    enable = true
+    custom = ""
+    hugo = false
+    copyright = true
+    author = true
+    since = 2022
+  [params.section] # aka ALL posts page config
+    paginate = 10
+    dateFormat = "January 2, 2006"
+    rss = 10
+  [params.list] # category or tag list
+    paginate = 10
+    dateFormat = "January 2, 2006"
+    rss = 10
+  [params.search]
+    enable = true
+    type = "lunr"
+    contentLength = 4000
+    placeholder = "Search..."
+    maxResultLength = 10
+    snippetLength = 30
+    highlightTag = "em"
+    absoluteURL = false
+  [params.home]
+    rss = 10
+    [params.home.profile]
+      enable = true
+      avatarURL = "/images/github_pfp.png"
+      title = "152334H"
+      subtitle = "the retired pwn guy"
+      typeit = true
+      social = true
+    [params.home.posts]
+      enable = true
+      paginate = 5
+  [params.social]
+    Github = "152334H"
+    Linkedin = "sherman-chann-385ab71a7"
+    RSS = "/index.xml"
+  [params.page] # config for all pages (?)
+    hiddenFromHomePage = false
+    hiddenFromSearch = false
+    twemoji = true # These are :thing: emojis
+    lightgallery = false # As far as I can tell, lightgallery is enabled even when this is false.
+    fraction = false # Display fractions with `[numer]/[denom]`. Don't need them right now
+    fontawesome = false # these are too complex for me to use, in all likelihood
+    [params.page.toc]
+      enable = true
+      keepStatic = true # TBD
+      auto = true # TBD
+    [params.page.code]
+      copy = true
+      maxShownLines = 10
+    [params.page.math]
+      enable = true
+    [params.page.share]
+      enable = true
+      Twitter = true
+      Linkedin = true
+      HackerNews = true
+      Reddit = true
+    [params.page.comment]
+      enable = true
+      [params.page.comment.giscus]
+        enable = true
+        repo = "152334H/blog"
+        repoId = "R_kgDOH03r2w"
+        category = "Announcements"
+        categoryId = "DIC_kwDOH03r284CQ2Tu"
+        # automatically adapt the current theme i18n configuration when empty
+        lang = ""
+        mapping = "pathname"
+        reactionsEnabled = "1"
+        emitMetadata = "0"
+        inputPosition = "bottom"
+        lazyLoading = false
+        lightTheme = "light"
+        darkTheme = "dark_dimmed"
+#   [params.page.library]
+#   [params.page.seo]
+
+  [params.typeit]
+    speed = 100
+    cursorSpeed = 1000
+    cursorChar = "|"
+    duration = 5000 # "time (in ms) until cursor reset". This doesn't actually work because of a bug in theme.js:initTypeIt()
+  [params.verification]
+    google = ""
+    bing = ""
+    yandex = ""
+# [params.seo]
+#   thumbnailUrl 
+  [params.analytics]
+    enable = true
+    [params.analytics.google]
+      id = "G-W0STJ4D3N3"
+      anonymizeIP = true
+  [params.cookieconsent]
+    enable = false
+    [params.cookieconsent.content]
+      message = "This site uses Google Analytics."
+      dismiss = "Allow cookies"
+      link = "What are cookies?"
+# [params.cdn]
+  [params.compatibility] # goodbye IE
+    polyfill = false
+    objectFit = false
+
+[markup]
+  [markup.highlight]
+    codeFences = true
+    guessSyntax = true
+    lineNos = true
+    lineNumbersInTable = true
+    # false is a necessary configuration (https://github.com/dillonzq/LoveIt/issues/158)
+    noClasses = false
+  # Goldmark is from Hugo 0.60 the default library used for Markdown
+  [markup.goldmark]
+    [markup.goldmark.extensions]
+      definitionList = true
+      footnote = true
+      linkify = true
+      strikethrough = true
+      table = true
+      taskList = true
+      typographer = true
+    [markup.goldmark.renderer]
+      # whether to use HTML tags directly in the document
+      unsafe = true
+  # Table Of Contents settings
+  [markup.tableOfContents]
+    startLevel = 2
+    endLevel = 6
+
+[sitemap]
+  changefreq = "weekly"
+  filename = "sitemap.xml"
+  priority = 0.5 # no idea what this does
+
+[permalinks]
+  posts = "blog/:filename"
+
+[outputs]
+  home = ["HTML", "RSS", "JSON"]
+  page = ["HTML"]
+  section = ["HTML", "RSS"]
+  taxonomy = ["HTML", "RSS"]
+  taxonomyTerm = ["HTML"]
+

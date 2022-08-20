@@ -1,7 +1,7 @@
 dev.sh
 new.sh
 edit.sh
-config.toml
+config_DEV.toml
 public/
 .hugo_build.lock
 
