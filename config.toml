@@ -127,7 +127,7 @@ enableEmoji = true
       copy = true
       maxShownLines = 10
     [params.page.math]
-      enable = true
+      enable = false # Only enable this if you don't care about page speed.
     [params.page.share]
       enable = true
       Twitter = true
