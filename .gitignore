@@ -2,3 +2,7 @@ dev.sh
 new.sh
 edit.sh
 config.toml
+public/
+.hugo_build.lock
+
+resources/
