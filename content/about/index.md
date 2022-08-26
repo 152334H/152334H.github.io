@@ -45,7 +45,7 @@ They indicate, roughly speaking, what technologies I used for a specific project
 
 You're looking at it!
 
-This blog is hosted by [Github Pages](pages.github.com). I upload the source files for this blog (developed in [Hugo](https://gohugo.io/documentation/)) to [a repository](https://github.com/152334H/blog), triggering a [Github Action](TODO) that compiles everything into a bundle minified HTML/CSS/JS. This produces the static page you're reading right now.
+This blog is hosted by [Github Pages](pages.github.com). I upload the source files for this blog (developed in [Hugo](https://gohugo.io/documentation/)) to [a repository](https://github.com/152334H/blog), triggering a [Github Action](/TODO) that compiles everything into a bundle minified HTML/CSS/JS. This produces the static page you're reading right now.
 
 Previously, I used [Jekyll](https://jekyllrb.com/docs/github-pages/) (instead of Hugo), but there were many unfortunate problems with that setup. [More on that here](/blog/Blog-refurbishment).
 
@@ -92,7 +92,7 @@ I was personally responsible for:
 * Challenge development: I made the most number of challenges, tested even more of them, and did my best to simplify/balance them in favour of the participants. I also handled the hosting/testing for most remote challenge microservices.
 * QA/Admin details: CTF Platform testing, Discord announcements/organisation, post-event cleanup && writeup collection.
 
-It takes a lot more than that to run a CTF, but I'll leave that information to [a future post](TODO).
+It takes a lot more than that to run a CTF, but I'll leave that information to [a future post](/TODO).
 
 <sup>1</sup> - 1.0 was a school event, 2.0 was nominally public but primarily catered to a few schools.
 
@@ -138,7 +138,7 @@ I used to be _very_ active in the CTF scene. My old [CTFTime profile](https://ct
 * 3rd in DSO-NUS CTF 2021
 * 1st in CTF.SG CTF 2021
 
-[I am no longer a CTF player](/TODO/Future_blog_post). I'm happy to assist juniors/newcomers in learning the fundamentals, but I'm effectively retired from the local cadre of CTF professionals.
+[I am no longer a CTF player](/TODO). I'm happy to assist juniors/newcomers in learning the fundamentals, but I'm effectively retired from the local cadre of CTF professionals.
 
 ### Advent of Code
 {{< icon name=gnubash title="For a CLI utility to interact with Advent of Code's API." >}}
@@ -146,7 +146,7 @@ I used to be _very_ active in the CTF scene. My old [CTFTime profile](https://ct
 {{< icon javascript >}}
 {{< icon c >}}
 
-[Advent of Code](https://adventofcode.com) was my introduction to the world of programming puzzles. My secondary school didn't offer much in the way of programming (beyond the [regrettable](/TODO/Future_post_link) _Hello World_ tutorials), and I might not have become the programmer I am today without Eric Wastl's work.
+[Advent of Code](https://adventofcode.com) was my introduction to the world of programming puzzles. My secondary school didn't offer much in the way of programming (beyond the [regrettable](/TODO) _Hello World_ tutorials), and I might not have become the programmer I am today without Eric Wastl's work.
 
 | Year | Points (global) | Languages |
 |---|---|---|
