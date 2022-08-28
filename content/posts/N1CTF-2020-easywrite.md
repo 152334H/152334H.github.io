@@ -5,7 +5,6 @@ author: "152334H"
 
 lastmod:   2020-10-19 13:49:27 +0800
 
-weight: 50
 draft: false
 subtitle: "Yet another FILE* walkthrough"
 description: "Yet another FILE* walkthrough"
