@@ -138,7 +138,7 @@ enableEmoji = true
       enable = true
       [params.page.comment.giscus]
         enable = true
-        repo = "152334H/blog"
+        repo = "152334H/152334h.github.io"
         repoId = "R_kgDOH03r2w"
         category = "Announcements"
         categoryId = "DIC_kwDOH03r284CQ2Tu"
