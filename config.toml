@@ -11,6 +11,8 @@ enableRobotsTXT = true
 enableGitInfo = true
 enableEmoji = true
 
+buildFuture = true # enable for development. on the repo, posts will only be committed on time.
+
 [author]
   name = "152334H"
   email = ""
