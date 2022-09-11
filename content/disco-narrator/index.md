@@ -5,7 +5,6 @@ author: "152334H"
 
 lastmod: 2022-09-11T:00:00+01:00
 
-draft: true
 subtitle: "Status: <i>In progress</i>"
 tags: [ machine learning, Disco Elysium, WIP, series ]
 categories: [ "not a post" ]

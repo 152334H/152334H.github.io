@@ -5,7 +5,6 @@ author: "152334H"
 
 lastmod: 2022-09-11T00:00:00+01:00
 
-draft: true
 subtitle: "Part 1/4 of a <a href=/disco-narrator>series</a>"
 description: ""
 tags: [ Disco Elysium, reverse engineering, part of a series, WIP ]
