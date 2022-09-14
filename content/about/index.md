@@ -39,7 +39,7 @@ They indicate, roughly speaking, what technologies I used for a specific project
 ### This blog
 
 {{< icon hugo "https://github.com/gohugoio/hugo" >}}
-{{< icon name=github url="https://pages.github.com" title="The Github Pages logo looks really bad compared to this one.">}}
+{{< icon name=github url="https://pages.github.com" title="The Github Pages logo looks really bad compared to this one." >}}
 {{< icon name=obsidian url="https://obsidian.md" title="For first drafts" >}}
 {{< icon name=neovim url="https://neovim.io/" title="For final posts, as well as future changes." >}}
 
@@ -50,6 +50,19 @@ This blog is hosted by [Github Pages](pages.github.com). I upload the source fil
 Previously, I used [Jekyll](https://jekyllrb.com/docs/github-pages/) (instead of Hugo), but there were many unfortunate problems with that setup. [More on that here](/blog/Blog-refurbishment).
 
 I use [Obsidian](https://obsidian.md) to draft out posts, before settling the post metadata && final checks in neovim while running `hugo server -D`. This isn't the greatest workflow, and I'm working on a file sync system to smoothen the process.
+
+### Disco Narrator
+{{< icon name=pandas url="https://pandas.pydata.org/" title="Dataset creation" >}}
+{{< icon name=googlecolab url="https://colab.research.google.com" title="Used for GPU resources in training models" >}}
+{{< icon name=pytorchlightning url="https://github.com/NVIDIA/NeMo" title="NeMo's TalkNet implementation." >}}
+{{< icon name=flask url="https://palletsprojects.com/p/flask/" title="Backend routing. Also: uwsgi" >}}
+{{< icon python >}}
+{{< icon name=javascript title="I used vanilla HTML/CSS/JS for the frontend as an exercise" >}}
+{{< icon name=html5 title="I used vanilla HTML/CSS/JS for the frontend as an exercise" >}}
+{{< icon name=github url="https://github.com/SortAnon/ControllableTalkNet" title="Fork of this linked project" >}}
+
+A simple web app ([demo](https://test.disco-narrator.xyz)) that uses AI to emulate the voices of a few video game characters. Forked from the [Controllable TalkNet](https://github.com/SortAnon/ControllableTalkNet) project. More information available in the following series:
+{{< single_summary "/disco-narrator" >}}
 
 ### `react-viewer-viewer`
 {{< icon typescript "https://www.typescriptlang.org/" >}}
