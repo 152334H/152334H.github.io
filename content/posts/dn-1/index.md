@@ -14,7 +14,7 @@ toc: true
 ---
 
 To train an AI Text-To-Speech (TTS) model, we'll need to obtain a Labelled Dataset with two things:
-1. Clean audio files (`.wav`s), containing only the voice we're cloning
+1. Clean audio files, containing only the voice we're cloning
 2. The dialogue transcript (text) for each audio file
 
 <!--more-->
