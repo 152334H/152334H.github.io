@@ -5,7 +5,6 @@ author: "152334H"
 
 lastmod:   2021-06-26 17:28:35 +0800
 
-weight: 20
 draft: false
 subtitle: ""
 description: "It's really not hard."
