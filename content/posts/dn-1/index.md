@@ -231,4 +231,4 @@ Re-opening AssetStudio, I follow the README, and...
 
 It's there! `AssetName`, `ArticyID`. The `AssetName`s match up with the `.wav` filenames we extracted, and the `ArticyID`s match exactly to the expected dialogue for each audio file. Taking the first example in the image, `0x010000060001BDCA` refers to this part of the massive Dialogue `json`:
 {{< figure src="Pasted%20image%2020220817203121.png" >}}
-With all the information we need (theoretically) in tow, we can move on to [Data Formatting](/todo).
+With all the information we need (theoretically) in tow, we can move on to [Data Formatting](/dn-2).

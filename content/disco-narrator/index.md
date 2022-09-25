@@ -19,7 +19,7 @@ How I made a Text-to-Speech (TTS) model for (some of) [a video game's](https://e
 | Post | TL;DR |
 |------|-------|
 | [Data scraping](/blog/dn-1) | Simple retelling of the data collection process |
-| Data formatting | Python scripting to LJSpeech, plus data cleaning methods |
+| [Data formatting](/blog/dn-2) | Python scripting to LJSpeech, plus data cleaning methods |
 | Simplistic Training | Various attempts to create my first model |
 | Additional characters | Training extra models, and the limitations of small datasets |
 
