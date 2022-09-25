@@ -1,0 +1,883 @@
+<!doctype html><html lang=en><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><meta name=robots content="noodp"><title>Disco Narrator - Data Formatting - 152334H</title><meta name=Description content="152334H Personal Blog"><meta property="og:title" content="Disco Narrator - Data Formatting"><meta property="og:description" content="With the raw data in tow, we can construct a proper TTS Dataset with the use of a few Python scripts."><meta property="og:type" content="article"><meta property="og:url" content="https://152334H.github.io/blog/dn-2/"><meta property="og:image" content="https://152334H.github.io/undefined.png"><meta property="article:section" content="posts"><meta property="article:published_time" content="2022-09-25T00:00:00+01:00"><meta property="article:modified_time" content="2022-09-25T06:56:10+01:00"><meta property="og:site_name" content="152334H"><meta name=twitter:card content="summary_large_image"><meta name=twitter:image content="https://152334H.github.io/undefined.png"><meta name=twitter:title content="Disco Narrator - Data Formatting"><meta name=twitter:description content="With the raw data in tow, we can construct a proper TTS Dataset with the use of a few Python scripts."><meta name=application-name content="My cool site"><meta name=apple-mobile-web-app-title content="My cool site"><meta name=theme-color content="#ffffff"><meta name=msapplication-TileColor content="#da532c"><link rel="shortcut icon" type=image/x-icon href=/favicon.ico><link rel=icon type=image/png sizes=32x32 href=/favicon-32x32.png><link rel=icon type=image/png sizes=16x16 href=/favicon-16x16.png><link rel=apple-touch-icon sizes=180x180 href=/apple-touch-icon.png><link rel=mask-icon href=/safari-pinned-tab.svg color=#5bbad5><link rel=manifest href=/site.webmanifest><link rel=canonical href=https://152334H.github.io/blog/dn-2/><link rel=prev href=https://152334H.github.io/blog/funcoding-setup/><link rel=next href=https://152334H.github.io/blog/blog-refurbishment/><link rel=stylesheet href=/css/style.min.css><link rel=preload href=https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css as=style onload='this.onload=null,this.rel="stylesheet"'><noscript><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css></noscript><link rel=preload href=https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css as=style onload='this.onload=null,this.rel="stylesheet"'><noscript><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css></noscript><script type=application/ld+json>{"@context":"http://schema.org","@type":"BlogPosting","headline":"Disco Narrator - Data Formatting","inLanguage":"en","mainEntityOfPage":{"@type":"WebPage","@id":"https:\/\/152334H.github.io\/blog\/dn-2\/"},"genre":"posts","keywords":"Disco Elysium, pandas, part of a series, WIP","wordcount":3220,"url":"https:\/\/152334H.github.io\/blog\/dn-2\/","datePublished":"2022-09-25T00:00:00+01:00","dateModified":"2022-09-25T06:56:10+01:00","publisher":{"@type":"Organization","name":""},"author":{"@type":"Person","name":"152334H"},"description":""}</script></head><body data-header-desktop=fixed data-header-mobile=auto><script type=text/javascript>(window.localStorage&&localStorage.getItem("theme")?localStorage.getItem("theme")==="dark":"dark"==="auto"?window.matchMedia("(prefers-color-scheme: dark)").matches:"dark"==="dark")&&document.body.setAttribute("theme","dark")</script><div id=mask></div><div class=wrapper><header class=desktop id=header-desktop><div class=header-wrapper><div class=header-title><a href=/ title=152334H>Simple Thoughts</a></div><div class=menu><div class=menu-inner><a class=menu-item href=/posts/>All Posts </a><a class=menu-item href=/tags/>Tags </a><a class=menu-item href=/categories/>Categories </a><a class=menu-item href=/about/><b>About </b></a><span class="menu-item delimiter"></span><span class="menu-item search" id=search-desktop>
+<input type=text placeholder=Search... id=search-input-desktop>
+<a href=javascript:void(0); class="search-button search-toggle" id=search-toggle-desktop title=Search><i class="fas fa-search fa-fw" aria-hidden=true></i></a>
+<a href=javascript:void(0); class="search-button search-clear" id=search-clear-desktop title=Clear><i class="fas fa-times-circle fa-fw" aria-hidden=true></i></a>
+<span class="search-button search-loading" id=search-loading-desktop><i class="fas fa-spinner fa-fw fa-spin" aria-hidden=true></i></span>
+</span><a href=javascript:void(0); class="menu-item theme-switch" title="Switch Theme"><i class="fas fa-adjust fa-fw" aria-hidden=true></i></a></div></div></div></header><header class=mobile id=header-mobile><div class=header-container><div class=header-wrapper><div class=header-title><a href=/ title=152334H>Simple Thoughts</a></div><div class=menu-toggle id=menu-toggle-mobile><span></span><span></span><span></span></div></div><div class=menu id=menu-mobile><div class=search-wrapper><div class="search mobile" id=search-mobile><input type=text placeholder=Search... id=search-input-mobile>
+<a href=javascript:void(0); class="search-button search-toggle" id=search-toggle-mobile title=Search><i class="fas fa-search fa-fw" aria-hidden=true></i></a>
+<a href=javascript:void(0); class="search-button search-clear" id=search-clear-mobile title=Clear><i class="fas fa-times-circle fa-fw" aria-hidden=true></i></a>
+<span class="search-button search-loading" id=search-loading-mobile><i class="fas fa-spinner fa-fw fa-spin" aria-hidden=true></i></span></div><a href=javascript:void(0); class=search-cancel id=search-cancel-mobile>Cancel</a></div><a class=menu-item href=/posts/ title>All Posts</a><a class=menu-item href=/tags/ title>Tags</a><a class=menu-item href=/categories/ title>Categories</a><a class=menu-item href=/about/ title><b>About</b></a><a href=javascript:void(0); class="menu-item theme-switch" title="Switch Theme">
+<i class="fas fa-adjust fa-fw" aria-hidden=true></i></a></div></div></header><div class="search-dropdown desktop"><div id=search-dropdown-desktop></div></div><div class="search-dropdown mobile"><div id=search-dropdown-mobile></div></div><main class=main><div class=container><div class=toc id=toc-auto><h2 class=toc-title>Contents</h2><div class=toc-content id=toc-content-auto></div></div><article class="page single"><h1 class="single-title animate__animated animate__flipInX">Disco Narrator - Data Formatting</h1><h2 class=single-subtitle>Part 2/4 of a <a href=/disco-narrator>series</a></h2><div class=post-meta><div class=post-meta-line><span class=post-author><a href=https://152334H.github.io/ title=Author target=_blank rel="noopener noreffer author" class=author><i class="fas fa-user-circle fa-fw" aria-hidden=true></i>152334H</a></span>&nbsp;<span class=post-category>included in <a href=/categories/tech/><i class="far fa-folder fa-fw" aria-hidden=true></i>tech</a></span></div><div class=post-meta-line><i class="far fa-calendar-alt fa-fw" aria-hidden=true></i>&nbsp;<time datetime="September 25, 2022">September 25, 2022</time>&nbsp;<i class="fas fa-pencil-alt fa-fw" aria-hidden=true></i>&nbsp;3220 words&nbsp;
+<i class="far fa-clock fa-fw" aria-hidden=true></i>&nbsp;16 minutes&nbsp;</div></div><div class="details toc" id=toc-static data-kept=true><div class="details-summary toc-title"><span>Contents</span>
+<span><i class="details-icon fas fa-angle-right" aria-hidden=true></i></span></div><div class="details-content toc-content" id=toc-content-static><nav id=TableOfContents><ul><li><a href=#preprocessing>Preprocessing</a><ul><li><a href=#useless-dialogueentries>Useless <code>dialogueEntries</code></a></li><li><a href=#one-to-many-mapping-articyid----assetname>One-to-many mapping: <code>ArticyID</code> &ndash;> <code>AssetName</code></a></li><li><a href=#404-not-found-assetname----wav-file>404 not found: <code>AssetName</code> -/-> <code>.wav</code> file</a></li><li><a href=#one-to-many-mapping-assetname----dialogueentry>One-to-many mapping: <code>AssetName</code> &ndash;> <code>DialogueEntry</code></a></li><li><a href=#404-not-found-articyid----dialogueentry>404 not found: <code>articyID</code> -/-> <code>DialogueEntry</code></a></li><li><a href=#final-result>Final result</a></li></ul></li><li><a href=#packaging>Packaging</a></li><li><a href=#filtering-for-voice-actors>Filtering for voice actors</a></li><li><a href=#the-first-dataset>The First Dataset</a></li></ul></nav></div></div><div class=content id=content><p>With the raw data in tow, we can construct a proper TTS Dataset with the use of a few Python scripts.</p><p>I currently have:</p><ol><li>named audio files (<code>AudioClip/</code>)</li><li>dialogue lines with IDs (<code>dialog.json</code>)</li><li>IDs that are linked to the names of audio files from (1) (<code>VoiceOverClipsLibrary.json</code>)</li></ol><p>I want to squash (1) and (2) together &ndash; to create dialog lines linked to audio files &ndash; and we need to use (3) to get there.</p><h2 id=preprocessing>Preprocessing</h2><p>My idea was simple:</p><ol><li>Each line of dialog from <code>dialog.json</code> has an <code>articyID</code>.</li><li>Each <code>articyID</code> is linked to an <code>assetName</code></li><li>Each <code>assetName</code> represents a unique <code>.wav</code> file</li><li>Run through steps 1-3 to obtain <code>(dialog, wav_file)</code> pairs.</li></ol><p>Or at least, it was supposed to be simple. In reality, each and every one of these steps were <strong>assumptions</strong> &ndash; expected conditions that weren&rsquo;t strictly followed by the raw data I had obtained in the first post.</p><p>Here&rsquo;s what went wrong:</p><h3 id=useless-dialogueentries>Useless <code>dialogueEntries</code></h3><p>Each <a href=https://www.pixelcrushers.com/dialogue_system/manual2x/html/class_pixel_crushers_1_1_dialogue_system_1_1_dialogue_entry.html target=_blank rel="noopener noreffer">DialogueEntry</a> in <code>dialog.json</code> contained an <code>articyID</code>, which was great. What was less great was the presence of useless/meta dialogue entries like this:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-json data-lang=json><span class=line><span class=cl><span class=p>{</span>
+</span></span><span class=line><span class=cl>  <span class=nt>&#34;id&#34;</span><span class=p>:</span> <span class=mi>0</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>  <span class=nt>&#34;fields&#34;</span><span class=p>:</span> <span class=p>[</span>
+</span></span><span class=line><span class=cl>    <span class=p>{</span>
+</span></span><span class=line><span class=cl>      <span class=nt>&#34;title&#34;</span><span class=p>:</span> <span class=s2>&#34;Title&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>      <span class=nt>&#34;value&#34;</span><span class=p>:</span> <span class=s2>&#34;START&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>      <span class=nt>&#34;type&#34;</span><span class=p>:</span> <span class=mi>0</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>      <span class=nt>&#34;typeString&#34;</span><span class=p>:</span> <span class=s2>&#34;&#34;</span>                                            
+</span></span><span class=line><span class=cl>    <span class=p>},</span>
+</span></span><span class=line><span class=cl>    <span class=p>{</span>
+</span></span><span class=line><span class=cl>      <span class=nt>&#34;title&#34;</span><span class=p>:</span> <span class=s2>&#34;Articy Id&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>      <span class=nt>&#34;value&#34;</span><span class=p>:</span> <span class=s2>&#34;0x0000000000000000&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>      <span class=nt>&#34;type&#34;</span><span class=p>:</span> <span class=mi>0</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>      <span class=nt>&#34;typeString&#34;</span><span class=p>:</span> <span class=s2>&#34;&#34;</span>                                            
+</span></span><span class=line><span class=cl>    <span class=p>},</span>
+</span></span><span class=line><span class=cl>    <span class=p>{</span>
+</span></span><span class=line><span class=cl>      <span class=nt>&#34;title&#34;</span><span class=p>:</span> <span class=s2>&#34;Sequence&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>      <span class=nt>&#34;value&#34;</span><span class=p>:</span> <span class=s2>&#34;Continue()&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>      <span class=nt>&#34;type&#34;</span><span class=p>:</span> <span class=mi>0</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>      <span class=nt>&#34;typeString&#34;</span><span class=p>:</span> <span class=s2>&#34;&#34;</span>
+</span></span><span class=line><span class=cl>	<span class=p>}</span>
+</span></span><span class=line><span class=cl>  <span class=p>],</span>
+</span></span><span class=line><span class=cl>  <span class=err>...</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></td></tr></table></div></div><p>So, instead of looping through every dialogue entry in the game, I threw every entry into a <a href=https://pandas.pydata.org/ target=_blank rel="noopener noreffer">pandas</a> dataframe and ran <code>articyID</code> queries on that:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span><span class=lnt>8
+</span><span class=lnt>9
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=k>with</span> <span class=nb>open</span><span class=p>(</span><span class=n>JSON_DIALOG</span><span class=p>)</span> <span class=k>as</span> <span class=n>f</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>  <span class=n>loaded</span> <span class=o>=</span> <span class=n>json</span><span class=o>.</span><span class=n>load</span><span class=p>(</span><span class=n>f</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>  <span class=n>df_actors_init</span> <span class=o>=</span> <span class=n>pd</span><span class=o>.</span><span class=n>json_normalize</span><span class=p>(</span><span class=n>loaded</span><span class=p>,</span><span class=n>record_path</span><span class=o>=</span><span class=p>[</span><span class=s1>&#39;actors&#39;</span><span class=p>])</span>
+</span></span><span class=line><span class=cl>  <span class=n>df_actors</span> <span class=o>=</span> <span class=n>pd</span><span class=o>.</span><span class=n>concat</span><span class=p>([</span><span class=n>df_actors_init</span><span class=p>,</span> <span class=n>df_actors_init</span><span class=o>.</span><span class=n>pop</span><span class=p>(</span><span class=s1>&#39;fields&#39;</span><span class=p>)</span><span class=o>.</span><span class=n>apply</span><span class=p>(</span><span class=n>iterate</span><span class=p>)],</span> <span class=n>axis</span><span class=o>=</span><span class=mi>1</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>  <span class=n>df_convos_init</span> <span class=o>=</span> <span class=n>pd</span><span class=o>.</span><span class=n>json_normalize</span><span class=p>(</span><span class=n>loaded</span><span class=p>,</span><span class=n>record_path</span><span class=o>=</span><span class=p>[</span><span class=s1>&#39;conversations&#39;</span><span class=p>,</span><span class=s1>&#39;dialogueEntries&#39;</span><span class=p>])</span>
+</span></span><span class=line><span class=cl>  <span class=n>df_convos</span> <span class=o>=</span> <span class=n>pd</span><span class=o>.</span><span class=n>concat</span><span class=p>([</span><span class=n>df_convos_init</span><span class=p>,</span> <span class=n>df_convos_init</span><span class=o>.</span><span class=n>pop</span><span class=p>(</span><span class=s1>&#39;fields&#39;</span><span class=p>)</span><span class=o>.</span><span class=n>apply</span><span class=p>(</span><span class=n>iterate</span><span class=p>)],</span> <span class=n>axis</span><span class=o>=</span><span class=mi>1</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># To access a dialogueEntry with a given `ArticyID`,</span>
+</span></span><span class=line><span class=cl><span class=c1># access `df_convos[df_convos[&#34;Articy Id&#34;] == ArticyID]`</span>
+</span></span></code></pre></td></tr></table></div></div><p>This was a somewhat inefficient solution and I am not very proud of it. More on this later, in the final script.</p><h3 id=one-to-many-mapping-articyid----assetname>One-to-many mapping: <code>ArticyID</code> &ndash;> <code>AssetName</code></h3><p>Problem: in <code>VoiceOverClipsLibrary.json</code>, some <code>clipInformation[]</code> entries contain <code>alternativeVoiceClips[]</code>. Example:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span><span class=lnt>32
+</span><span class=lnt>33
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-json data-lang=json><span class=line><span class=cl><span class=p>{</span>
+</span></span><span class=line><span class=cl>  <span class=nt>&#34;AssetName&#34;</span><span class=p>:</span> <span class=s2>&#34;Empathy-KINEEMA  SYLVIE-198&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>  <span class=nt>&#34;ArticyID&#34;</span><span class=p>:</span> <span class=s2>&#34;0x0100002B00060B58&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>  <span class=nt>&#34;AssetBundle&#34;</span><span class=p>:</span> <span class=s2>&#34;kineema_empathy&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>  <span class=nt>&#34;PathToClipInProject&#34;</span><span class=p>:</span> <span class=s2>&#34;Assets\\Sounds/Dialogue/VOImports\\kineema\\empathy\\Empathy-KINEEMA  SYLVIE-198.wav&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>  <span class=nt>&#34;DoesNotNeedVO&#34;</span><span class=p>:</span> <span class=kc>false</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>  <span class=nt>&#34;alternativeVoiceClips&#34;</span><span class=p>:</span> <span class=p>[</span>
+</span></span><span class=line><span class=cl>    <span class=p>{</span>
+</span></span><span class=line><span class=cl>      <span class=nt>&#34;AlternativeID&#34;</span><span class=p>:</span> <span class=mi>0</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>      <span class=nt>&#34;AlternativeAssetName&#34;</span><span class=p>:</span> <span class=s2>&#34;alternative-0-Empathy-KINEEMA  SYLVIE-198-0&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>      <span class=nt>&#34;AlternativeClipPath&#34;</span><span class=p>:</span> <span class=s2>&#34;Assets\\Sounds/Dialogue/VOImports\\kineema\\empathy\\Alternative\\alternative-0-Empathy-KINEEMA  SYLVIE-198-0.wav&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>      <span class=nt>&#34;DoesNotNeedVO&#34;</span><span class=p>:</span> <span class=kc>false</span>
+</span></span><span class=line><span class=cl>	<span class=p>},</span>
+</span></span><span class=line><span class=cl>	<span class=p>{</span>
+</span></span><span class=line><span class=cl>      <span class=nt>&#34;AlternativeID&#34;</span><span class=p>:</span> <span class=mi>1</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>      <span class=nt>&#34;AlternativeAssetName&#34;</span><span class=p>:</span> <span class=s2>&#34;alternative-1-Empathy-KINEEMA  SYLVIE-198-1&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>      <span class=nt>&#34;AlternativeClipPath&#34;</span><span class=p>:</span> <span class=s2>&#34;Assets\\Sounds/Dialogue/VOImports\\kineema\\empathy\\Alternative\\alternative-1-Empathy-KINEEMA  SYLVIE-198-1.wav&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>      <span class=nt>&#34;DoesNotNeedVO&#34;</span><span class=p>:</span> <span class=kc>false</span>
+</span></span><span class=line><span class=cl>	<span class=p>},</span>
+</span></span><span class=line><span class=cl>	<span class=p>{</span>
+</span></span><span class=line><span class=cl>      <span class=nt>&#34;AlternativeID&#34;</span><span class=p>:</span> <span class=mi>2</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>      <span class=nt>&#34;AlternativeAssetName&#34;</span><span class=p>:</span> <span class=s2>&#34;alternative-2-Empathy-KINEEMA  SYLVIE-198-2&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>      <span class=nt>&#34;AlternativeClipPath&#34;</span><span class=p>:</span> <span class=s2>&#34;Assets\\Sounds/Dialogue/VOImports\\kineema\\empathy\\Alternative\\alternative-2-Empathy-KINEEMA  SYLVIE-198-2.wav&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>      <span class=nt>&#34;DoesNotNeedVO&#34;</span><span class=p>:</span> <span class=kc>false</span>
+</span></span><span class=line><span class=cl>	<span class=p>},</span>
+</span></span><span class=line><span class=cl>	<span class=p>{</span>
+</span></span><span class=line><span class=cl>      <span class=nt>&#34;AlternativeID&#34;</span><span class=p>:</span> <span class=mi>3</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>      <span class=nt>&#34;AlternativeAssetName&#34;</span><span class=p>:</span> <span class=s2>&#34;alternative-3-Empathy-KINEEMA  SYLVIE-198-3&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>      <span class=nt>&#34;AlternativeClipPath&#34;</span><span class=p>:</span> <span class=s2>&#34;Assets\\Sounds/Dialogue/VOImports\\kineema\\empathy\\Alternative\\alternative-3-Empathy-KINEEMA  SYLVIE-198-3.wav&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>      <span class=nt>&#34;DoesNotNeedVO&#34;</span><span class=p>:</span> <span class=kc>false</span>
+</span></span><span class=line><span class=cl>	<span class=p>}</span>
+</span></span><span class=line><span class=cl>  <span class=p>]</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></td></tr></table></div></div><p>The full object has only 1 <code>articyID</code>, but many <code>AssetNames</code>. And all of these AssetNames exist as <code>.wav</code> files, and correspond to their own separate dialogue lines:
+<img src=Pasted%20image%2020220817205406.png>
+So, that&rsquo;s not great. I have to create additional code to handle this edge case.</p><h3 id=404-not-found-assetname----wav-file>404 not found: <code>AssetName</code> -/-> <code>.wav</code> file</h3><p>Some <code>AssetName</code>s pointed to <code>.wav</code> files that simply didn&rsquo;t exist.</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>WARNING: Unable to find .wav file for: &#39;Titus Hardie-WHIRLING F1  TITUS HARDIE barks-2&#39;
+</span></span><span class=line><span class=cl>WARNING: Unable to find .wav file for: &#39;Titus Hardie-WHIRLING F1  TITUS HARDIE barks-3&#39;
+</span></span><span class=line><span class=cl>... (&lt;1000 lines omitted) ...
+</span></span><span class=line><span class=cl>WARNING: Unable to find .wav file for: &#39;Echo Maker-APT  ECHO MAKER barks-11&#39;
+</span></span><span class=line><span class=cl>WARNING: Unable to find .wav file for: &#39;Echo Maker-APT  ECHO MAKER barks-12&#39;
+</span></span></code></pre></td></tr></table></div></div><p>The vast majority of these were labelled as <code>barks</code>, which from what I gather refers to <a href=https://www.pixelcrushers.com/dialogue_system/manual2x/html/tutorial_bark.html target=_blank rel="noopener noreffer">this</a>. Generally speaking, they aren&rsquo;t actual voice lines and it doesn&rsquo;t hurt the dataset to simply ignore their presence (or lackthereof).</p><h3 id=one-to-many-mapping-assetname----dialogueentry>One-to-many mapping: <code>AssetName</code> &ndash;> <code>DialogueEntry</code></h3><p>A small number of <code>clipInformation[]</code> entries contained duplicate <code>AssetName</code>s, despite having different <code>articyID</code>s:
+<img src=Pasted%20image%2020220828102321.png>
+These appear mostly linked to extra dialogue lines added from <em>The Final Cut</em>, and are distinguished by the presence of a <code>fixed-</code> prefix in their <code>PathToCLipInProject</code>:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span><span class=lnt>8
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-json data-lang=json><span class=line><span class=cl><span class=p>{</span>
+</span></span><span class=line><span class=cl>  <span class=nt>&#34;AssetName&#34;</span><span class=p>:</span> <span class=s2>&#34;Kim Kitsuragi-WHIRLING  KIM MAIN-55&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>  <span class=nt>&#34;ArticyID&#34;</span><span class=p>:</span> <span class=s2>&#34;0x0100000400008D23&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>  <span class=nt>&#34;AssetBundle&#34;</span><span class=p>:</span> <span class=s2>&#34;whirling_kim-kitsuragi&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>  <span class=nt>&#34;PathToClipInProject&#34;</span><span class=p>:</span> <span class=s2>&#34;Assets\\Sounds/Dialogue/VOImports\\whirling\\kim kitsuragi\\fixed-Kim Kitsuragi-WHIRLING  KIM MAIN-55.wav&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>  <span class=nt>&#34;DoesNotNeedVO&#34;</span><span class=p>:</span> <span class=kc>false</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>  <span class=nt>&#34;alternativeVoiceClips&#34;</span><span class=p>:</span> <span class=p>[]</span>
+</span></span><span class=line><span class=cl><span class=p>}</span><span class=err>,</span>
+</span></span></code></pre></td></tr></table></div></div><p>So I implemented extra corner case code for this too.</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=k>def</span> <span class=nf>parseVoiceOver</span><span class=p>(</span><span class=n>vo</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>  <span class=n>ID</span><span class=p>,</span><span class=n>AN</span><span class=p>,</span><span class=n>PATH</span> <span class=o>=</span> <span class=n>vo</span><span class=p>[</span><span class=s1>&#39;ArticyID&#39;</span><span class=p>],</span> <span class=n>vo</span><span class=p>[</span><span class=s1>&#39;AssetName&#39;</span><span class=p>],</span> <span class=n>vo</span><span class=p>[</span><span class=s1>&#39;PathToClipInProject&#39;</span><span class=p>]</span>
+</span></span><span class=line><span class=cl>  <span class=n>expected_fname</span> <span class=o>=</span> <span class=n>PATH</span><span class=o>.</span><span class=n>split</span><span class=p>(</span><span class=s1>&#39;</span><span class=se>\\</span><span class=s1>&#39;</span><span class=p>)</span><span class=o>.</span><span class=n>pop</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>  <span class=k>if</span> <span class=n>expected_fname</span><span class=p>[:</span><span class=o>-</span><span class=mi>4</span><span class=p>]</span> <span class=o>!=</span> <span class=n>AN</span><span class=p>:</span> <span class=c1># INACCURATE AN DETECTED</span>
+</span></span><span class=line><span class=cl>    <span class=n>AN</span> <span class=o>=</span> <span class=n>expected_fname</span><span class=p>[:</span><span class=o>-</span><span class=mi>4</span><span class=p>]</span>
+</span></span><span class=line><span class=cl>    <span class=k>assert</span> <span class=n>AN</span><span class=p>[:</span><span class=mi>6</span><span class=p>]</span> <span class=o>==</span> <span class=s1>&#39;fixed-&#39;</span> <span class=c1># this is a very specific kind of file.</span>
+</span></span><span class=line><span class=cl>  <span class=o>...</span>
+</span></span></code></pre></td></tr></table></div></div><h3 id=404-not-found-articyid----dialogueentry>404 not found: <code>articyID</code> -/-> <code>DialogueEntry</code></h3><p>After fixing all of the above, and making my first attempt to squash all the data, I noticed there were also a few unused (either that or my code was incorrect) <code>.wav</code> files detected:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span><span class=lnt>32
+</span><span class=lnt>33
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=n>Building</span> <span class=n>final</span> <span class=n>csv</span><span class=o>...</span><span class=p>:</span>   <span class=mi>0</span><span class=o>%|</span>                                                                                                          <span class=o>|</span> <span class=mi>1</span><span class=o>/</span><span class=mi>45545</span> <span class=p>[</span><span class=mi>00</span><span class=p>:</span><span class=mi>00</span><span class=o>&lt;</span><span class=mi>2</span><span class=p>:</span><span class=mi>38</span><span class=p>:</span><span class=mi>26</span><span class=p>,</span>  <span class=mf>4.79</span><span class=n>it</span><span class=o>/</span><span class=n>s</span><span class=p>]</span>
+</span></span><span class=line><span class=cl><span class=n>WARNING</span><span class=p>:</span> <span class=n>unused</span> <span class=n>audio</span> <span class=n>clip</span><span class=p>(</span><span class=n>s</span><span class=p>)</span> <span class=p>[</span><span class=n>PosixPath</span><span class=p>(</span><span class=s1>&#39;AudioClip/Inland Empire-WHIRLING F2  TEQUILA DOOR-5.wav&#39;</span><span class=p>)]</span>
+</span></span><span class=line><span class=cl><span class=n>Building</span> <span class=n>final</span> <span class=n>csv</span><span class=o>...</span><span class=p>:</span>   <span class=mi>0</span><span class=o>%|</span><span class=err>▏</span>                                                                                                         <span class=o>|</span> <span class=mi>102</span><span class=o>/</span><span class=mi>45545</span> <span class=p>[</span><span class=mi>00</span><span class=p>:</span><span class=mi>01</span><span class=o>&lt;</span><span class=mi>07</span><span class=p>:</span><span class=mi>45</span><span class=p>,</span> <span class=mf>97.59</span><span class=n>it</span><span class=o>/</span><span class=n>s</span><span class=p>]</span>
+</span></span><span class=line><span class=cl><span class=n>WARNING</span><span class=p>:</span> <span class=n>unused</span> <span class=n>audio</span> <span class=n>clip</span><span class=p>(</span><span class=n>s</span><span class=p>)</span> <span class=p>[</span><span class=n>PosixPath</span><span class=p>(</span><span class=s1>&#39;AudioClip/Inland Empire-WHIRLING F2  DREAM 2 INTRO-40.wav&#39;</span><span class=p>)]</span>
+</span></span><span class=line><span class=cl><span class=n>Building</span> <span class=n>final</span> <span class=n>csv</span><span class=o>...</span><span class=p>:</span>   <span class=mi>3</span><span class=o>%|</span><span class=err>███▌</span>                                                                                                     <span class=o>|</span> <span class=mi>1533</span><span class=o>/</span><span class=mi>45545</span> <span class=p>[</span><span class=mi>00</span><span class=p>:</span><span class=mi>16</span><span class=o>&lt;</span><span class=mi>07</span><span class=p>:</span><span class=mi>32</span><span class=p>,</span> <span class=mf>97.27</span><span class=n>it</span><span class=o>/</span><span class=n>s</span><span class=p>]</span>
+</span></span><span class=line><span class=cl><span class=n>WARNING</span><span class=p>:</span> <span class=n>unused</span> <span class=n>audio</span> <span class=n>clip</span><span class=p>(</span><span class=n>s</span><span class=p>)</span> <span class=p>[</span><span class=n>PosixPath</span><span class=p>(</span><span class=s1>&#39;AudioClip/Composure-JAM  TOMMY-776.wav&#39;</span><span class=p>)]</span>
+</span></span><span class=line><span class=cl><span class=n>Building</span> <span class=n>final</span> <span class=n>csv</span><span class=o>...</span><span class=p>:</span>  <span class=mi>13</span><span class=o>%|</span><span class=err>█████████████▊</span>                                                                                           <span class=o>|</span> <span class=mi>5982</span><span class=o>/</span><span class=mi>45545</span> <span class=p>[</span><span class=mi>01</span><span class=p>:</span><span class=mi>03</span><span class=o>&lt;</span><span class=mi>07</span><span class=p>:</span><span class=mi>05</span><span class=p>,</span> <span class=mf>92.98</span><span class=n>it</span><span class=o>/</span><span class=n>s</span><span class=p>]</span>
+</span></span><span class=line><span class=cl><span class=n>WARNING</span><span class=p>:</span> <span class=n>unused</span> <span class=n>audio</span> <span class=n>clip</span><span class=p>(</span><span class=n>s</span><span class=p>)</span> <span class=p>[</span><span class=n>PosixPath</span><span class=p>(</span><span class=s1>&#39;AudioClip/Kortenaer-PLAZA  KORTENAER-525.wav&#39;</span><span class=p>)]</span>
+</span></span><span class=line><span class=cl><span class=n>Building</span> <span class=n>final</span> <span class=n>csv</span><span class=o>...</span><span class=p>:</span>  <span class=mi>23</span><span class=o>%|</span><span class=err>████████████████████████</span>                                                                                <span class=o>|</span> <span class=mi>10519</span><span class=o>/</span><span class=mi>45545</span> <span class=p>[</span><span class=mi>01</span><span class=p>:</span><span class=mi>53</span><span class=o>&lt;</span><span class=mi>06</span><span class=p>:</span><span class=mi>26</span><span class=p>,</span> <span class=mf>90.60</span><span class=n>it</span><span class=o>/</span><span class=n>s</span><span class=p>]</span>
+</span></span><span class=line><span class=cl><span class=n>WARNING</span><span class=p>:</span> <span class=n>unused</span> <span class=n>audio</span> <span class=n>clip</span><span class=p>(</span><span class=n>s</span><span class=p>)</span> <span class=p>[</span><span class=n>PosixPath</span><span class=p>(</span><span class=s1>&#39;AudioClip/Garte, the Cafeteria Manager-WHIRLING F1  GARTE MAIN-120.wav&#39;</span><span class=p>)]</span>
+</span></span><span class=line><span class=cl><span class=n>Building</span> <span class=n>final</span> <span class=n>csv</span><span class=o>...</span><span class=p>:</span>  <span class=mi>49</span><span class=o>%|</span><span class=err>███████████████████████████████████████████████████</span>                                                     <span class=o>|</span> <span class=mi>22388</span><span class=o>/</span><span class=mi>45545</span> <span class=p>[</span><span class=mi>04</span><span class=p>:</span><span class=mi>11</span><span class=o>&lt;</span><span class=mi>04</span><span class=p>:</span><span class=mi>40</span><span class=p>,</span> <span class=mf>82.59</span><span class=n>it</span><span class=o>/</span><span class=n>s</span><span class=p>]</span>
+</span></span><span class=line><span class=cl><span class=n>WARNING</span><span class=p>:</span> <span class=n>unused</span> <span class=n>audio</span> <span class=n>clip</span><span class=p>(</span><span class=n>s</span><span class=p>)</span> <span class=p>[</span><span class=n>PosixPath</span><span class=p>(</span><span class=s1>&#39;AudioClip/Siileng-JAM  HUMANITARIAN AID-482.wav&#39;</span><span class=p>)]</span>
+</span></span><span class=line><span class=cl><span class=n>Building</span> <span class=n>final</span> <span class=n>csv</span><span class=o>...</span><span class=p>:</span>  <span class=mi>49</span><span class=o>%|</span><span class=err>███████████████████████████████████████████████████▍</span>                                                    <span class=o>|</span> <span class=mi>22505</span><span class=o>/</span><span class=mi>45545</span> <span class=p>[</span><span class=mi>04</span><span class=p>:</span><span class=mi>12</span><span class=o>&lt;</span><span class=mi>04</span><span class=p>:</span><span class=mi>35</span><span class=p>,</span> <span class=mf>83.49</span><span class=n>it</span><span class=o>/</span><span class=n>s</span><span class=p>]</span>
+</span></span><span class=line><span class=cl><span class=n>WARNING</span><span class=p>:</span> <span class=n>unused</span> <span class=n>audio</span> <span class=n>clip</span><span class=p>(</span><span class=n>s</span><span class=p>)</span> <span class=p>[</span><span class=n>PosixPath</span><span class=p>(</span><span class=s1>&#39;AudioClip/Siileng-JAM  HUMANITARIAN AID-479.wav&#39;</span><span class=p>)]</span>
+</span></span><span class=line><span class=cl><span class=n>Building</span> <span class=n>final</span> <span class=n>csv</span><span class=o>...</span><span class=p>:</span>  <span class=mi>49</span><span class=o>%|</span><span class=err>███████████████████████████████████████████████████▍</span>                                                    <span class=o>|</span> <span class=mi>22532</span><span class=o>/</span><span class=mi>45545</span> <span class=p>[</span><span class=mi>04</span><span class=p>:</span><span class=mi>13</span><span class=o>&lt;</span><span class=mi>04</span><span class=p>:</span><span class=mi>35</span><span class=p>,</span> <span class=mf>83.45</span><span class=n>it</span><span class=o>/</span><span class=n>s</span><span class=p>]</span>
+</span></span><span class=line><span class=cl><span class=n>WARNING</span><span class=p>:</span> <span class=n>unused</span> <span class=n>audio</span> <span class=n>clip</span><span class=p>(</span><span class=n>s</span><span class=p>)</span> <span class=p>[</span><span class=n>PosixPath</span><span class=p>(</span><span class=s1>&#39;AudioClip/Siileng-JAM  faln sneakers on a pedestal of speakers-88.wav&#39;</span><span class=p>)]</span>
+</span></span><span class=line><span class=cl><span class=n>WARNING</span><span class=p>:</span> <span class=n>unused</span> <span class=n>audio</span> <span class=n>clip</span><span class=p>(</span><span class=n>s</span><span class=p>)</span> <span class=p>[</span><span class=n>PosixPath</span><span class=p>(</span><span class=s1>&#39;AudioClip/Siileng-JAM  faln sneakers on a pedestal of speakers-94.wav&#39;</span><span class=p>)]</span>
+</span></span><span class=line><span class=cl><span class=n>WARNING</span><span class=p>:</span> <span class=n>unused</span> <span class=n>audio</span> <span class=n>clip</span><span class=p>(</span><span class=n>s</span><span class=p>)</span> <span class=p>[</span><span class=n>PosixPath</span><span class=p>(</span><span class=s1>&#39;AudioClip/Siileng-JAM  faln sneakers on a pedestal of speakers-99.wav&#39;</span><span class=p>)]</span>
+</span></span><span class=line><span class=cl><span class=n>Building</span> <span class=n>final</span> <span class=n>csv</span><span class=o>...</span><span class=p>:</span>  <span class=mi>50</span><span class=o>%|</span><span class=err>███████████████████████████████████████████████████▍</span>                                                    <span class=o>|</span> <span class=mi>22550</span><span class=o>/</span><span class=mi>45545</span> <span class=p>[</span><span class=mi>04</span><span class=p>:</span><span class=mi>13</span><span class=o>&lt;</span><span class=mi>04</span><span class=p>:</span><span class=mi>29</span><span class=p>,</span> <span class=mf>85.40</span><span class=n>it</span><span class=o>/</span><span class=n>s</span><span class=p>]</span>
+</span></span><span class=line><span class=cl><span class=n>WARNING</span><span class=p>:</span> <span class=n>unused</span> <span class=n>audio</span> <span class=n>clip</span><span class=p>(</span><span class=n>s</span><span class=p>)</span> <span class=p>[</span><span class=n>PosixPath</span><span class=p>(</span><span class=s1>&#39;AudioClip/Siileng-JAM  box of clothes-64.wav&#39;</span><span class=p>)]</span>
+</span></span><span class=line><span class=cl><span class=n>WARNING</span><span class=p>:</span> <span class=n>unused</span> <span class=n>audio</span> <span class=n>clip</span><span class=p>(</span><span class=n>s</span><span class=p>)</span> <span class=p>[</span><span class=n>PosixPath</span><span class=p>(</span><span class=s1>&#39;AudioClip/Siileng-JAM  box of clothes-67.wav&#39;</span><span class=p>)]</span>
+</span></span><span class=line><span class=cl><span class=n>WARNING</span><span class=p>:</span> <span class=n>unused</span> <span class=n>audio</span> <span class=n>clip</span><span class=p>(</span><span class=n>s</span><span class=p>)</span> <span class=p>[</span><span class=n>PosixPath</span><span class=p>(</span><span class=s1>&#39;AudioClip/Siileng-JAM  box of clothes-74.wav&#39;</span><span class=p>)]</span>
+</span></span><span class=line><span class=cl><span class=n>Building</span> <span class=n>final</span> <span class=n>csv</span><span class=o>...</span><span class=p>:</span>  <span class=mi>50</span><span class=o>%|</span><span class=err>███████████████████████████████████████████████████▌</span>                                                    <span class=o>|</span> <span class=mi>22568</span><span class=o>/</span><span class=mi>45545</span> <span class=p>[</span><span class=mi>04</span><span class=p>:</span><span class=mi>13</span><span class=o>&lt;</span><span class=mi>04</span><span class=p>:</span><span class=mi>26</span><span class=p>,</span> <span class=mf>86.27</span><span class=n>it</span><span class=o>/</span><span class=n>s</span><span class=p>]</span>
+</span></span><span class=line><span class=cl><span class=n>WARNING</span><span class=p>:</span> <span class=n>unused</span> <span class=n>audio</span> <span class=n>clip</span><span class=p>(</span><span class=n>s</span><span class=p>)</span> <span class=p>[</span><span class=n>PosixPath</span><span class=p>(</span><span class=s1>&#39;AudioClip/Siileng-JAM  box of sun glasses-77.wav&#39;</span><span class=p>)]</span>
+</span></span><span class=line><span class=cl><span class=n>WARNING</span><span class=p>:</span> <span class=n>unused</span> <span class=n>audio</span> <span class=n>clip</span><span class=p>(</span><span class=n>s</span><span class=p>)</span> <span class=p>[</span><span class=n>PosixPath</span><span class=p>(</span><span class=s1>&#39;AudioClip/Siileng-JAM  box of sun glasses-83.wav&#39;</span><span class=p>)]</span>
+</span></span><span class=line><span class=cl><span class=n>WARNING</span><span class=p>:</span> <span class=n>unused</span> <span class=n>audio</span> <span class=n>clip</span><span class=p>(</span><span class=n>s</span><span class=p>)</span> <span class=p>[</span><span class=n>PosixPath</span><span class=p>(</span><span class=s1>&#39;AudioClip/Siileng-JAM  box of sun glasses-87.wav&#39;</span><span class=p>)]</span>
+</span></span><span class=line><span class=cl><span class=n>Building</span> <span class=n>final</span> <span class=n>csv</span><span class=o>...</span><span class=p>:</span>  <span class=mi>57</span><span class=o>%|</span><span class=err>███████████████████████████████████████████████████████████</span>                                             <span class=o>|</span> <span class=mi>25844</span><span class=o>/</span><span class=mi>45545</span> <span class=p>[</span><span class=mi>04</span><span class=p>:</span><span class=mi>53</span><span class=o>&lt;</span><span class=mi>04</span><span class=p>:</span><span class=mi>07</span><span class=p>,</span> <span class=mf>79.57</span><span class=n>it</span><span class=o>/</span><span class=n>s</span><span class=p>]</span>
+</span></span><span class=line><span class=cl><span class=n>WARNING</span><span class=p>:</span> <span class=n>unused</span> <span class=n>audio</span> <span class=n>clip</span><span class=p>(</span><span class=n>s</span><span class=p>)</span> <span class=p>[</span><span class=n>PosixPath</span><span class=p>(</span><span class=s1>&#39;AudioClip/Kim Kitsuragi-WHIRLING F1  GARTE MAIN-553.wav&#39;</span><span class=p>)]</span>
+</span></span><span class=line><span class=cl><span class=n>Building</span> <span class=n>final</span> <span class=n>csv</span><span class=o>...</span><span class=p>:</span>  <span class=mi>62</span><span class=o>%|</span><span class=err>████████████████████████████████████████████████████████████████▎</span>                                       <span class=o>|</span> <span class=mi>28138</span><span class=o>/</span><span class=mi>45545</span> <span class=p>[</span><span class=mi>05</span><span class=p>:</span><span class=mi>22</span><span class=o>&lt;</span><span class=mi>03</span><span class=p>:</span><span class=mi>45</span><span class=p>,</span> <span class=mf>77.19</span><span class=n>it</span><span class=o>/</span><span class=n>s</span><span class=p>]</span>
+</span></span><span class=line><span class=cl><span class=n>WARNING</span><span class=p>:</span> <span class=n>unused</span> <span class=n>audio</span> <span class=n>clip</span><span class=p>(</span><span class=n>s</span><span class=p>)</span> <span class=p>[</span><span class=n>PosixPath</span><span class=p>(</span><span class=s1>&#39;AudioClip/Kim Kitsuragi-VILLAGE  POSSE 2-74.wav&#39;</span><span class=p>)]</span>
+</span></span><span class=line><span class=cl><span class=n>Building</span> <span class=n>final</span> <span class=n>csv</span><span class=o>...</span><span class=p>:</span>  <span class=mi>82</span><span class=o>%|</span><span class=err>█████████████████████████████████████████████████████████████████████████████████████▋</span>                  <span class=o>|</span> <span class=mi>37550</span><span class=o>/</span><span class=mi>45545</span> <span class=p>[</span><span class=mi>07</span><span class=p>:</span><span class=mi>25</span><span class=o>&lt;</span><span class=mi>01</span><span class=p>:</span><span class=mi>45</span><span class=p>,</span> <span class=mf>75.45</span><span class=n>it</span><span class=o>/</span><span class=n>s</span><span class=p>]</span>
+</span></span><span class=line><span class=cl><span class=n>WARNING</span><span class=p>:</span> <span class=n>unused</span> <span class=n>audio</span> <span class=n>clip</span><span class=p>(</span><span class=n>s</span><span class=p>)</span> <span class=p>[</span><span class=n>PosixPath</span><span class=p>(</span><span class=s1>&#39;AudioClip/Kim Kitsuragi-WHIRLING  KIM MAIN-981.wav&#39;</span><span class=p>)]</span>
+</span></span><span class=line><span class=cl><span class=n>Building</span> <span class=n>final</span> <span class=n>csv</span><span class=o>...</span><span class=p>:</span> <span class=mi>100</span><span class=o>%|</span><span class=err>████████████████████████████████████████████████████████████████████████████████████████████████████████</span><span class=o>|</span> <span class=mi>45545</span><span class=o>/</span><span class=mi>45545</span> <span class=p>[</span><span class=mi>09</span><span class=p>:</span><span class=mi>16</span><span class=o>&lt;</span><span class=mi>00</span><span class=p>:</span><span class=mi>00</span><span class=p>,</span> <span class=mf>81.81</span><span class=n>it</span><span class=o>/</span><span class=n>s</span>
+</span></span></code></pre></td></tr></table></div></div><p>Considering how few of these there were, I deliberately chose to move on instead of investigating further.</p><h3 id=final-result>Final result</h3><p>After accounting for all of those intricacies, I end up with this final script:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span><span class=lnt>32
+</span><span class=lnt>33
+</span><span class=lnt>34
+</span><span class=lnt>35
+</span><span class=lnt>36
+</span><span class=lnt>37
+</span><span class=lnt>38
+</span><span class=lnt>39
+</span><span class=lnt>40
+</span><span class=lnt>41
+</span><span class=lnt>42
+</span><span class=lnt>43
+</span><span class=lnt>44
+</span><span class=lnt>45
+</span><span class=lnt>46
+</span><span class=lnt>47
+</span><span class=lnt>48
+</span><span class=lnt>49
+</span><span class=lnt>50
+</span><span class=lnt>51
+</span><span class=lnt>52
+</span><span class=lnt>53
+</span><span class=lnt>54
+</span><span class=lnt>55
+</span><span class=lnt>56
+</span><span class=lnt>57
+</span><span class=lnt>58
+</span><span class=lnt>59
+</span><span class=lnt>60
+</span><span class=lnt>61
+</span><span class=lnt>62
+</span><span class=lnt>63
+</span><span class=lnt>64
+</span><span class=lnt>65
+</span><span class=lnt>66
+</span><span class=lnt>67
+</span><span class=lnt>68
+</span><span class=lnt>69
+</span><span class=lnt>70
+</span><span class=lnt>71
+</span><span class=lnt>72
+</span><span class=lnt>73
+</span><span class=lnt>74
+</span><span class=lnt>75
+</span><span class=lnt>76
+</span><span class=lnt>77
+</span><span class=lnt>78
+</span><span class=lnt>79
+</span><span class=lnt>80
+</span><span class=lnt>81
+</span><span class=lnt>82
+</span><span class=lnt>83
+</span><span class=lnt>84
+</span><span class=lnt>85
+</span><span class=lnt>86
+</span><span class=lnt>87
+</span><span class=lnt>88
+</span><span class=lnt>89
+</span><span class=lnt>90
+</span><span class=lnt>91
+</span><span class=lnt>92
+</span><span class=lnt>93
+</span><span class=lnt>94
+</span><span class=lnt>95
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=ch>#!/usr/bin/python3</span>
+</span></span><span class=line><span class=cl><span class=kn>import</span> <span class=nn>os</span>
+</span></span><span class=line><span class=cl><span class=kn>import</span> <span class=nn>json</span>
+</span></span><span class=line><span class=cl><span class=kn>import</span> <span class=nn>pandas</span> <span class=k>as</span> <span class=nn>pd</span>
+</span></span><span class=line><span class=cl><span class=kn>from</span> <span class=nn>pathlib</span> <span class=kn>import</span> <span class=n>Path</span>
+</span></span><span class=line><span class=cl><span class=kn>from</span> <span class=nn>tqdm</span> <span class=kn>import</span> <span class=n>tqdm</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># this is for df.append()</span>
+</span></span><span class=line><span class=cl><span class=kn>import</span> <span class=nn>warnings</span>
+</span></span><span class=line><span class=cl><span class=n>warnings</span><span class=o>.</span><span class=n>simplefilter</span><span class=p>(</span><span class=n>action</span><span class=o>=</span><span class=s1>&#39;ignore&#39;</span><span class=p>,</span> <span class=n>category</span><span class=o>=</span><span class=ne>FutureWarning</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1>### filepaths</span>
+</span></span><span class=line><span class=cl><span class=n>os</span><span class=o>.</span><span class=n>chdir</span><span class=p>(</span><span class=s1>&#39;../0_original_data&#39;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=n>JSON_DIALOG</span> <span class=o>=</span> <span class=s1>&#39;./dialog.json&#39;</span>
+</span></span><span class=line><span class=cl><span class=n>JSON_VOCLIPS</span> <span class=o>=</span> <span class=s1>&#39;./VoiceOverClipsLibrary.json&#39;</span>
+</span></span><span class=line><span class=cl><span class=n>WAV_AUDIOCLIPS_FOLDER</span> <span class=o>=</span> <span class=n>Path</span><span class=p>(</span><span class=s1>&#39;./AudioClip&#39;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1>### List /AudioClip/ folder</span>
+</span></span><span class=line><span class=cl><span class=n>audio_assets</span> <span class=o>=</span> <span class=p>{</span><span class=n>wav_file</span><span class=o>.</span><span class=n>stem</span><span class=p>:</span><span class=n>wav_file</span> <span class=k>for</span> <span class=n>wav_file</span> <span class=ow>in</span> <span class=n>WAV_AUDIOCLIPS_FOLDER</span><span class=o>.</span><span class=n>iterdir</span><span class=p>()}</span>
+</span></span><span class=line><span class=cl><span class=nb>print</span><span class=p>(</span><span class=s1>&#39;loaded audio clips folder&#39;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1>### Load VoiceOverClipsLibrary into clips{}</span>
+</span></span><span class=line><span class=cl><span class=n>clips</span> <span class=o>=</span> <span class=p>{}</span>
+</span></span><span class=line><span class=cl><span class=k>def</span> <span class=nf>aasset</span><span class=p>(</span><span class=n>k</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>    <span class=n>v</span> <span class=o>=</span> <span class=n>audio_assets</span><span class=o>.</span><span class=n>get</span><span class=p>(</span><span class=n>k</span><span class=p>,</span><span class=kc>None</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=k>if</span> <span class=n>v</span> <span class=ow>is</span> <span class=kc>None</span><span class=p>:</span> <span class=nb>print</span><span class=p>(</span><span class=sa>f</span><span class=s2>&#34;WARNING: Missing &#39;</span><span class=si>{</span><span class=n>k</span><span class=si>}</span><span class=s2>&#39;&#34;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=k>def</span> <span class=nf>parseVoiceOver</span><span class=p>(</span><span class=n>vo</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>    <span class=n>ID</span><span class=p>,</span><span class=n>AN</span><span class=p>,</span><span class=n>PATH</span> <span class=o>=</span> <span class=n>vo</span><span class=p>[</span><span class=s1>&#39;ArticyID&#39;</span><span class=p>],</span> <span class=n>vo</span><span class=p>[</span><span class=s1>&#39;AssetName&#39;</span><span class=p>],</span> <span class=n>vo</span><span class=p>[</span><span class=s1>&#39;PathToClipInProject&#39;</span><span class=p>]</span>
+</span></span><span class=line><span class=cl>    <span class=n>expected_fname</span> <span class=o>=</span> <span class=n>PATH</span><span class=o>.</span><span class=n>split</span><span class=p>(</span><span class=s1>&#39;</span><span class=se>\\</span><span class=s1>&#39;</span><span class=p>)</span><span class=o>.</span><span class=n>pop</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>    <span class=k>if</span> <span class=n>expected_fname</span><span class=p>[:</span><span class=o>-</span><span class=mi>4</span><span class=p>]</span> <span class=o>!=</span> <span class=n>AN</span><span class=p>:</span> <span class=c1># INACCURATE AN DETECTED</span>
+</span></span><span class=line><span class=cl>        <span class=n>AN</span> <span class=o>=</span> <span class=n>expected_fname</span><span class=p>[:</span><span class=o>-</span><span class=mi>4</span><span class=p>]</span>
+</span></span><span class=line><span class=cl>        <span class=k>assert</span> <span class=n>AN</span><span class=p>[:</span><span class=mi>6</span><span class=p>]</span> <span class=o>==</span> <span class=s1>&#39;fixed-&#39;</span> <span class=c1># this is a very specific kind of file.</span>
+</span></span><span class=line><span class=cl>    <span class=n>path</span> <span class=o>=</span> <span class=n>audio_assets</span><span class=o>.</span><span class=n>get</span><span class=p>(</span><span class=n>AN</span><span class=p>,</span><span class=kc>None</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=k>if</span> <span class=n>path</span> <span class=ow>is</span> <span class=kc>None</span><span class=p>:</span> <span class=k>return</span> <span class=nb>print</span><span class=p>(</span><span class=sa>f</span><span class=s2>&#34;WARNING: Unable to find .wav file for: &#39;</span><span class=si>{</span><span class=n>AN</span><span class=si>}</span><span class=s2>&#39;&#34;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=n>clips</span><span class=p>[</span><span class=n>ID</span><span class=p>]</span> <span class=o>=</span> <span class=p>[</span><span class=n>path</span><span class=p>]</span>
+</span></span><span class=line><span class=cl>    <span class=k>for</span> <span class=n>alt</span> <span class=ow>in</span> <span class=nb>sorted</span><span class=p>(</span><span class=n>vo</span><span class=p>[</span><span class=s1>&#39;alternativeVoiceClips&#39;</span><span class=p>],</span> <span class=n>key</span><span class=o>=</span><span class=k>lambda</span> <span class=n>alt</span><span class=p>:</span> <span class=n>alt</span><span class=p>[</span><span class=s1>&#39;AlternativeID&#39;</span><span class=p>]):</span>
+</span></span><span class=line><span class=cl>        <span class=c1>#assert alt[&#39;AlternativeClipPath&#39;].split(&#39;\\&#39;).pop()[:-4] == alt[&#39;AlternativeAssetName&#39;]</span>
+</span></span><span class=line><span class=cl>        <span class=c1># Alt assets do not appear to have the &#34;fixed-&#34; problem.</span>
+</span></span><span class=line><span class=cl>        <span class=n>clips</span><span class=p>[</span><span class=n>ID</span><span class=p>]</span><span class=o>.</span><span class=n>append</span><span class=p>(</span><span class=n>audio_assets</span><span class=p>[</span><span class=n>alt</span><span class=p>[</span><span class=s1>&#39;AlternativeAssetName&#39;</span><span class=p>]])</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=k>with</span> <span class=nb>open</span><span class=p>(</span><span class=n>JSON_VOCLIPS</span><span class=p>)</span> <span class=k>as</span> <span class=n>f</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>    <span class=n>loaded</span> <span class=o>=</span> <span class=n>json</span><span class=o>.</span><span class=n>load</span><span class=p>(</span><span class=n>f</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=n>df_vo</span> <span class=o>=</span> <span class=n>pd</span><span class=o>.</span><span class=n>json_normalize</span><span class=p>(</span><span class=n>loaded</span><span class=p>,</span> <span class=n>record_path</span><span class=o>=</span><span class=p>[</span><span class=s1>&#39;clipInformations&#39;</span><span class=p>])</span>
+</span></span><span class=line><span class=cl>    <span class=n>filtered</span> <span class=o>=</span> <span class=n>df_vo</span><span class=o>.</span><span class=n>filter</span><span class=p>([</span><span class=s1>&#39;AssetName&#39;</span><span class=p>,</span><span class=s1>&#39;ArticyID&#39;</span><span class=p>,</span><span class=s1>&#39;alternativeVoiceClips&#39;</span><span class=p>,</span><span class=s1>&#39;PathToClipInProject&#39;</span><span class=p>])</span>
+</span></span><span class=line><span class=cl>    <span class=n>filtered</span><span class=o>.</span><span class=n>apply</span><span class=p>(</span><span class=n>parseVoiceOver</span><span class=p>,</span><span class=n>axis</span><span class=o>=</span><span class=mi>1</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=nb>print</span><span class=p>(</span><span class=s1>&#39;parsed VoiceOverClipsLibrary&#39;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1>### Load dialog.json into DataFrames</span>
+</span></span><span class=line><span class=cl><span class=k>def</span> <span class=nf>iterate</span><span class=p>(</span><span class=n>values</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>    <span class=k>return</span> <span class=n>pd</span><span class=o>.</span><span class=n>Series</span><span class=p>({</span><span class=n>x</span><span class=p>[</span><span class=s2>&#34;title&#34;</span><span class=p>]:</span> <span class=n>x</span><span class=p>[</span><span class=s2>&#34;value&#34;</span><span class=p>]</span> <span class=k>for</span> <span class=n>x</span> <span class=ow>in</span> <span class=n>values</span><span class=p>})</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=k>with</span> <span class=nb>open</span><span class=p>(</span><span class=n>JSON_DIALOG</span><span class=p>)</span> <span class=k>as</span> <span class=n>f</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>    <span class=n>loaded</span> <span class=o>=</span> <span class=n>json</span><span class=o>.</span><span class=n>load</span><span class=p>(</span><span class=n>f</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=n>df_actors_init</span> <span class=o>=</span> <span class=n>pd</span><span class=o>.</span><span class=n>json_normalize</span><span class=p>(</span><span class=n>loaded</span><span class=p>,</span><span class=n>record_path</span><span class=o>=</span><span class=p>[</span><span class=s1>&#39;actors&#39;</span><span class=p>])</span>
+</span></span><span class=line><span class=cl>    <span class=n>df_actors</span> <span class=o>=</span> <span class=n>pd</span><span class=o>.</span><span class=n>concat</span><span class=p>([</span><span class=n>df_actors_init</span><span class=p>,</span> <span class=n>df_actors_init</span><span class=o>.</span><span class=n>pop</span><span class=p>(</span><span class=s1>&#39;fields&#39;</span><span class=p>)</span><span class=o>.</span><span class=n>apply</span><span class=p>(</span><span class=n>iterate</span><span class=p>)],</span> <span class=n>axis</span><span class=o>=</span><span class=mi>1</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=n>df_convos_init</span> <span class=o>=</span> <span class=n>pd</span><span class=o>.</span><span class=n>json_normalize</span><span class=p>(</span><span class=n>loaded</span><span class=p>,</span><span class=n>record_path</span><span class=o>=</span><span class=p>[</span><span class=s1>&#39;conversations&#39;</span><span class=p>,</span><span class=s1>&#39;dialogueEntries&#39;</span><span class=p>])</span>
+</span></span><span class=line><span class=cl>    <span class=n>df_convos</span> <span class=o>=</span> <span class=n>pd</span><span class=o>.</span><span class=n>concat</span><span class=p>([</span><span class=n>df_convos_init</span><span class=p>,</span> <span class=n>df_convos_init</span><span class=o>.</span><span class=n>pop</span><span class=p>(</span><span class=s1>&#39;fields&#39;</span><span class=p>)</span><span class=o>.</span><span class=n>apply</span><span class=p>(</span><span class=n>iterate</span><span class=p>)],</span> <span class=n>axis</span><span class=o>=</span><span class=mi>1</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=nb>print</span><span class=p>(</span><span class=s1>&#39;Read huge dialog json file&#39;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1>### Create processed csv file</span>
+</span></span><span class=line><span class=cl><span class=n>df_final</span> <span class=o>=</span> <span class=n>pd</span><span class=o>.</span><span class=n>DataFrame</span><span class=p>(</span><span class=n>columns</span><span class=o>=</span><span class=p>[</span>
+</span></span><span class=line><span class=cl>    <span class=s1>&#39;fname&#39;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>    <span class=s1>&#39;acticyID&#39;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>    <span class=s1>&#39;alternativeIdx&#39;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>    <span class=s1>&#39;text&#39;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>    <span class=s1>&#39;actorID&#39;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>    <span class=s1>&#39;actorName&#39;</span>
+</span></span><span class=line><span class=cl><span class=p>])</span> <span class=c1># shape of the output csv</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=k>for</span> <span class=n>aID</span><span class=p>,</span><span class=n>clip_ls</span> <span class=ow>in</span> <span class=n>tqdm</span><span class=p>(</span><span class=n>clips</span><span class=o>.</span><span class=n>items</span><span class=p>(),</span><span class=n>desc</span><span class=o>=</span><span class=s1>&#39;Building final csv...&#39;</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>    <span class=n>dialogueEntries</span> <span class=o>=</span> <span class=n>df_convos</span><span class=p>[</span><span class=n>df_convos</span><span class=p>[</span><span class=s2>&#34;Articy Id&#34;</span><span class=p>]</span> <span class=o>==</span> <span class=n>aID</span><span class=p>]</span>
+</span></span><span class=line><span class=cl>    <span class=k>if</span> <span class=n>dialogueEntries</span><span class=o>.</span><span class=n>shape</span><span class=p>[</span><span class=mi>0</span><span class=p>]</span> <span class=o>==</span> <span class=mi>0</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>        <span class=nb>print</span><span class=p>(</span><span class=sa>f</span><span class=s1>&#39;WARNING: unused audio clip(s) </span><span class=si>{</span><span class=n>clip_ls</span><span class=si>}</span><span class=s1>&#39;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>        <span class=k>continue</span>
+</span></span><span class=line><span class=cl>    <span class=k>assert</span> <span class=n>dialogueEntries</span><span class=o>.</span><span class=n>shape</span><span class=p>[</span><span class=mi>0</span><span class=p>]</span> <span class=o>==</span> <span class=mi>1</span> <span class=c1># make sure there&#39;s only 1 entry</span>
+</span></span><span class=line><span class=cl>    <span class=n>dialogueEntry</span> <span class=o>=</span> <span class=n>dialogueEntries</span><span class=o>.</span><span class=n>iloc</span><span class=p>[</span><span class=mi>0</span><span class=p>]</span> <span class=c1># get the entry</span>
+</span></span><span class=line><span class=cl>    <span class=n>actor</span> <span class=o>=</span> <span class=n>df_actors</span><span class=p>[</span><span class=n>df_actors</span><span class=o>.</span><span class=n>id</span> <span class=o>==</span> <span class=nb>int</span><span class=p>(</span><span class=n>dialogueEntry</span><span class=o>.</span><span class=n>Actor</span><span class=p>)]</span><span class=o>.</span><span class=n>iloc</span><span class=p>[</span><span class=mi>0</span><span class=p>]</span>
+</span></span><span class=line><span class=cl>    <span class=k>for</span> <span class=n>i</span><span class=p>,</span><span class=n>path</span> <span class=ow>in</span> <span class=nb>enumerate</span><span class=p>(</span><span class=n>clip_ls</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>        <span class=n>text</span> <span class=o>=</span> <span class=n>dialogueEntry</span><span class=p>[</span><span class=s1>&#39;Alternate</span><span class=si>%d</span><span class=s1>&#39;</span><span class=o>%</span><span class=n>i</span><span class=p>]</span> <span class=k>if</span> <span class=n>i</span> <span class=k>else</span> <span class=n>dialogueEntry</span><span class=p>[</span><span class=s1>&#39;Dialogue Text&#39;</span><span class=p>]</span>
+</span></span><span class=line><span class=cl>        <span class=n>df_final</span> <span class=o>=</span> <span class=n>df_final</span><span class=o>.</span><span class=n>append</span><span class=p>({</span>
+</span></span><span class=line><span class=cl>            <span class=s1>&#39;fname&#39;</span><span class=p>:</span> <span class=n>path</span><span class=o>.</span><span class=n>name</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>            <span class=s1>&#39;acticyID&#39;</span><span class=p>:</span> <span class=n>aID</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>            <span class=s1>&#39;alternativeIdx&#39;</span><span class=p>:</span> <span class=n>i</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>            <span class=s1>&#39;text&#39;</span><span class=p>:</span> <span class=n>text</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>            <span class=s1>&#39;actorID&#39;</span><span class=p>:</span> <span class=n>actor</span><span class=o>.</span><span class=n>id</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>            <span class=s1>&#39;actorName&#39;</span><span class=p>:</span> <span class=n>actor</span><span class=o>.</span><span class=n>Name</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>        <span class=p>},</span> <span class=n>ignore_index</span><span class=o>=</span><span class=kc>True</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=n>df_final</span><span class=o>.</span><span class=n>to_csv</span><span class=p>(</span><span class=sa>r</span><span class=s1>&#39;AudioClipMetadata.csv&#39;</span><span class=p>,</span> <span class=n>index</span><span class=o>=</span><span class=kc>False</span><span class=p>)</span>
+</span></span></code></pre></td></tr></table></div></div><p>The script is single-threaded, because I don&rsquo;t know how to properly operate <code>pandas</code>. After about fifteen minutes of waiting, I end up with a <code>.csv</code> file that looks like this:
+<img src=Pasted%20image%2020220818175859.png>
+Audio files, lines, and actor names. Great.</p><h2 id=packaging>Packaging</h2><p>Now, there are a few problems with the audio transcript as-is:</p><ul><li><p>Unaccepted punctuation. <code>*asterisks*</code> for emphasis, dashes (<code>--</code>) and ellipses (<code>...</code>) for pauses, quotation marks (<code>""</code>) &ndash; these are all readable by humans, but poorly handled by the models I&rsquo;ll be using.</p></li><li><p>Fantasy words. Oranje, Revachol, Kineema, radiocomputer, Reál, Isola&mldr; Some people have the volition to sift through entire datasets, manually assigning the right pronunciations to each word. I am not one of those people.</p></li><li><p>Lines that just shouldn&rsquo;t exist in any audio dataset. For example:</p><blockquote><p>Half-Finished Paperwork: KK57-0803-0815 (THE HANGED MAN)</p></blockquote><blockquote><p>Pale Latitude Compressor: &ldquo;236189281&mldr; If you&rsquo;re looking for a deal on mattresses&mldr; SUHSUHSUHSPEEDFRRRR&mldr; 23567&mldr; 32971047302819&mldr; Oh Rosaline, oh Rosaline&mldr;&rdquo;</p></blockquote></li></ul><p>But I&rsquo;m going to ignore these problems for now. We have close to 50k lines of speech, and given about half of those are by the Narrator, that&rsquo;s >20k lines of training data. I <em>assume</em> that&rsquo;s enough to get a passable first model, even with problems in the dataset.</p><p>So, ignoring those issues for the future I want to format my raw data for an AI blackbox to eat. Which AI? From what little I know, <a href=https://github.com/NVIDIA/tacotron2 target=_blank rel="noopener noreffer">Tacotron 2</a> is one of the simplest and cheapest models to train. Starting with it sounds like a good idea. Let&rsquo;s read the <a href="https://colab.research.google.com/github/NVIDIA/NeMo/blob/stable/tutorials/tts/Tacotron2_Training.ipynb#scrollTo=htbJiaJjYQAD" target=_blank rel="noopener noreffer">tutorial</a>:</p><figure><img src=Pasted%20image%2020220818193200.png></figure><p>Well, this is quite nice. I don&rsquo;t really know what a <em>phoneme</em> is (yet), and much of the audio I have is significantly longer than 10 seconds, but the other 4 bullet points seem to be OK.</p><p>The data format shown above is also delightfully simplistic. The main problem for us is that it requires a <code>"duration"</code> field, which our current raw data does not declare. This isn&rsquo;t much of a problem; it&rsquo;s trivial to extract the info from each <code>.wav</code> file:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=kn>import</span> <span class=nn>csv</span>
+</span></span><span class=line><span class=cl><span class=kn>import</span> <span class=nn>wave</span>
+</span></span><span class=line><span class=cl><span class=kn>import</span> <span class=nn>contextlib</span>
+</span></span><span class=line><span class=cl><span class=kn>from</span> <span class=nn>json</span> <span class=kn>import</span> <span class=n>dumps</span>
+</span></span><span class=line><span class=cl><span class=kn>from</span> <span class=nn>multiprocessing</span> <span class=kn>import</span> <span class=n>Pool</span>
+</span></span><span class=line><span class=cl><span class=n>AUDIO_DIR</span> <span class=o>=</span> <span class=s1>&#39;./AudioClip/&#39;</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># https://stackoverflow.com/a/7833963</span>
+</span></span><span class=line><span class=cl><span class=k>def</span> <span class=nf>duration</span><span class=p>(</span><span class=n>fname</span><span class=p>:</span> <span class=nb>str</span><span class=p>)</span> <span class=o>-&gt;</span> <span class=nb>float</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>    <span class=k>with</span> <span class=n>contextlib</span><span class=o>.</span><span class=n>closing</span><span class=p>(</span><span class=n>wave</span><span class=o>.</span><span class=n>open</span><span class=p>(</span><span class=n>fname</span><span class=p>,</span><span class=s1>&#39;r&#39;</span><span class=p>))</span> <span class=k>as</span> <span class=n>f</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>        <span class=n>frames</span> <span class=o>=</span> <span class=n>f</span><span class=o>.</span><span class=n>getnframes</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>        <span class=n>rate</span> <span class=o>=</span> <span class=n>f</span><span class=o>.</span><span class=n>getframerate</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>        <span class=k>return</span> <span class=n>frames</span> <span class=o>/</span> <span class=nb>float</span><span class=p>(</span><span class=n>rate</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=c1># 2.2565208333333335 == duration(&#39;./AudioClip/ANTI OBJECT TASK FORCE_TITLE.wav&#39;))</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># [&#39;fname&#39;, &#39;acticyID&#39;, &#39;alternativeIdx&#39;, &#39;text&#39;, &#39;actorID&#39;, &#39;actorName&#39;]</span>
+</span></span><span class=line><span class=cl><span class=k>def</span> <span class=nf>csvToJson</span><span class=p>(</span><span class=n>args</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>    <span class=n>fname</span><span class=p>,</span> <span class=n>text</span> <span class=o>=</span> <span class=n>args</span><span class=p>[</span><span class=mi>0</span><span class=p>],</span> <span class=n>args</span><span class=p>[</span><span class=mi>3</span><span class=p>]</span>
+</span></span><span class=line><span class=cl>    <span class=n>t</span> <span class=o>=</span> <span class=n>duration</span><span class=p>(</span><span class=n>AUDIO_DIR</span><span class=o>+</span><span class=n>fname</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=k>return</span> <span class=n>dumps</span><span class=p>({</span><span class=s1>&#39;audio_filepath&#39;</span><span class=p>:</span> <span class=n>fname</span><span class=p>,</span> <span class=s1>&#39;text&#39;</span><span class=p>:</span> <span class=n>text</span><span class=p>,</span> <span class=s1>&#39;duration&#39;</span><span class=p>:</span> <span class=n>t</span><span class=p>})</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=n>CORES</span> <span class=o>=</span> <span class=mi>8</span>
+</span></span><span class=line><span class=cl><span class=k>with</span> <span class=nb>open</span><span class=p>(</span><span class=s1>&#39;./AudioClipMetadata.csv&#39;</span><span class=p>)</span> <span class=k>as</span> <span class=n>csvfile</span><span class=p>,</span> <span class=n>Pool</span><span class=p>(</span><span class=n>CORES</span><span class=p>)</span> <span class=k>as</span> <span class=n>pool</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>    <span class=n>reader</span> <span class=o>=</span> <span class=n>csv</span><span class=o>.</span><span class=n>reader</span><span class=p>(</span><span class=n>csvfile</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=nb>next</span><span class=p>(</span><span class=n>reader</span><span class=p>)</span> <span class=c1># ignore header</span>
+</span></span><span class=line><span class=cl>    <span class=k>for</span> <span class=n>json_line</span> <span class=ow>in</span> <span class=n>pool</span><span class=o>.</span><span class=n>imap</span><span class=p>(</span><span class=n>csvToJson</span><span class=p>,</span> <span class=n>reader</span><span class=p>,</span> <span class=mi>1</span><span class=o>&lt;&lt;</span><span class=mi>10</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>        <span class=nb>print</span><span class=p>(</span><span class=n>json_line</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>        <span class=n>exit</span><span class=p>()</span>
+</span></span></code></pre></td></tr></table></div></div><p>Here, I&rsquo;ve made the outlines of a script to create each expected <code>json</code> line with multithreading. I leave an <code>exit()</code> in the main loop so that I can test that the script approximately works without parsing everything yet:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=err>$</span> <span class=n>python3</span> <span class=n>duration</span><span class=o>.</span><span class=n>py</span>
+</span></span><span class=line><span class=cl><span class=p>{</span><span class=s2>&#34;audio_filepath&#34;</span><span class=p>:</span> <span class=s2>&#34;Inland Empire-BOOKSTORE  BIOGRAPHIES-29.wav&#34;</span><span class=p>,</span> <span class=s2>&#34;text&#34;</span><span class=p>:</span> <span class=s2>&#34;You feel like you should get this one. Definitely. It&#39;s *important* somehow. There is something personal inside...&#34;</span><span class=p>,</span> <span class=s2>&#34;duration&#34;</span><span class=p>:</span> <span class=mf>7.793041666666666</span><span class=p>}</span>
+</span></span></code></pre></td></tr></table></div></div><p>Format looks good. But I&rsquo;m not looking to use <em>all</em> of the voices here; just the voices of the narrator. I need to figure out which voice actors are narrated and which aren&rsquo;t.</p><p>Step 1 is to extract a list of actors. I use <code>disco-courier</code> to export <code>actors.json</code>:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-json data-lang=json><span class=line><span class=cl><span class=err>$</span> <span class=err>fx</span> <span class=err>disco-courier/src/data/json/actors/actors.json</span> <span class=err>.actors</span><span class=p>[</span><span class=mi>100</span><span class=p>]</span>
+</span></span><span class=line><span class=cl><span class=p>{</span>
+</span></span><span class=line><span class=cl>  <span class=nt>&#34;actorId&#34;</span><span class=p>:</span> <span class=mi>101</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>  <span class=nt>&#34;refId&#34;</span><span class=p>:</span> <span class=s2>&#34;0x0100002F0000F968&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>  <span class=nt>&#34;name&#34;</span><span class=p>:</span> <span class=s2>&#34;Little Lily&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>  <span class=nt>&#34;shortDescription&#34;</span><span class=p>:</span> <span class=s2>&#34;&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>  <span class=nt>&#34;longDescription&#34;</span><span class=p>:</span> <span class=s2>&#34;&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>  <span class=nt>&#34;isPlayer&#34;</span><span class=p>:</span> <span class=kc>false</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>  <span class=nt>&#34;isNPC&#34;</span><span class=p>:</span> <span class=kc>true</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>  <span class=nt>&#34;isFemale&#34;</span><span class=p>:</span> <span class=kc>true</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></td></tr></table></div></div><p><code>isPlayer</code>/<code>isNPC</code> looks promising. Can we filter for those?</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span><span class=lnt>32
+</span><span class=lnt>33
+</span><span class=lnt>34
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-json data-lang=json><span class=line><span class=cl><span class=err>$</span> <span class=err>fx</span> <span class=err>&#39;.actors.filter(d</span> <span class=err>=&gt;</span> <span class=err>!d.isNPC)</span><span class=p>[</span><span class=mi>0</span><span class=p>]</span><span class=err>&#39;</span> <span class=err>&lt;</span> <span class=err>actors.json</span>
+</span></span><span class=line><span class=cl><span class=p>{</span>
+</span></span><span class=line><span class=cl>  <span class=nt>&#34;actorId&#34;</span><span class=p>:</span> <span class=mi>20</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>  <span class=nt>&#34;refId&#34;</span><span class=p>:</span> <span class=s2>&#34;0x01000014000003D8&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>  <span class=nt>&#34;name&#34;</span><span class=p>:</span> <span class=s2>&#34;Large Scab&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>  <span class=nt>&#34;isPlayer&#34;</span><span class=p>:</span> <span class=kc>false</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>  <span class=nt>&#34;isNPC&#34;</span><span class=p>:</span> <span class=kc>false</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>  <span class=nt>&#34;isFemale&#34;</span><span class=p>:</span> <span class=kc>false</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>  <span class=nt>&#34;voice&#34;</span><span class=p>:</span> <span class=kc>null</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span><span class=line><span class=cl><span class=err>$</span> <span class=err>fx</span> <span class=err>&#39;.actors.filter(d</span> <span class=err>=&gt;</span> <span class=err>d.isNPC).slice(</span><span class=mi>-1</span><span class=err>)&#39;</span> <span class=err>&lt;</span> <span class=err>actors.json</span>
+</span></span><span class=line><span class=cl><span class=p>[</span>
+</span></span><span class=line><span class=cl>  <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=nt>&#34;actorId&#34;</span><span class=p>:</span> <span class=mi>424</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>    <span class=nt>&#34;refId&#34;</span><span class=p>:</span> <span class=s2>&#34;0x0100000800000BBC&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>    <span class=nt>&#34;name&#34;</span><span class=p>:</span> <span class=s2>&#34;Perception (Sight)&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>    <span class=nt>&#34;shortDescription&#34;</span><span class=p>:</span> <span class=s2>&#34;&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>    <span class=nt>&#34;longDescription&#34;</span><span class=p>:</span> <span class=s2>&#34;&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>    <span class=nt>&#34;isPlayer&#34;</span><span class=p>:</span> <span class=kc>false</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>    <span class=nt>&#34;isNPC&#34;</span><span class=p>:</span> <span class=kc>true</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>    <span class=nt>&#34;isFemale&#34;</span><span class=p>:</span> <span class=kc>false</span>
+</span></span><span class=line><span class=cl>  <span class=p>}</span>
+</span></span><span class=line><span class=cl><span class=p>]</span>
+</span></span><span class=line><span class=cl><span class=err>$</span> <span class=err>fx</span> <span class=err>&#39;.actors.filter(d</span> <span class=err>=&gt;</span> <span class=err>d.isPlayer)&#39;</span> <span class=err>&lt;</span> <span class=err>actors.json</span>
+</span></span><span class=line><span class=cl><span class=p>[</span>
+</span></span><span class=line><span class=cl>  <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=nt>&#34;actorId&#34;</span><span class=p>:</span> <span class=mi>396</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>    <span class=nt>&#34;refId&#34;</span><span class=p>:</span> <span class=s2>&#34;0x010000000000057C&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>    <span class=nt>&#34;name&#34;</span><span class=p>:</span> <span class=s2>&#34;You&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>    <span class=nt>&#34;isPlayer&#34;</span><span class=p>:</span> <span class=kc>true</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>    <span class=nt>&#34;isNPC&#34;</span><span class=p>:</span> <span class=kc>false</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>    <span class=nt>&#34;isFemale&#34;</span><span class=p>:</span> <span class=kc>false</span>
+</span></span><span class=line><span class=cl>  <span class=p>}</span>
+</span></span><span class=line><span class=cl><span class=p>]</span>
+</span></span></code></pre></td></tr></table></div></div><p>Well, this is clearly useless. <code>isNPC</code> covers narrated actors like <code>Perception</code> <em>and</em> other voice actors like <code>Kim Kitsuragi</code>, while <code>isPlayer</code> covers absolutely nothing of value.</p><p>Reading <code>actors.json</code> further, I realise that there are actors like <code>Ceiling Fan</code> or <code>"Smallest Church in Saint-Saëns"</code> that are actually voiced by the main Narrator too:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>$ jq .actors<span class=o>[]</span>.name src/data/json/actors/actors.json <span class=p>|</span> tail -100
+</span></span><span class=line><span class=cl><span class=s2>&#34;Door, Basement Apartment&#34;</span>
+</span></span><span class=line><span class=cl><span class=s2>&#34;The Great Doorgunner Megamix&#34;</span>
+</span></span><span class=line><span class=cl><span class=s2>&#34;Coffee Table&#34;</span>
+</span></span><span class=line><span class=cl><span class=s2>&#34;A Note from the Fridge&#34;</span>
+</span></span><span class=line><span class=cl><span class=s2>&#34;Shimmering Wall of Vices&#34;</span>
+</span></span><span class=line><span class=cl><span class=s2>&#34;Photo of Tattoos&#34;</span>
+</span></span><span class=line><span class=cl><span class=s2>&#34;\&#34;Smallest Church in Saint-Saëns\&#34;&#34;</span>
+</span></span><span class=line><span class=cl><span class=s2>&#34;Karaoke Stand&#34;</span>
+</span></span><span class=line><span class=cl><span class=s2>&#34;A Folded Library Card&#34;</span>
+</span></span></code></pre></td></tr></table></div></div><p>So, <code>disco-courier</code> is ineffective here, and we have no idea which <code>actorID</code> corresponds to the Narrator of the game, so we&rsquo;ll need to&mldr;</p><p>&mldr; <code>*deep sigh*</code> &mldr;</p><p>&mldr;manually label the data.</p><h2 id=filtering-for-voice-actors>Filtering for voice actors</h2><p>The voice actors can be split into 5 categories for our purposes:</p><ol><li>NPCs (like Kim Kitsuragi)</li><li>Narrator (obviously)</li><li>Not sure (I don&rsquo;t have an encyclopedic knowledge of the game; I&rsquo;ll ignore a few actors for now and check again later)</li><li>404 Not Found. Interestingly, several voice actors listed in <code>actors.json</code> do not actually have any voice lines.</li><li>Mixed voices. Many of the voice lines labelled to be by an NPC are actually narrated. Consider these lines, labelled to be by <code>Cunoesse</code>:<figure><img src=Pasted%20image%2020220819155102.png></figure>The top 5 are narrated; the bottom five aren&rsquo;t. The full solution to this is <em>not</em> as simple as, &ldquo;look for quotation marks&rdquo;, either. Scare/rhetorical quotes are a thing.</li></ol><p>I started work by editing the <code>.json</code> file in a text editor, but quickly realised it was <em>ridiculously slow</em>. Instead, I created a buggy script to minimise the time delay between each label:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span><span class=lnt>32
+</span><span class=lnt>33
+</span><span class=lnt>34
+</span><span class=lnt>35
+</span><span class=lnt>36
+</span><span class=lnt>37
+</span><span class=lnt>38
+</span><span class=lnt>39
+</span><span class=lnt>40
+</span><span class=lnt>41
+</span><span class=lnt>42
+</span><span class=lnt>43
+</span><span class=lnt>44
+</span><span class=lnt>45
+</span><span class=lnt>46
+</span><span class=lnt>47
+</span><span class=lnt>48
+</span><span class=lnt>49
+</span><span class=lnt>50
+</span><span class=lnt>51
+</span><span class=lnt>52
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=kn>import</span> <span class=nn>pandas</span> <span class=k>as</span> <span class=nn>pd</span>
+</span></span><span class=line><span class=cl><span class=kn>from</span> <span class=nn>prompt_toolkit</span> <span class=kn>import</span> <span class=n>prompt</span>
+</span></span><span class=line><span class=cl><span class=kn>from</span> <span class=nn>prompt_toolkit.key_binding</span> <span class=kn>import</span> <span class=n>KeyBindings</span>
+</span></span><span class=line><span class=cl><span class=kn>from</span> <span class=nn>termcolor</span> <span class=kn>import</span> <span class=n>cprint</span>
+</span></span><span class=line><span class=cl><span class=kn>from</span> <span class=nn>json</span> <span class=kn>import</span> <span class=n>load</span><span class=p>,</span><span class=n>dump</span><span class=p>,</span><span class=n>dumps</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=k>with</span> <span class=nb>open</span><span class=p>(</span><span class=s1>&#39;./actors.json&#39;</span><span class=p>)</span> <span class=k>as</span> <span class=n>f</span><span class=p>:</span> <span class=n>actors</span> <span class=o>=</span> <span class=n>load</span><span class=p>(</span><span class=n>f</span><span class=p>)[</span><span class=s1>&#39;actors&#39;</span><span class=p>]</span>
+</span></span><span class=line><span class=cl><span class=n>df</span> <span class=o>=</span> <span class=n>pd</span><span class=o>.</span><span class=n>read_csv</span><span class=p>(</span><span class=s1>&#39;./AudioClipMetadata.csv&#39;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=n>res</span> <span class=o>=</span> <span class=p>[]</span>
+</span></span><span class=line><span class=cl><span class=k>def</span> <span class=nf>handle</span><span class=p>(</span><span class=n>opt</span><span class=p>:</span> <span class=nb>str</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>    <span class=nb>print</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>    <span class=k>if</span> <span class=ow>not</span> <span class=n>opt</span><span class=p>:</span> <span class=nb>print</span><span class=p>(</span><span class=n>dumps</span><span class=p>(</span><span class=n>res</span><span class=p>))</span>
+</span></span><span class=line><span class=cl>    <span class=k>elif</span> <span class=n>opt</span> <span class=o>==</span> <span class=s1>&#39;back&#39;</span><span class=p>:</span> <span class=n>res</span><span class=o>.</span><span class=n>pop</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>    <span class=k>elif</span> <span class=nb>len</span><span class=p>(</span><span class=n>actors</span><span class=p>)</span> <span class=o>&gt;</span> <span class=nb>len</span><span class=p>(</span><span class=n>res</span><span class=p>):</span> <span class=n>res</span><span class=o>.</span><span class=n>append</span><span class=p>({</span><span class=o>**</span><span class=n>actors</span><span class=p>[</span><span class=nb>len</span><span class=p>(</span><span class=n>res</span><span class=p>)],</span> <span class=s1>&#39;narratorType&#39;</span><span class=p>:</span> <span class=n>opt</span><span class=p>})</span>
+</span></span><span class=line><span class=cl>    <span class=k>else</span><span class=p>:</span> <span class=nb>print</span><span class=p>(</span><span class=s1>&#39;press q bro&#39;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=c1>#</span>
+</span></span><span class=line><span class=cl>    <span class=k>while</span> <span class=mi>1</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>        <span class=k>if</span> <span class=nb>len</span><span class=p>(</span><span class=n>actors</span><span class=p>)</span> <span class=o>==</span> <span class=nb>len</span><span class=p>(</span><span class=n>res</span><span class=p>):</span> <span class=k>break</span>
+</span></span><span class=line><span class=cl>        <span class=n>a</span> <span class=o>=</span> <span class=n>actors</span><span class=p>[</span><span class=nb>len</span><span class=p>(</span><span class=n>res</span><span class=p>)]</span>
+</span></span><span class=line><span class=cl>        <span class=n>cprint</span><span class=p>(</span><span class=n>a</span><span class=p>[</span><span class=s1>&#39;name&#39;</span><span class=p>],</span> <span class=s1>&#39;magenta&#39;</span><span class=p>,</span> <span class=kc>None</span><span class=p>,</span> <span class=p>[</span><span class=s1>&#39;bold&#39;</span><span class=p>,</span> <span class=s1>&#39;underline&#39;</span><span class=p>])</span>
+</span></span><span class=line><span class=cl>        <span class=n>desc</span> <span class=o>=</span> <span class=n>a</span><span class=o>.</span><span class=n>get</span><span class=p>(</span><span class=s1>&#39;longDescription&#39;</span><span class=p>,</span><span class=s1>&#39;&#39;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>        <span class=k>if</span> <span class=n>desc</span><span class=p>:</span> <span class=n>cprint</span><span class=p>(</span><span class=n>desc</span><span class=p>,</span> <span class=s1>&#39;yellow&#39;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>        <span class=k>else</span><span class=p>:</span> <span class=n>cprint</span><span class=p>(</span><span class=s1>&#39;No description&#39;</span><span class=p>,</span> <span class=s1>&#39;grey&#39;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>        <span class=c1>#</span>
+</span></span><span class=line><span class=cl>        <span class=n>lines</span> <span class=o>=</span> <span class=n>df</span><span class=p>[</span><span class=n>df</span><span class=p>[</span><span class=s1>&#39;actorID&#39;</span><span class=p>]</span> <span class=o>==</span> <span class=n>a</span><span class=p>[</span><span class=s1>&#39;actorId&#39;</span><span class=p>]]</span>
+</span></span><span class=line><span class=cl>        <span class=k>if</span> <span class=n>lines</span><span class=o>.</span><span class=n>shape</span><span class=p>[</span><span class=mi>0</span><span class=p>]:</span>
+</span></span><span class=line><span class=cl>            <span class=nb>print</span><span class=p>(</span><span class=n>lines</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>            <span class=k>break</span>
+</span></span><span class=line><span class=cl>        <span class=k>else</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>            <span class=n>cprint</span><span class=p>(</span><span class=s1>&#39;No lines found for this Actor. Skipping...&#39;</span><span class=p>,</span> <span class=s1>&#39;grey&#39;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>            <span class=n>res</span><span class=o>.</span><span class=n>append</span><span class=p>({</span><span class=o>**</span><span class=n>actors</span><span class=p>[</span><span class=nb>len</span><span class=p>(</span><span class=n>res</span><span class=p>)],</span> <span class=s1>&#39;narratorType&#39;</span><span class=p>:</span> <span class=s1>&#39;Absent&#39;</span><span class=p>})</span>
+</span></span><span class=line><span class=cl>    <span class=nb>print</span><span class=p>(</span><span class=s1>&#39;&gt; &#39;</span><span class=p>,</span> <span class=n>end</span><span class=o>=</span><span class=s1>&#39;&#39;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=n>bindings</span> <span class=o>=</span> <span class=n>KeyBindings</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=k>def</span> <span class=nf>bind</span><span class=p>(</span><span class=n>c</span><span class=p>:</span> <span class=nb>str</span><span class=p>,</span> <span class=n>out</span><span class=p>:</span> <span class=nb>str</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>    <span class=nd>@bindings</span><span class=o>.</span><span class=n>add</span><span class=p>(</span><span class=n>c</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=k>def</span> <span class=nf>_</span><span class=p>(</span><span class=n>e</span><span class=p>):</span> <span class=n>handle</span><span class=p>(</span><span class=n>out</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=n>bind</span><span class=p>(</span><span class=s1>&#39;enter&#39;</span><span class=p>,</span> <span class=s1>&#39;&#39;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=n>bind</span><span class=p>(</span><span class=s1>&#39;b&#39;</span><span class=p>,</span> <span class=s1>&#39;back&#39;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=n>bind</span><span class=p>(</span><span class=s1>&#39;1&#39;</span><span class=p>,</span> <span class=s1>&#39;NPC&#39;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=n>bind</span><span class=p>(</span><span class=s1>&#39;2&#39;</span><span class=p>,</span> <span class=s1>&#39;Narrator&#39;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=n>bind</span><span class=p>(</span><span class=s1>&#39;3&#39;</span><span class=p>,</span> <span class=s1>&#39;Unknown&#39;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=n>bind</span><span class=p>(</span><span class=s1>&#39;4&#39;</span><span class=p>,</span> <span class=s1>&#39;Mixed&#39;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=nd>@bindings</span><span class=o>.</span><span class=n>add</span><span class=p>(</span><span class=s1>&#39;q&#39;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=k>def</span> <span class=nf>finish</span><span class=p>(</span><span class=n>e</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>    <span class=k>with</span> <span class=nb>open</span><span class=p>(</span><span class=s1>&#39;actors_by_narrator.json&#39;</span><span class=p>,</span> <span class=s1>&#39;w&#39;</span><span class=p>)</span> <span class=k>as</span> <span class=n>f</span><span class=p>:</span> <span class=n>dump</span><span class=p>(</span><span class=n>res</span><span class=p>,</span><span class=n>f</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=n>exit</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=n>prompt</span><span class=p>(</span><span class=s2>&#34;Press enter to begin: &#34;</span><span class=p>,</span> <span class=n>key_bindings</span><span class=o>=</span><span class=n>bindings</span><span class=p>)</span>
+</span></span></code></pre></td></tr></table></div></div><p>This script breaks extremely often, but it was enough for me to create the labelled data within a few hours:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>$ jq .<span class=o>[]</span>.narratorType actors_by_narrator.json <span class=p>|</span> head
+</span></span><span class=line><span class=cl><span class=s2>&#34;Absent&#34;</span>
+</span></span><span class=line><span class=cl><span class=s2>&#34;Absent&#34;</span>
+</span></span><span class=line><span class=cl><span class=s2>&#34;Absent&#34;</span>
+</span></span><span class=line><span class=cl><span class=s2>&#34;Absent&#34;</span>
+</span></span><span class=line><span class=cl><span class=s2>&#34;NPC&#34;</span>
+</span></span><span class=line><span class=cl><span class=s2>&#34;Mixed&#34;</span>
+</span></span><span class=line><span class=cl><span class=s2>&#34;Mixed&#34;</span>
+</span></span><span class=line><span class=cl><span class=s2>&#34;NPC&#34;</span>
+</span></span><span class=line><span class=cl><span class=s2>&#34;NPC&#34;</span>
+</span></span><span class=line><span class=cl><span class=s2>&#34;NPC&#34;</span>
+</span></span></code></pre></td></tr></table></div></div><h2 id=the-first-dataset>The First Dataset</h2><p>I finished the script from earlier to create the json file:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span><span class=lnt>32
+</span><span class=lnt>33
+</span><span class=lnt>34
+</span><span class=lnt>35
+</span><span class=lnt>36
+</span><span class=lnt>37
+</span><span class=lnt>38
+</span><span class=lnt>39
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=kn>import</span> <span class=nn>csv</span>
+</span></span><span class=line><span class=cl><span class=kn>import</span> <span class=nn>wave</span>
+</span></span><span class=line><span class=cl><span class=kn>import</span> <span class=nn>contextlib</span>
+</span></span><span class=line><span class=cl><span class=kn>import</span> <span class=nn>pandas</span> <span class=k>as</span> <span class=nn>pd</span>
+</span></span><span class=line><span class=cl><span class=kn>from</span> <span class=nn>shutil</span> <span class=kn>import</span> <span class=n>copy</span>
+</span></span><span class=line><span class=cl><span class=kn>from</span> <span class=nn>typing</span> <span class=kn>import</span> <span class=n>List</span>
+</span></span><span class=line><span class=cl><span class=kn>from</span> <span class=nn>json</span> <span class=kn>import</span> <span class=n>dumps</span><span class=p>,</span><span class=n>load</span>
+</span></span><span class=line><span class=cl><span class=kn>from</span> <span class=nn>multiprocessing</span> <span class=kn>import</span> <span class=n>Pool</span>
+</span></span><span class=line><span class=cl><span class=n>AUDIO_DIR</span> <span class=o>=</span> <span class=s1>&#39;./AudioClip/&#39;</span>
+</span></span><span class=line><span class=cl><span class=n>AUDIO_DIR_NEW</span> <span class=o>=</span> <span class=s1>&#39;./AudioClip_Narrator/&#39;</span>
+</span></span><span class=line><span class=cl><span class=k>with</span> <span class=nb>open</span><span class=p>(</span><span class=s1>&#39;./actors_by_narrator.json&#39;</span><span class=p>)</span> <span class=k>as</span> <span class=n>f</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>    <span class=n>df_actor</span> <span class=o>=</span> <span class=n>pd</span><span class=o>.</span><span class=n>json_normalize</span><span class=p>(</span><span class=n>load</span><span class=p>(</span><span class=n>f</span><span class=p>))</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># https://stackoverflow.com/a/7833963</span>
+</span></span><span class=line><span class=cl><span class=k>def</span> <span class=nf>duration</span><span class=p>(</span><span class=n>fname</span><span class=p>:</span> <span class=nb>str</span><span class=p>)</span> <span class=o>-&gt;</span> <span class=nb>float</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>    <span class=k>with</span> <span class=n>contextlib</span><span class=o>.</span><span class=n>closing</span><span class=p>(</span><span class=n>wave</span><span class=o>.</span><span class=n>open</span><span class=p>(</span><span class=n>fname</span><span class=p>,</span><span class=s1>&#39;r&#39;</span><span class=p>))</span> <span class=k>as</span> <span class=n>f</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>        <span class=n>frames</span> <span class=o>=</span> <span class=n>f</span><span class=o>.</span><span class=n>getnframes</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>        <span class=n>rate</span> <span class=o>=</span> <span class=n>f</span><span class=o>.</span><span class=n>getframerate</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>        <span class=k>return</span> <span class=n>frames</span> <span class=o>/</span> <span class=nb>float</span><span class=p>(</span><span class=n>rate</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=c1># 2.2565208333333335 == duration(&#39;./AudioClip/ANTI OBJECT TASK FORCE_TITLE.wav&#39;))</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=k>def</span> <span class=nf>csvToJson</span><span class=p>(</span><span class=n>fname</span><span class=p>:</span> <span class=nb>str</span><span class=p>,</span> <span class=n>text</span><span class=p>:</span> <span class=nb>str</span><span class=p>)</span> <span class=o>-&gt;</span> <span class=nb>str</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>    <span class=n>t</span> <span class=o>=</span> <span class=n>duration</span><span class=p>(</span><span class=n>AUDIO_DIR</span><span class=o>+</span><span class=n>fname</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=k>return</span> <span class=n>dumps</span><span class=p>({</span><span class=s1>&#39;audio_filepath&#39;</span><span class=p>:</span> <span class=n>fname</span><span class=p>,</span> <span class=s1>&#39;text&#39;</span><span class=p>:</span> <span class=n>text</span><span class=p>,</span> <span class=s1>&#39;duration&#39;</span><span class=p>:</span> <span class=n>t</span><span class=p>})</span>
+</span></span><span class=line><span class=cl><span class=c1># [&#39;fname&#39;, &#39;acticyID&#39;, &#39;alternativeIdx&#39;, &#39;text&#39;, &#39;actorID&#39;, &#39;actorName&#39;]</span>
+</span></span><span class=line><span class=cl><span class=k>def</span> <span class=nf>consider</span><span class=p>(</span><span class=n>line</span><span class=p>:</span> <span class=n>List</span><span class=p>[</span><span class=nb>str</span><span class=p>]):</span>
+</span></span><span class=line><span class=cl>    <span class=n>fname</span><span class=p>,</span> <span class=n>text</span><span class=p>,</span> <span class=n>actorID</span> <span class=o>=</span> <span class=n>line</span><span class=p>[</span><span class=mi>0</span><span class=p>],</span> <span class=n>line</span><span class=p>[</span><span class=mi>3</span><span class=p>],</span> <span class=n>line</span><span class=p>[</span><span class=mi>4</span><span class=p>]</span>
+</span></span><span class=line><span class=cl>    <span class=n>actor</span> <span class=o>=</span> <span class=n>df_actor</span><span class=o>.</span><span class=n>loc</span><span class=p>[</span><span class=nb>int</span><span class=p>(</span><span class=n>actorID</span><span class=p>)</span><span class=o>-</span><span class=mi>1</span><span class=p>]</span>
+</span></span><span class=line><span class=cl>    <span class=k>assert</span> <span class=n>actor</span><span class=o>.</span><span class=n>actorId</span> <span class=o>==</span> <span class=nb>int</span><span class=p>(</span><span class=n>actorID</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=k>if</span> <span class=n>actor</span><span class=o>.</span><span class=n>narratorType</span> <span class=o>==</span> <span class=s1>&#39;Narrator&#39;</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>        <span class=n>copy</span><span class=p>(</span><span class=n>AUDIO_DIR</span><span class=o>+</span><span class=n>fname</span><span class=p>,</span> <span class=n>AUDIO_DIR_NEW</span><span class=o>+</span><span class=n>fname</span><span class=p>)</span> <span class=c1># very slow operation.</span>
+</span></span><span class=line><span class=cl>        <span class=k>return</span> <span class=n>csvToJson</span><span class=p>(</span><span class=n>fname</span><span class=p>,</span> <span class=n>text</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=n>CORES</span> <span class=o>=</span> <span class=mi>8</span>
+</span></span><span class=line><span class=cl><span class=k>with</span> <span class=nb>open</span><span class=p>(</span><span class=s1>&#39;./AudioClipMetadata.csv&#39;</span><span class=p>)</span> <span class=k>as</span> <span class=n>csvfile</span><span class=p>,</span> <span class=n>Pool</span><span class=p>(</span><span class=n>CORES</span><span class=p>)</span> <span class=k>as</span> <span class=n>pool</span><span class=p>,</span> <span class=nb>open</span><span class=p>(</span><span class=s1>&#39;./AudioClips_Narrator.json&#39;</span><span class=p>,</span> <span class=s1>&#39;w&#39;</span><span class=p>)</span> <span class=k>as</span> <span class=n>json_file</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>    <span class=n>reader</span> <span class=o>=</span> <span class=n>csv</span><span class=o>.</span><span class=n>reader</span><span class=p>(</span><span class=n>csvfile</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=nb>next</span><span class=p>(</span><span class=n>reader</span><span class=p>)</span> <span class=c1># ignore header</span>
+</span></span><span class=line><span class=cl>    <span class=k>for</span> <span class=n>json_line</span> <span class=ow>in</span> <span class=n>pool</span><span class=o>.</span><span class=n>imap</span><span class=p>(</span><span class=n>consider</span><span class=p>,</span> <span class=n>reader</span><span class=p>,</span> <span class=mi>1</span><span class=o>&lt;&lt;</span><span class=mi>8</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>        <span class=k>if</span> <span class=n>json_line</span><span class=p>:</span> <span class=n>json_file</span><span class=o>.</span><span class=n>write</span><span class=p>(</span><span class=n>json_line</span><span class=o>+</span><span class=s1>&#39;</span><span class=se>\n</span><span class=s1>&#39;</span><span class=p>)</span> <span class=c1># this isn&#39;t pooled, but this is ok since consider() is much slower.</span>
+</span></span></code></pre></td></tr></table></div></div><p>Looks good:<figure><img src=Pasted%20image%2020220819171057.png></figure>But we&rsquo;re supposed to split this into test/train data. Let&rsquo;s copy a stackoverflow solution again:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=c1># https://stackoverflow.com/a/48347284</span>
+</span></span><span class=line><span class=cl><span class=kn>import</span> <span class=nn>random</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=k>def</span> <span class=nf>split_file</span><span class=p>(</span><span class=n>file</span><span class=p>,</span><span class=n>out1</span><span class=p>,</span><span class=n>out2</span><span class=p>,</span><span class=n>percentage</span><span class=o>=</span><span class=mf>0.75</span><span class=p>,</span><span class=n>isShuffle</span><span class=o>=</span><span class=kc>True</span><span class=p>,</span><span class=n>seed</span><span class=o>=</span><span class=mi>123</span><span class=p>):</span>
+</span></span><span class=line><span class=cl>    <span class=s2>&#34;&#34;&#34;Splits a file in 2 given the `percentage` to go in the large file.&#34;&#34;&#34;</span>
+</span></span><span class=line><span class=cl>    <span class=n>random</span><span class=o>.</span><span class=n>seed</span><span class=p>(</span><span class=n>seed</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=k>with</span> <span class=nb>open</span><span class=p>(</span><span class=n>file</span><span class=p>,</span> <span class=s1>&#39;r&#39;</span><span class=p>,</span><span class=n>encoding</span><span class=o>=</span><span class=s2>&#34;utf-8&#34;</span><span class=p>)</span> <span class=k>as</span> <span class=n>fin</span><span class=p>,</span> \
+</span></span><span class=line><span class=cl>         <span class=nb>open</span><span class=p>(</span><span class=n>out1</span><span class=p>,</span> <span class=s1>&#39;w&#39;</span><span class=p>)</span> <span class=k>as</span> <span class=n>foutBig</span><span class=p>,</span> \
+</span></span><span class=line><span class=cl>         <span class=nb>open</span><span class=p>(</span><span class=n>out2</span><span class=p>,</span> <span class=s1>&#39;w&#39;</span><span class=p>)</span> <span class=k>as</span> <span class=n>foutSmall</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>        <span class=n>nLines</span> <span class=o>=</span> <span class=nb>sum</span><span class=p>(</span><span class=mi>1</span> <span class=k>for</span> <span class=n>line</span> <span class=ow>in</span> <span class=n>fin</span><span class=p>)</span> <span class=c1># if didn&#39;t count you could only approximate the percentage</span>
+</span></span><span class=line><span class=cl>        <span class=n>fin</span><span class=o>.</span><span class=n>seek</span><span class=p>(</span><span class=mi>0</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>        <span class=n>nTrain</span> <span class=o>=</span> <span class=nb>int</span><span class=p>(</span><span class=n>nLines</span><span class=o>*</span><span class=n>percentage</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>        <span class=n>nValid</span> <span class=o>=</span> <span class=n>nLines</span> <span class=o>-</span> <span class=n>nTrain</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>        <span class=n>i</span> <span class=o>=</span> <span class=mi>0</span>
+</span></span><span class=line><span class=cl>        <span class=k>for</span> <span class=n>line</span> <span class=ow>in</span> <span class=n>fin</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>            <span class=n>r</span> <span class=o>=</span> <span class=n>random</span><span class=o>.</span><span class=n>random</span><span class=p>()</span> <span class=k>if</span> <span class=n>isShuffle</span> <span class=k>else</span> <span class=mi>0</span> <span class=c1># so that always evaluated to true when not isShuffle</span>
+</span></span><span class=line><span class=cl>            <span class=k>if</span> <span class=p>(</span><span class=n>i</span> <span class=o>&lt;</span> <span class=n>nTrain</span> <span class=ow>and</span> <span class=n>r</span> <span class=o>&lt;</span> <span class=n>percentage</span><span class=p>):</span><span class=c1># or (nLines - i &gt; nValid): # &lt;-- error in the SO solution.</span>
+</span></span><span class=line><span class=cl>                <span class=n>foutBig</span><span class=o>.</span><span class=n>write</span><span class=p>(</span><span class=n>line</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>                <span class=n>i</span> <span class=o>+=</span> <span class=mi>1</span>
+</span></span><span class=line><span class=cl>            <span class=k>else</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>                <span class=n>foutSmall</span><span class=o>.</span><span class=n>write</span><span class=p>(</span><span class=n>line</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=n>split_file</span><span class=p>(</span><span class=s1>&#39;./AudioClips_Narrator.json&#39;</span><span class=p>,</span> <span class=s1>&#39;./AudioClips_Narrator_train.json&#39;</span><span class=p>,</span> <span class=s1>&#39;./AudioClips_Narrator_val.json&#39;</span><span class=p>)</span>
+</span></span></code></pre></td></tr></table></div></div><p>I can verify that this doesn&rsquo;t accidentally delete any of the lines:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>$ cat AudioClips_Narrator_* <span class=p>|</span> sort <span class=p>|</span> diff - &lt;<span class=o>(</span>sort AudioClips_Narrator.json<span class=o>)</span> -s
+</span></span><span class=line><span class=cl>Files - and /dev/fd/63 are identical
+</span></span></code></pre></td></tr></table></div></div><p>And now we just need to pack the data:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-sh data-lang=sh><span class=line><span class=cl>$ <span class=c1># this step takes a few minutes</span>
+</span></span><span class=line><span class=cl>$ tar zcf disco_dataset_NARRATOR.tar.gz AudioClip_Narrator/ AudioClips_Narrator_*
+</span></span><span class=line><span class=cl>$ du disco_dataset_NARRATOR.tar.gz -h <span class=c1># check filesize</span>
+</span></span><span class=line><span class=cl>7.1G    disco_dataset_NARRATOR.tar.gz
+</span></span></code></pre></td></tr></table></div></div><p>7GB is big, but not too big. Google Drive provides 15GB of space for free, so I&rsquo;m good to go for <a href=/todo rel>Colab training</a>.</p></div><div class=post-footer id=post-footer><div class=post-info><div class=post-info-line><div class=post-info-mod><span>Updated on September 25, 2022&nbsp;<a class=git-hash href=https://github.com/152334H/blog/commit/c9859e60c38b68f746847415a317b0ad9a2aaa8f target=_blank title="commit by 152334H(54623771+152334H@users.noreply.github.com) c9859e60c38b68f746847415a317b0ad9a2aaa8f: Post: TTS Data Formatting">
+<i class="fas fa-hashtag fa-fw" aria-hidden=true></i>c9859e6</a></span></div></div><div class=post-info-line><div class=post-info-md></div><div class=post-info-share><span><a href=javascript:void(0); title="Share on Twitter" data-sharer=twitter data-url=https://152334H.github.io/blog/dn-2/ data-title="Disco Narrator - Data Formatting" data-hashtags="Disco Elysium,pandas,part of a series,WIP"><i class="fab fa-twitter fa-fw" aria-hidden=true></i></a><a href=javascript:void(0); title="Share on Facebook" data-sharer=facebook data-url=https://152334H.github.io/blog/dn-2/ data-hashtag="Disco Elysium"><i class="fab fa-facebook-square fa-fw" aria-hidden=true></i></a><a href=javascript:void(0); title="Share on Linkedin" data-sharer=linkedin data-url=https://152334H.github.io/blog/dn-2/><i class="fab fa-linkedin fa-fw" aria-hidden=true></i></a><a href=javascript:void(0); title="Share on Hacker News" data-sharer=hackernews data-url=https://152334H.github.io/blog/dn-2/ data-title="Disco Narrator - Data Formatting"><i class="fab fa-hacker-news fa-fw" aria-hidden=true></i></a><a href=javascript:void(0); title="Share on Reddit" data-sharer=reddit data-url=https://152334H.github.io/blog/dn-2/><i class="fab fa-reddit fa-fw" aria-hidden=true></i></a><a href=javascript:void(0); title="Share on Line" data-sharer=line data-url=https://152334H.github.io/blog/dn-2/ data-title="Disco Narrator - Data Formatting"><i data-svg-src=https://cdn.jsdelivr.net/npm/simple-icons@7.3.0/icons/line.svg aria-hidden=true></i></a><a href=javascript:void(0); title="Share on 微博" data-sharer=weibo data-url=https://152334H.github.io/blog/dn-2/ data-title="Disco Narrator - Data Formatting"><i class="fab fa-weibo fa-fw" aria-hidden=true></i></a></span></div></div></div><div class=post-info-more><section class=post-tags><i class="fas fa-tags fa-fw" aria-hidden=true></i>&nbsp;<a href=/tags/disco-elysium/>Disco Elysium</a>,&nbsp;<a href=/tags/pandas/>pandas</a>,&nbsp;<a href=/tags/part-of-a-series/>part of a series</a>,&nbsp;<a href=/tags/wip/>WIP</a></section><section><span><a href=javascript:void(0); onclick=window.history.back()>Back</a></span>&nbsp;|&nbsp;<span><a href=/>Home</a></span></section></div><div class=post-nav><a href=/blog/funcoding-setup/ class=prev rel=prev title=Phonecoding><i class="fas fa-angle-left fa-fw" aria-hidden=true></i>Phonecoding</a>
+<a href=/blog/blog-refurbishment/ class=next rel=next title="Blog Refurbishment">Blog Refurbishment<i class="fas fa-angle-right fa-fw" aria-hidden=true></i></a></div></div><div id=comments><div id=giscus class=comment></div><noscript>Please enable JavaScript to view the comments powered by <a href=https://giscus.app>Giscus</a>.</noscript></div></article></div></main><footer class=footer><div class=footer-container><div class=footer-line itemscope itemtype=http://schema.org/CreativeWork><i class="far fa-copyright fa-fw" aria-hidden=true></i><span itemprop=copyrightYear>2022</span><span class=author itemprop=copyrightHolder>&nbsp;<a href=https://152334H.github.io/ target=_blank>152334H</a></span></div></div></footer></div><div id=fixed-buttons><a href=# id=back-to-top class=fixed-button title="Back to Top"><i class="fas fa-arrow-up fa-fw" aria-hidden=true></i>
+</a><a href=# id=view-comments class=fixed-button title="View Comments"><i class="fas fa-comment fa-fw" aria-hidden=true></i></a></div><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/katex.min.css><script type=text/javascript src=https://cdn.jsdelivr.net/npm/autocomplete.js@0.38.1/dist/autocomplete.min.js></script><script type=text/javascript src=https://cdn.jsdelivr.net/npm/lunr@2.3.9/lunr.min.js></script><script type=text/javascript src=https://cdn.jsdelivr.net/npm/lazysizes@5.3.2/lazysizes.min.js></script><script type=text/javascript src=https://cdn.jsdelivr.net/npm/twemoji@14.0.2/dist/twemoji.min.js></script><script type=text/javascript src=https://cdn.jsdelivr.net/npm/clipboard@2.0.11/dist/clipboard.min.js></script><script type=text/javascript src=https://cdn.jsdelivr.net/npm/sharer.js@0.5.1/sharer.min.js></script><script type=text/javascript src=https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/katex.min.js></script><script type=text/javascript src=https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/auto-render.min.js></script><script type=text/javascript src=https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/copy-tex.min.js></script><script type=text/javascript src=https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/mhchem.min.js></script><script type=text/javascript>window.config={code:{copyTitle:"Copy to clipboard",maxShownLines:10},comment:{giscus:{category:"Announcements",categoryId:"DIC_kwDOH03r284CQ2Tu",darkTheme:"dark_dimmed",emitMetadata:"0",inputPosition:"bottom",lang:"en",lazyLoading:!1,lightTheme:"light",mapping:"pathname",reactionsEnabled:"1",repo:"152334H/152334h.github.io",repoId:"R_kgDOH03r2w"}},math:{delimiters:[{display:!0,left:"$$",right:"$$"},{display:!0,left:"\\[",right:"\\]"},{display:!0,left:"\\begin{equation}",right:"\\end{equation}"},{display:!0,left:"\\begin{equation*}",right:"\\end{equation*}"},{display:!0,left:"\\begin{align}",right:"\\end{align}"},{display:!0,left:"\\begin{align*}",right:"\\end{align*}"},{display:!0,left:"\\begin{alignat}",right:"\\end{alignat}"},{display:!0,left:"\\begin{alignat*}",right:"\\end{alignat*}"},{display:!0,left:"\\begin{gather}",right:"\\end{gather}"},{display:!0,left:"\\begin{CD}",right:"\\end{CD}"},{display:!1,left:"$",right:"$"},{display:!1,left:"\\(",right:"\\)"}],strict:!1},search:{highlightTag:"em",lunrIndexURL:"/index.json",maxResultLength:10,noResultsFound:"No results found",snippetLength:30,type:"lunr"},twemoji:!0}</script><script type=text/javascript src=/js/theme.min.js></script><script type=text/javascript>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date),gtag("config","G-W0STJ4D3N3",{anonymize_ip:!0})</script><script type=text/javascript src="https://www.googletagmanager.com/gtag/js?id=G-W0STJ4D3N3" async></script></body></html>
