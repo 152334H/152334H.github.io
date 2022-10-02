@@ -176,7 +176,7 @@ Although I started playing Advent of Code to learn programming, I mostly do it f
 {{< icon rust >}}
 
 [![Badge](https://cp-logo.vercel.app/codeforces/152334H)](https://codeforces.com/profile/152334H)
-[![Leetcode Badge](https://img.shields.io/badge/Leetcode-2129-GREEN.svg)](https://leetcode.com/152334H/)
+[![Leetcode Badge](https://img.shields.io/badge/Leetcode-2181-blue.svg)](https://leetcode.com/152334H/)
 [Kattis](https://open.kattis.com/users/sczs2)
 
 While I'm not a Real™ Competitive Programmer, I play contests every now and then for fun, as well as to keep myself qualified for basic coding interviews.
