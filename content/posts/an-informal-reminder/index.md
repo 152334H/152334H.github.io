@@ -3,7 +3,7 @@ title: "An Informal Reminder"
 date: 2022-12-02T05:15:20+08:00
 author: "152334H"
 
-lastmod: 2022-12-02T05:15:20+08:00
+lastmod: 2022-12-02T11:45:20+08:00
 featuredImagePreview: ""
 featuredImage: ""
 
@@ -52,5 +52,8 @@ ChatGPT is currently [free for public use](https://chat.openai.com/chat). There 
 * [A comparison with Google](https://twitter.com/jdjkelly/status/1598021488795586561)
 * [`longwest_incweasing_subseqence(aww)`](https://cdn.discordapp.com/attachments/730095596861521970/1047854144817479711/Screenshot_2022-12-01_at_13-37-45_ChatGPT.png)
 * The samples from [OpenAI](https://openai.com/blog/chatgpt/#samples)
-
+* [Decompiling assembly](https://twitter.com/sagitz_/status/1598426274157961229)
+* [Fixing and Diagnosing problems in AWS IAM Policies](https://twitter.com/iangcarroll/status/1598171507062022148)
+* [Making a React login page](https://cln.sh/X4p01n)
+* [Bubblesort explained by a 40's gangsta](https://twitter.com/goodside/status/1598129631609380864)
 
