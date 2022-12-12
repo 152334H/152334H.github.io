@@ -8,7 +8,7 @@ featuredImagePreview: ""
 featuredImage: ""
 
 draft: false
-subtitle: ""
+subtitle: "<span style=color:grey>Alt title: <i>Please help me fact-check my code</i></span>"
 description: ""
 tags: ["machine learning", "language models", "research"]
 categories: ["tech"]
@@ -19,7 +19,7 @@ categories: ["tech"]
 
 * <u>**GPT-NeoX-20B appears to be anisotropic**</u> (Isotropy: 0.197)
 * Int8 quantisation appears to have ~no effect on isotropy 
-* I am new to ML so the above could be false
+* I am new to ML so the above could be false, feel free to poke at my findings [here](https://github.com/152334H/Contrastive_Search_Is_What_You_Need/tree/main/isotropy_analysis)
 
 <!--more-->
 
@@ -170,5 +170,4 @@ Probably not.
 I tested int8 quantisised vs fp16/fp32 models, and got mostly identical results.
 
 I can't rule out the possibility that my code/hardware is broken specifically for NeoX-20B, but I think the experiments I've done are strong indicators that bugged code is probably not the cause of the observed anisotropy.
-
 
