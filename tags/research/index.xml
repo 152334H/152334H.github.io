@@ -2,5 +2,5 @@
 <ul>
 <li><u><strong>GPT-NeoX-20B appears to be anisotropic</strong></u> (Isotropy: 0.197)</li>
 <li>Int8 quantisation appears to have ~no effect on isotropy</li>
-<li>I am new to ML so the above could be false</li>
+<li>I am new to ML so the above could be false, feel free to poke at my findings <a href="https://github.com/152334H/Contrastive_Search_Is_What_You_Need/tree/main/isotropy_analysis" target="_blank" rel="noopener noreffer ">here</a></li>
 </ul>]]></description></item></channel></rss>
