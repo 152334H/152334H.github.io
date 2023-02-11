@@ -10,7 +10,7 @@ featuredImage: ""
 draft: false
 subtitle: "A surprisingly cunning move"
 description: ""
-tags: [ "machine learning" ]
+tags: [ "machine learning", "TTS" ]
 categories: [ "tech" ]
 
 ---

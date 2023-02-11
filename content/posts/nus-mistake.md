@@ -10,7 +10,7 @@ featuredImage: ""
 draft: false
 subtitle: "truncuated"
 description: ""
-tags: ["sg"]
+tags: ["sg", "personal"]
 categories: ["opinion"]
 
 ---
