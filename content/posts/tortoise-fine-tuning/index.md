@@ -15,7 +15,7 @@ categories: [ "tech" ]
 
 ---
 
-[TorToiSe :turtle:](http://nonint.com/static/tortoise_v2_examples.html) is an open-source Text-To-Speech (TTS) neural network that <a href="#" title="It is also notable for its alleged similiarity to 11labs's TTS stack." style="color:#bbb;text-decoration-style: dotted;text-decoration-line:underline">creates fairly authentic & realistic voices</a>. Checkpoints for local inference have been available since [April last year](https://huggingface.co/jbetker/tortoise-tts-v2/tree/main/.models), but its users are seemingly unable to fine-tune the model with additional voice data.
+[TorToiSe :turtle:](http://nonint.com/static/tortoise_v2_examples.html) is an open-source Text-To-Speech (TTS) neural network that <abbr tabindex="0" title="It is also notable for its alleged similiarity to 11labs's TTS stack." style="color:#bbb;text-decoration-style: dotted;text-decoration-line:underline">creates fairly authentic & realistic voices</abbr>. Checkpoints for local inference have been available since [April last year](https://huggingface.co/jbetker/tortoise-tts-v2/tree/main/.models), but its users are seemingly unable to fine-tune the model with additional voice data.
 
 Why is this the case, and how could it be fixed?
 
