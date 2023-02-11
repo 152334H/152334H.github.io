@@ -7,7 +7,7 @@ lastmod: 2023-02-11T08:13:30+08:00
 featuredImagePreview: ""
 featuredImage: ""
 
-draft: true
+draft: false
 subtitle: "A surprisingly cunning move"
 description: ""
 tags: [ "machine learning" ]
