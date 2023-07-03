@@ -4,7 +4,6 @@ date:   2022-10-02 00:00:00 +0800
 author: "152334H"
 
 lastmod:   2021-10-02 00:00:00 +0800
-
 draft: false
 subtitle: "<code>srand()</code> but cooler"
 tags: [ "code", "python" ]
@@ -19,6 +18,9 @@ Let's say, for [some odd reason](https://huggingface.co/blog/stable_diffusion), 
 Then, it's likely you'll introduce a subtle randomness bug that leads to duplicate seeds appearing. Let me explain:
 
 <!--more-->
+
+<iframe id="AudioNativeElevenLabsPlayer" width="100%" height="180" frameBorder="no" scrolling="no" seamless src="https://beta.elevenlabs.io/player/index.html?publicUserId=01e30727d011cacbba870a0524d6020b350e4855e45a2854e421a4f6152a9f30"></iframe>
+<script src="https://beta.elevenlabs.io/player/audioNativeHelper.js" type="text/javascript"></script>
 
 {{< admonition info "Regarding Reproducibility" false >}}
 The following tests were done on a Ubuntu 20.04 LTS Hetzner instance using:
