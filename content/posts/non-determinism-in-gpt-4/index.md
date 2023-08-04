@@ -162,9 +162,10 @@ Before I noticed the `logit_bias` problem, I also obtained the following results
 ### Yes, I'm sure
 The number of unique completions from GPT-4 is **ridiculously** high -- practically *always* non-deterministic with longer outputs. This almost certainly confirms that something is up with GPT-4.
 
-Additionally, all other models that do not collapse into a repetitive useless loop experience some degree of non-determinism as well. This lines up with the public claim that unreliable GPU calculations are responsible for some degree of randomness.
+Additionally, all other models that do not collapse into a repetitive useless loop experience some degree of non-determinism as well. This lines up with the public claim that unreliable GPU calculations are responsible for some degree of randomness. However,
 
-However, I'm still partially confused by the gradual increase in randomness from text-davinci-001 up to gpt-3.5-turbo. I don't have a neat explanation for why 003 is reliably more random than 001, or turbo more so than 003. Although I expect only the chat models to be MoE models, and not any of the 3.5 completion models, I don't feel confident based on the current evidence available.
+1. I'm still partially confused by the gradual increase in randomness from text-davinci-001 up to gpt-3.5-turbo. I don't have a neat explanation for why 003 is reliably more random than 001, or turbo more so than 003. Although I expect only the chat models to be MoE models, and not any of the 3.5 completion models, I don't feel confident based on the current evidence available.
+2. This is only evidence that *something* is causing GPT-4 to be much, much more non-deterministic than other models. Maybe I'm still completely wrong about the MoE part. Maybe it's just because of parameter count. (but then -- why would Turbo be more unpredictable than davinci? Turbo's faster; if you assumed the same architecture, Turbo ought to be smaller)
 
 ## Implications
 
@@ -173,7 +174,7 @@ It's actually pretty crazy to me, that this looks true. For a few reasons:
 ### We're so far behind
 *If* the non-determinism is an inherent feature of batched inference with Sparse MoE, then this fact should be visibly obvious to anyone that works with models in that vein.
 
-Given that the vast majority of GPT-4 users still have no idea what is causing their API calls to be unreliable, it should be concluded that too few people know anything about MoE models to launch this explanation into the public consciousness.
+Given that the vast majority of GPT-4 users still have no idea what is causing their API calls to be unreliable, it should be concluded that (I am completely wrong, OR) too few people know anything about MoE models to launch this explanation into the public consciousness.
 
 It implies that Google Deepmind knew, and found it trivial enough to write as a throwaway sentence in a paper. It implies that I should be a lot more bullish on them, and a lot more bearish against every other wannabe foundation model org that's still working on dense models only.
 
