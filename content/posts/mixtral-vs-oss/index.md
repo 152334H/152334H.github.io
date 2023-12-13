@@ -7,7 +7,7 @@ lastmod: 2023-12-13T20:12:34+08:00
 featuredImagePreview: ""
 featuredImage: ""
 
-draft: true
+draft: false
 subtitle: "Draft post, incomplete, epistemtically uncertain, etc"
 description: ""
 tags: ["machine learning", "llms", "moe"]
