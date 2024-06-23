@@ -78,9 +78,21 @@ So they do some isoflops scaling experiments on [batch size, lr, compute budget 
    I have contentions with their intuitions as described above, but the empirical results are important.
 
 Note that:
-* the param initialisation used for any of their experiments. i.e. no mUP && presumed const stddev = 0.006 for everything. Or maybe they used default torch init?
-* the equation for $M$ only makes sense if you have no attention mask && you do MHA && have a constant 8/3 FFN ratio w/ GLU.
-* they never state how they determine which of $L,D$ to vary (or how much to vary) when $M$ is changed. Kaplan 2020 implies it shouldn't matter too much whether they varied L or D more, though.
+ * the param initialisation used for any of their experiments.
+
+   Presumably, there was no mUP-like initialisation scaling involved, and they used $\mathcal{N}(0, 0.006^2)$ for everything. Or maybe they used default torch init?
+ * they never state how they determine which of $L,D$ to vary (or how much to vary) when $M$ is changed. Kaplan 2020 implies it shouldn't matter too much whether they varied L or D more, though.
+ * the equation for $M$ only makes sense if you have no attention mask && you do MHA && have a constant 8/3 FFN ratio w/ GLU (or a FFN ratio of 4 for a non-GLU model) && you ignore lmhead FLOPs.
+
+   If you parameterize $R_{kv} = \frac{\text{k or v heads}}{\text{q heads}}$ and $R_{\text{ffn}} = 4$, you should instead have
+     * $M_{\text{ffn}} = 2\cdot D\cdot D\cdot R_{\text{ffn}}\cdot 6 = 12 \cdot R_{\text{ffn}} \cdot D^2$ and
+     * $M_{\text{att}} = 2\cdot D\cdot D\cdot (1 + R_{kv})\cdot 6 = 12 \cdot (1 + R_{kv}) \cdot D^2$
+     * $M_{\text{sdpa}} \approx 6\cdot D\cdot L\cdot l_{seq}$ for causal attention
+     * $M_{\text{lmhead}} = V \cdot D \cdot 6$ for an output vocab of size $V$.
+
+   for a total of $M = 12D^2L(1 + R_{kv} + R_{ffn}) + 6DL\cdot l_{seq} + 6DV$
+
+   $= 6D(2DL(1+R_{kv}+R_{ffn}) + L\cdot l_{seq} + V)$.
 
 In any case, their predictions hold up to 67B scale, so I don't have a good empirical reason to complain.
 
