@@ -25,7 +25,7 @@ It's [well-known](https://twitter.com/BorisMPower/status/1608522707372740609) at
 When asked about this behaviour at the [developer roundtables](https://humanloop.com/blog/openai-plans) during OpenAI's World Tour, the responses of the members of technical staff were something along the lines of,
 > Honestly, we're confused as well. We think there might be some bug in our systems, or some [non-determinism in optimized floating point calculations](https://twitter.com/taliaringer/status/1511411984398487564)...
 
-And internally, I was thinking -- okay, I know the latter point is true sometimes, and maybe OpenAI doesn't have enough engineers to look into a problem as small as this. I felt a little bit [confused](https://www.lesswrong.com/s/zpCiuR4T343j9WkcK) when I noticed a reference to this behavior [over 3 years ago](https://community.openai.com/t/a-question-on-determinism/8185/2) -- 3 years, and this couldn't be fixed?
+And internally, I was thinking -- okay, I know the latter point is true sometimes, and maybe OpenAI doesn't have enough engineers to look into a problem as small as this. I felt a little bit [confused](https://www.lesswrong.com/s/zpCiuR4T343j9WkcK) when I noticed a reference to this behavior [over 2 years ago](https://community.openai.com/t/a-question-on-determinism/8185/2) -- 2 years, and this couldn't be fixed?
 
 But I didn't have a meaningful alternative explanation for the phenomenon. After all, why would you *want* to keep things random? Ilya's always going on about [reliability](https://www.youtube.com/watch?v=Yf1o0TQzry8), right? There was no way OpenAI _wanted_ to keep determinism bugged, so an unresolvable hardware limitation was the best explanation.
 

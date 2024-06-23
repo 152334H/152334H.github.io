@@ -104,7 +104,7 @@ buildFuture = true # enable for development. on the repo, posts will only be com
       enable = true
       avatarURL = "/images/github_pfp.png"
       title = "152334H"
-      subtitle = "the retired pwn guy"
+      subtitle = "main"
       typeit = true
       social = true
     [params.home.posts]
