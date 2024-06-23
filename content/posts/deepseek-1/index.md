@@ -58,7 +58,7 @@ They use VLLM for inference.
 
 ### Scaling experiments
 
-Instead of using the traditional $C=6ND$, they do $C=MD$, where $M = 72L\cdot D^2 + 12L\cdot D\cdot l_{seq}$ is the **non-embedding FLOPs per token**. This accounts for SDPA flops (though not causal?) and ignores embedding layer.
+Instead of using the traditional $C=6ND$, they do $C=MD$, where $M = 72L\cdot D^2 + 12L\cdot D\cdot l_{seq}$ is the **non-embedding FLOPs per token**. This accounts for SDPA flops and ignores embedding layer.
 
 So they do some isoflops scaling experiments on [batch size, lr, compute budget $C$]:
 
@@ -77,7 +77,12 @@ So they do some isoflops scaling experiments on [batch size, lr, compute budget 
    {{< figure src="Pasted%20image%2020240623143536.png" caption="" >}}
    I have contentions with their intuitions as described above, but the empirical results are important.
 
-Also: as far as I can tell, they do not mention the param initialisation used in any of their experiments, which is weird. Their predictions held up to 67B scale, though. Probably fine?
+Note that:
+* the param initialisation used for any of their experiments. i.e. no mUP && presumed const stddev = 0.006 for everything. Or maybe they used default torch init?
+* the equation for $M$ only makes sense if you have no attention mask && you do MHA && have a constant 8/3 FFN ratio w/ GLU.
+* they never state how they determine which of $L,D$ to vary (or how much to vary) when $M$ is changed. Kaplan 2020 implies it shouldn't matter too much whether they varied L or D more, though.
+
+In any case, their predictions hold up to 67B scale, so I don't have a good empirical reason to complain.
 
 ### Alignment
 1.5 mil CN+EN instructions. 20% of those are for safety refusals; of the remaining 80% they have around $\frac{2}{9}$ code $\frac{4}{9}$ maths $\frac{1}{3}$ language tasks.
