@@ -78,7 +78,7 @@ So they do some isoflops scaling experiments on [batch size, lr, compute budget 
    I have contentions with their intuitions as described above, but the empirical results are important.
 
 Note that:
- * the param initialisation used for any of their experiments.
+ * they never mention the param initialisation used for any of their experiments.
 
    Presumably, there was no mUP-like initialisation scaling involved, and they used $\mathcal{N}(0, 0.006^2)$ for everything. Or maybe they used default torch init?
  * they never state how they determine which of $L,D$ to vary (or how much to vary) when $M$ is changed. Kaplan 2020 implies it shouldn't matter too much whether they varied L or D more, though.
