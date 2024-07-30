@@ -9,7 +9,7 @@ featuredImage: ""
 
 draft: false
 subtitle: "How to burn US$10,000,000 on an arXiv preprint"
-tags: [ machine learning, DeepSeek, llm, series ]
+tags: [ machine learning, paper, llm, series ]
 categories: ["tech"]
 
 ---
