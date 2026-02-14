@@ -3,7 +3,7 @@ title: "The making of: Disco Narrator"
 date: 2022-09-11T00:00:00+01:00
 author: "152334H"
 
-lastmod: 2022-09-18T:00:00+01:00
+lastmod: 2022-09-18T00:00:00+01:00
 
 subtitle: "Status: <i>In progress</i>"
 tags: [ machine learning, Disco Elysium, WIP, series ]

@@ -3,7 +3,9 @@ theme = "LoveIt"
 title = "152334H"
 languageCode = "en"
 languageName = "English"
-paginate = 5
+
+[pagination]
+  pagerSize = 5
 
 googleAnalytics = "G-W0STJ4D3N3"
 
@@ -13,7 +15,7 @@ enableEmoji = true
 
 buildFuture = true # enable for development. on the repo, posts will only be committed on time.
 
-[author]
+[params.author]
   name = "152334H"
   email = ""
   link = "https://152334H.github.io/"
@@ -222,5 +224,5 @@ buildFuture = true # enable for development. on the repo, posts will only be com
   page = ["HTML"]
   section = ["HTML", "RSS"]
   taxonomy = ["HTML", "RSS"]
-  taxonomyTerm = ["HTML"]
+  term = ["HTML"]
 
