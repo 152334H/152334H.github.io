@@ -3,7 +3,7 @@ title: "About"
 date: 2022-08-12T13:09:50+01:00
 author: "152334H"
 
-lastmod: 2022-08-17T00:00:00+01:00
+lastmod: 2026-03-07T00:00:00+01:00
 
 draft: false
 subtitle: "So, tell me about yourself..."
@@ -19,7 +19,51 @@ toc: true
 This is the personal site of Sherman Chann (aka `152334H`) 
 {{< /admonition >}}
 
-## Stuff I've done
+## [2022+] AI stuff
+In what is surely a fairly common life story, in 2022 I rescoped my life to be defined by AI progress.
+
+### Cyber, again
+Recently, I've been abusing innocent coding models for various grey-area cybersecurity tasks.
+
+For example, in [kctf-eval](/blog/kctf-eval/), I took coding agents to task on certain KernelCTF problems, comparing them with painstakingly developed human solutions.
+
+{{< admonition question "But why?">}}
+Ignoring the more circumstantial answers,
+
+In 2025, much of the intelligence gains of AI progress were just beyond my ability to grasp. I think it's not easy to internalize the capabilities gap, between a model that gets [Silver](https://deepmind.google/blog/ai-solves-imo-problems-at-silver-medal-level/) or [Gold](https://github.com/aw31/openai-imo-2025-proofs) on IMO, if you've gotten neither.
+
+But on binexp -- I can still feel it. The visceral sense of intelligence, the awe of ingenuity, the intrinsic fear and sensation that the world is not ready for it...
+{{< /admonition >}}
+
+### Pseudonymous work
+Like many other young members of the AI community, I have done my fair share of public AI research, under various pseudonyms online.
+
+Among other things, I spent several months rigorously investigating the compute efficiency and scaling behavior of a [novel hierarchical language modelling architecture](https://arxiv.org/abs/2507.07955).
+
+Although technically interesting -- I'm happy to talk about anything pretraining, really -- none of my research produced positive results, and I don't feel a particularly strong need to cite them directly.
+
+### Home node
+My main workstation for hobbyist AI work is a 8x3090 + 4090-48GB node. Pictures:
+
+{{< figure src="rack.jpg" >}}
+
+{{< figure src="nvtop.png" >}}
+
+### ElevenLabs
+I spent slightly under two years (April 2023 - Jan 2025) at 11labs, working on training infrastructure and MLLM research.
+
+Although I played a significant role in the pretraining infrastructure/optimization for [Eleven v3](https://elevenlabs.io/v3), as well as certain smaller projects and pieces of glue, the key research innovations should always be attributed to smarter people from the company, not me.
+
+To this day, I still receive monthly LinkedIn spam about speech research consultations, so to be absolutely 100% clear: **I know nothing, don't ask**.
+
+### Open source stuff
+Before I got roped into closed source startups, I was fairly active in the budding Stable Diffusion communities of 2022, as well as certain TTS communities, both oriented around specific internet subcultures.
+
+I have the dubious honor of being the first person to proliferate fine-tuning support for [tortoise-tts](/blog/tortoise-fine-tuned/).
+
+---
+
+## [2019-2021] Stuff I've done
 _Weakly sorted by chronology_
 
 {{< admonition type=tip title="Psst..." open=false >}}
@@ -168,7 +212,7 @@ I used to be _very_ active in the CTF scene. My old [CTFTime profile](https://ct
 | [2020](https://github.com/152334H/aoc_2020) | 28 | Python |
 | [2021](https://github.com/152334H/aoc) | 372 | Python |
 
-Although I started playing Advent of Code to learn programming, I mostly do it for the fun of it, nowadays.
+Although I started playing Advent of Code to learn programming, I stopped after reading [the Scaling Hypothesis](https://gwern.net/scaling-hypothesis).
 
 ### Other programming problems
 {{< icon python >}}
@@ -179,7 +223,7 @@ Although I started playing Advent of Code to learn programming, I mostly do it f
 [![Leetcode Badge](https://img.shields.io/badge/Leetcode-2181-blue.svg)](https://leetcode.com/152334H/)
 [Kattis](https://open.kattis.com/users/sczs2)
 
-While I'm not a Real™ Competitive Programmer, I play contests every now and then for fun, as well as to keep myself qualified for basic coding interviews.
+As with AoC, I stopped working on Competitive Programming around 2022.
 
 ### Open source contributions
 {{< icon gnubash >}}
@@ -191,10 +235,9 @@ While I'm not a Real™ Competitive Programmer, I play contests every now and th
 I've made minor contributions to other people's repositories. See my [GitHub profile](https://github.com/152334H) for more info.
 
 ## Academics 
+In 2023, I matriculated at the National University of Singapore, under their Bachelor of Computer Science program. Subsequently, I dropped out to pursue full time employment at [ElevenLabs](https://en.wikipedia.org/wiki/ElevenLabs).
+
 I'm an alumnus of [Hwa Chong Institution](https://www.hci.edu.sg/) (College), and spent most of my free time there helping out the [Cybersecurity Section](https://irscybersec.ml/) of the Infocomm and Robotics Society ([IRS](https://infocommsociety.com/)).
 
 Some info that will only make sense to Singaporean eggheads: PCMH+H3 Chem, AAAA/AD+Dist, SSEF, SChO.
 I include this for completion's sake; most readers probably don't care about this.
-
-## My religious beliefs
-Ubuntu, neovim, tabs > splits, tmux, docker, python3 (4 spaces per indent), Rust > C*, typescript, printf-debugging, `Casing_doesNotMatter`, iterators > indexing, Copilot, industry collapse by 2030.
