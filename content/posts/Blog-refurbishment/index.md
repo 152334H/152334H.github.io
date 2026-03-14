@@ -7,7 +7,6 @@ lastmod: 2022-08-13T05:30:32+01:00
 featuredImagePreview: ""
 featuredImage: ""
 
-weight: 1
 draft: false
 subtitle: "Under new management"
 description: "Under new management"
