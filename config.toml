@@ -4,6 +4,8 @@ title = "152334H"
 languageCode = "en"
 languageName = "English"
 
+buildDrafts = true
+
 [pagination]
   pagerSize = 5
 

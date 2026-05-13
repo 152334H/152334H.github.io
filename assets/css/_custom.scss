@@ -1,0 +1,43 @@
+// ==============================
+// Custom style
+// 自定义样式
+// ==============================
+
+@media (pointer: coarse), (hover: none) {
+  [title] {
+    position: relative;
+    display: inline-flex;
+    justify-content: center;
+  }
+  [title]:focus::after {
+    content: attr(title);
+    position: absolute;
+    top: 90%;
+    color: #000;
+    background-color: #bbb;
+    border: 1px solid;
+    width: fit-content;
+    padding: 3px;
+  }
+}
+
+.draft-badge {
+  display: inline-block;
+  vertical-align: middle;
+  margin-right: 0.4em;
+  padding: 0.1em 0.5em;
+  font-size: 0.5em;
+  font-weight: 600;
+  line-height: 1.4;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #c0392b;
+  background-color: transparent;
+  border: 1.5px solid #c0392b;
+  border-radius: 3px;
+}
+
+[theme="dark"] .draft-badge {
+  color: #ff8a7a;
+  border-color: #ff8a7a;
+}
